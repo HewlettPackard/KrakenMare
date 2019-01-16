@@ -1,0 +1,12 @@
+stages:
+  - deploy
+
+deploy-demo-u176i108:
+  stage: deploy
+  tags:
+    - u176i108
+  script:
+    - (cd demo && docker-compose down && docker-compose up --detach)
+  environment:
+    name: u176i108
+    url: https://16.19.176.108/
