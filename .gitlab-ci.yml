@@ -5,6 +5,9 @@ deploy-demo-u176i108:
   stage: deploy
   tags:
     - u176i108
+  variables:
+    DOCKER_HOST_IP: 16.19.176.108
+    PUBLIC_IP: 16.19.176.108
   script:
     - (cd demo && docker-compose down && docker-compose up --detach)
   environment:
