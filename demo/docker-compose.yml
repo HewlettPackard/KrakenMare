@@ -197,17 +197,17 @@ services:
       SCHEMAREGISTRY_URL: 'http://${PUBLIC_IP}:8081'
     restart: always
 
-#  kafka-manager:
-#    image: trivadisbds/kafka-manager
-#    hostname: kafka-manager
-#    depends_on:
-#      - zookeeper
-#    ports:
-#      - "39000:9000"
-#    environment:
-#      ZK_HOSTS: 'zookeeper:2181'
-#      APPLICATION_SECRET: 'letmein'
-#    restart: always
+  kafka-manager:
+    image: trivadisbds/kafka-manager
+    hostname: kafka-manager
+    depends_on:
+      - zookeeper
+    ports:
+      - "39000:9000"
+    environment:
+      ZK_HOSTS: 'zookeeper:2181'
+      APPLICATION_SECRET: 'letmein'
+    restart: always
 
   streamsets:
     image: trivadisbds/streamsets-kafka-nosql
