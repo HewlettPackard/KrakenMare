@@ -239,8 +239,8 @@ services:
       - broker-1
       - connect
       - ksql-server
-    volumes:
-      - $PWD/scripts/ksql/ksqlcommands:/tmp/ksqlcommands
+#    volumes:
+#      - $PWD/scripts/ksql/ksqlcommands:/tmp/ksqlcommands
     entrypoint: /bin/sh
     tty: true
     restart: always
