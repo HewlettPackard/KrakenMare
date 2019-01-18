@@ -18,7 +18,7 @@ stages:
 deploy-demo-u176i108:
   <<: *demo-u176i108
   script:
-    - (cd demo && docker-compose up --detach)
+    - (cd demo && docker-compose up --build --detach)
   environment:
     <<: *u176i108
     on_stop: stop-demo-u176i108

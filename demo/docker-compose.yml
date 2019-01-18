@@ -232,6 +232,15 @@ services:
     volumes:
       - ./mosquitto/mosquitto-1.conf:/mosquitto/config/mosquitto.conf
 
+  simulator:
+    build:
+      context: simulator
+      dockerfile: Dockerfile
+    hostname: simulator
+    depends_on:
+      - mosquitto-1
+    restart: always
+
   ksql-cli:
     image: confluentinc/cp-ksql-cli:5.0.0
     container_name: ksql-cli
