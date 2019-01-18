@@ -1,0 +1,35 @@
+stages:
+  - deploy
+
+.u176i108: &u176i108
+    name: u176i108
+    url: https://16.19.176.108/
+
+.demo-u176i108: &demo-u176i108
+  stage: deploy
+  tags:
+    - u176i108
+  variables:
+    DOCKER_HOST_IP: 16.19.176.108
+    PUBLIC_IP: 16.19.176.108
+  environment:
+    <<: *u176i108
+
+deploy-demo-u176i108:
+  <<: *demo-u176i108
+  script:
+    - (cd demo && docker-compose up --detach)
+  environment:
+    <<: *u176i108
+    on_stop: stop-demo-u176i108
+
+stop-demo-u176i108:
+  <<: *demo-u176i108
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - (cd demo && docker-compose down)
+  when: manual
+  environment:
+    <<: *u176i108
+    action: stop
