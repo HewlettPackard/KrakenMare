@@ -239,6 +239,8 @@ services:
     hostname: simulator
     depends_on:
       - mosquitto-1
+    environment:
+      MOSQUITTO_IP: '${DOCKER_HOST_IP}'
     restart: always
 
   ksql-cli:

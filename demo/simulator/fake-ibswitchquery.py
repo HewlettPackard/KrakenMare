@@ -1,6 +1,7 @@
 import subprocess
 import json
 import time
+import os
 from random import *
 
 # Read formatted JSON data that describes the switches in the IRU (c stands for CMC)
@@ -63,4 +64,4 @@ for cmc in ['r1i0c-ibswitch','r1i1c-ibswitch']:
       with open(output, 'w') as g:
          json.dump(query_output,g)
 
-      subprocess.call(["mosquitto_pub","-t","ibswitch","-f",output])
+      subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",output])
