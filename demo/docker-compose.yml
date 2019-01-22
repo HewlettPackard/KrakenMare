@@ -120,7 +120,9 @@ services:
     restart: always
       
   connect:
-    image: confluentinc/cp-kafka-connect:5.0.0
+    build:
+      context: kafka-connect
+      dockerfile: Dockerfile
     hostname: connect
     depends_on:
       - zookeeper
@@ -149,9 +151,7 @@ services:
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/custom-plugins"
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-4.0.0.jar
-    volumes:
-      - $PWD/kafka-connect:/etc/kafka-connect/custom-plugins
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.0.0.jar
     restart: always
 
   rest-proxy:
