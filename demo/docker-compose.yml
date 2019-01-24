@@ -169,6 +169,18 @@ services:
       KAFKA_REST_HOST_NAME: 'rest-proxy'
     restart: always
 
+  topics-ui:
+    image: landoop/kafka-topics-ui
+    hostname: topics-ui
+    depends_on:
+      - rest-proxy
+    ports:
+      - "8005:8000"
+    environment:
+      KAFKA_REST_PROXY_URL: 'http://${DOCKER_HOST_IP}:8084'
+      PROXY: 'true'
+    restart: always
+
   ksql-server:
     image: confluentinc/cp-ksql-server:5.0.0
     hostname: ksql-server
