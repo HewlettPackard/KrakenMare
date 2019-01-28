@@ -21,7 +21,7 @@ while True:
       # For data counters add randint[1000,4000]
       # for packet counters add randint[100,400]
       now=time.time()
-      nowint=long(now)
+      nowint=int(round(now))
 
       for switch in query_data['Switch']:
          hca=str(switch['HCA'])
