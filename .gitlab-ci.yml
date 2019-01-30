@@ -7,7 +7,6 @@ deploy-demo-u176i108: &demo-u176i108
     - u176i108
   variables:
     DOCKER_HOST_IP: 16.19.176.108
-    PUBLIC_IP: 16.19.176.108
   environment: &u176i108
     name: u176i108
     url: http://16.19.176.108:39000/
