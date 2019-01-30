@@ -257,7 +257,6 @@ services:
 
   ksql-cli:
     image: confluentinc/cp-ksql-cli:5.0.0
-    container_name: ksql-cli
     depends_on:
       - broker-1
       - connect
