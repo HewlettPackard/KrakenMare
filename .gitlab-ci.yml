@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-deploy-demo-u176i108: &demo-u176i108
+deploy-dev: &deploy-dev
   stage: deploy
   tags:
     - u176i108
@@ -10,12 +10,14 @@ deploy-demo-u176i108: &demo-u176i108
   environment: &u176i108
     name: u176i108
     url: http://16.19.176.108:39000/
-    on_stop: stop-demo-u176i108
+    on_stop: stop-dev
   script:
     - (cd demo && docker-compose up --build --remove-orphans --detach)
+  except:
+    - master
 
-stop-demo-u176i108:
-  <<: *demo-u176i108
+stop-dev:
+  <<: *deploy-dev
   variables:
     GIT_STRATEGY: none
   environment:
@@ -24,3 +26,17 @@ stop-demo-u176i108:
   script:
     - (cd demo && docker-compose down)
   when: manual
+
+deploy-master: &deploy-master
+  stage: deploy
+  tags:
+    - u176i109
+  variables:
+    DOCKER_HOST_IP: 16.19.176.109
+  environment: &u176i109
+    name: u176i109
+    url: http://16.19.176.109:39000/
+  script:
+    - (cd demo && docker-compose down && docker-compose up --build --remove-orphans --detach)
+  only:
+    - master
