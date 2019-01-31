@@ -5,7 +5,6 @@ echo "removing MQTT Source Connector"
 curl -X "DELETE" "$DOCKER_HOST_IP:8083/connectors/mqtt-source"
 
 echo ""
-
 echo "creating MQTT Source Connector"
 
 curl -X "POST" "$DOCKER_HOST_IP:8083/connectors" \
@@ -15,7 +14,7 @@ curl -X "POST" "$DOCKER_HOST_IP:8083/connectors" \
   "config": {
     "connector.class": "com.datamountaineer.streamreactor.connect.mqtt.source.MqttSourceConnector",
     "tasks.max": "1",
-    "topics": "ibswitch",
+    "topics": "fabric",
     "connect.mqtt.connection.clean": "true",
     "connect.mqtt.connection.timeout": "1000",
     "connect.mqtt.kcql": "INSERT INTO fabric SELECT * FROM ibswitch",
@@ -28,3 +27,6 @@ curl -X "POST" "$DOCKER_HOST_IP:8083/connectors" \
   }'
 
 echo ""
+echo "creating Kafka topic"
+
+kafka-topics --zookeeper zookeeper:2181 --topic fabric --partitions 3 --replication-factor 3 --create
