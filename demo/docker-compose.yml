@@ -155,6 +155,16 @@ services:
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.0.0.jar
     restart: always
 
+  connect-ui:
+    image: landoop/kafka-connect-ui
+    hostname: connect-ui
+    depends_on:
+      - connect
+    ports:
+      - "8001:8000"
+    environment:
+      CONNECT_URL: 'http://connect:8083'
+
   rest-proxy:
     image: confluentinc/cp-kafka-rest:5.0.0
     hostname: rest-proxy
