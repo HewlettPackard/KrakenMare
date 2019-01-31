@@ -33,4 +33,10 @@ Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=htt
 
 STEP3
 
+export DOCKER_HOST_IP=1.2.3.4 (your system public IP)
+
 `cd demo && docker-compose up --build --remove-orphans -d`
+
+or 
+
+`cd demo && sudo -E docker-compose up --build --remove-orphans -d`
