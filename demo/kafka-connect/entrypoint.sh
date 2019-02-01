@@ -7,4 +7,4 @@ until curl connect:8083/connectors; do
 	sleep 5
 done
 
-./configure-mqtt-fabric.sh
+/etc/kafka-connect/configure-mqtt-fabric.sh
