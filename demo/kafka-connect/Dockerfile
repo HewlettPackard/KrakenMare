@@ -11,4 +11,7 @@ RUN export https_proxy=http://web-proxy.corp.hpecorp.net:8080 \
 
 COPY configure-mqtt-fabric.sh entrypoint.sh /etc/kafka-connect/
 
-ENTRYPOINT ["/etc/kafka-connect/entrypoint.sh"]
+# see https://github.com/confluentinc/cp-docker-images/issues/638
+ENV CONNECT_LOG4J_LOGGERS "org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR"
+
+CMD ["/etc/kafka-connect/entrypoint.sh"]
