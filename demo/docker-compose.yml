@@ -128,6 +128,7 @@ services:
       - zookeeper
       - broker-1
       - schema_registry
+      - mosquitto
     ports:
       - "8083:8083"
     environment:
@@ -153,6 +154,16 @@ services:
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.0.0.jar
     restart: always
+
+  connect-ui:
+    image: landoop/kafka-connect-ui
+    hostname: connect-ui
+    depends_on:
+      - connect
+    ports:
+      - "8001:8000"
+    environment:
+      CONNECT_URL: 'http://connect:8083'
 
   rest-proxy:
     image: confluentinc/cp-kafka-rest:5.0.0
@@ -235,14 +246,14 @@ services:
 #      - "28080:8080"
 #    restart: always
 
-  mosquitto-1:
+  mosquitto:
     image: eclipse-mosquitto:latest
-    hostname: mosquitto-1
+    hostname: mosquitto
     ports: 
       - "1883:1883"
       - "9001:9001"
     volumes:
-      - ./mosquitto/mosquitto-1.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   simulator:
     build:
@@ -250,7 +261,7 @@ services:
       dockerfile: Dockerfile
     hostname: simulator
     depends_on:
-      - mosquitto-1
+      - mosquitto
     environment:
       MOSQUITTO_IP: '${DOCKER_HOST_IP}'
     restart: always

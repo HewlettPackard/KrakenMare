@@ -10,3 +10,6 @@ RUN wget https://github.com/Landoop/stream-reactor/releases/download/1.2.0/kafka
     && mkdir /etc/kafka-connect/custom-plugins \
     && mv *.jar /etc/kafka-connect/custom-plugins
 
+COPY configure-mqtt-fabric.sh entrypoint.sh /etc/kafka-connect/
+
+ENTRYPOINT /etc/kafka-connect/entrypoint.sh
