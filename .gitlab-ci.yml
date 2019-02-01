@@ -24,7 +24,7 @@ stop-dev:
     <<: *u176i108
     action: stop
   script:
-    - (cd demo && docker-compose down)
+    - (cd demo && docker-compose down --remove-orphans)
   when: manual
 
 deploy-master: &deploy-master
@@ -37,6 +37,6 @@ deploy-master: &deploy-master
     name: u176i109
     url: http://16.19.176.109:39000/
   script:
-    - (cd demo && docker-compose down && docker-compose up --build --remove-orphans --detach)
+    - (cd demo && docker-compose down --remove-orphans && docker-compose up --build --detach)
   only:
     - master
