@@ -131,12 +131,7 @@ services:
       - mosquitto
     ports:
       - "8083:8083"
-    volumes:
-      - ./kafka-connect/configure-mqtt-fabric.sh:/tmp/configure-mqtt-fabric.sh
-    command:
-      ["bash", "-c", "/etc/confluent/docker/run; sleep 60; /tmp/configure-mqtt-fabric.sh"]
     environment:
-      DOCKER_HOST_IP: '${DOCKER_HOST_IP}'
       CONNECT_BOOTSTRAP_SERVERS: 'broker-1:9092'
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
       CONNECT_REST_PORT: 8083
