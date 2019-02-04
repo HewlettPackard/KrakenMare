@@ -1,0 +1,103 @@
+{
+  "type": "graph",
+  "title": "Symbol Error Counter",
+  "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 12
+  },
+  "id": 2,
+  "targets": [
+    {
+      "policy": "default",
+      "resultFormat": "time_series",
+      "orderByTime": "ASC",
+      "tags": [],
+      "groupBy": [
+        {
+          "type": "tag",
+          "params": [
+            "GUID"
+          ]
+        }
+      ],
+      "select": [
+        [
+          {
+            "type": "field",
+            "params": [
+              "SymbolErrorCounter"
+            ]
+          }
+        ]
+      ],
+      "refId": "A",
+      "measurement": "perfquery"
+    }
+  ],
+  "renderer": "flot",
+  "yaxes": [
+    {
+      "label": null,
+      "show": true,
+      "logBase": 1,
+      "min": null,
+      "max": null,
+      "format": "short"
+    },
+    {
+      "label": null,
+      "show": true,
+      "logBase": 1,
+      "min": null,
+      "max": null,
+      "format": "short"
+    }
+  ],
+  "xaxis": {
+    "show": true,
+    "mode": "time",
+    "name": null,
+    "values": [],
+    "buckets": null
+  },
+  "yaxis": {
+    "align": false,
+    "alignLevel": null
+  },
+  "lines": true,
+  "fill": 1,
+  "linewidth": 1,
+  "dashes": false,
+  "dashLength": 10,
+  "spaceLength": 10,
+  "points": false,
+  "pointradius": 5,
+  "bars": false,
+  "stack": false,
+  "percentage": false,
+  "legend": {
+    "show": true,
+    "values": false,
+    "min": false,
+    "max": false,
+    "current": false,
+    "total": false,
+    "avg": false
+  },
+  "nullPointMode": "null",
+  "steppedLine": false,
+  "tooltip": {
+    "value_type": "individual",
+    "shared": true,
+    "sort": 0
+  },
+  "timeFrom": null,
+  "timeShift": null,
+  "aliasColors": {},
+  "seriesOverrides": [],
+  "thresholds": [],
+  "timeRegions": [],
+  "links": []
+}
