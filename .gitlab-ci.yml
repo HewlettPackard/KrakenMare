@@ -9,7 +9,7 @@ deploy-dev: &deploy-dev
     DOCKER_HOST_IP: 16.19.176.108
   environment: &u176i108
     name: u176i108
-    url: http://16.19.176.108:39000/
+    url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
     on_stop: stop-dev
   script:
     - (cd demo && docker-compose up --build --remove-orphans --detach)
@@ -35,7 +35,7 @@ deploy-master: &deploy-master
     DOCKER_HOST_IP: 16.19.176.109
   environment: &u176i109
     name: u176i109
-    url: http://16.19.176.109:39000/
+    url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   script:
     - (cd demo && docker-compose down --remove-orphans && docker-compose up --build --detach)
   only:
