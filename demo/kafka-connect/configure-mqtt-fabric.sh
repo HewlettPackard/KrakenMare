@@ -1,13 +1,18 @@
 #!/bin/bash
 
+echo "creating Kafka topic"
+
+kafka-topics --zookeeper zookeeper:2181 --topic fabric --partitions 3 --replication-factor 3 --create
+
+echo ""
 echo "removing MQTT Source Connector"
 
-curl -X "DELETE" "connect:8083/connectors/mqtt-source"
+curl -X DELETE "connect:8083/connectors/mqtt-source"
 
 echo ""
 echo "creating MQTT Source Connector"
 
-curl -X "POST" "connect:8083/connectors" \
+curl -X POST "connect:8083/connectors" \
      -H "Content-Type: application/json" \
      -d $'{
   "name": "mqtt-source",
@@ -29,7 +34,3 @@ curl -X "POST" "connect:8083/connectors" \
   }
   }'
 
-echo ""
-echo "creating Kafka topic"
-
-kafka-topics --zookeeper zookeeper:2181 --topic fabric --partitions 3 --replication-factor 3 --create

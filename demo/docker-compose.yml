@@ -127,8 +127,11 @@ services:
     depends_on:
       - zookeeper
       - broker-1
+      - broker-2
+      - broker-3
       - schema_registry
       - mosquitto
+      - influxdb
     ports:
       - "8083:8083"
     environment:
@@ -278,23 +281,9 @@ services:
     tty: true
     restart: always
 
-#  adminer:
-#    image: adminer
-#    ports:
-#      - 18080:8080
-#
-#  db:
-#    image: mujz/pagila
-#    environment:
-#      - POSTGRES_PASSWORD=sample
-#      - POSTGRES_USER=sample
-#      - POSTGRES_DB=sample
-
-# I can't figure out how (yet) to make a daemon out of this.
-#  db:
-#    image: switch-sqlite
-#    volumes:
-#      - /mnt/home/jhanson/PathF/pathforward:/db
-#    tty: true
-#    command: switch.db
-
+  influxdb:
+    image: influxdb
+    hostname: influxdb
+    ports:
+      - "8086:8086"
+    restart: always
