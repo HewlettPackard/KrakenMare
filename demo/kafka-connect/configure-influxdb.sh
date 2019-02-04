@@ -23,7 +23,7 @@ curl -X "POST" "connect:8083/connectors" \
     "connect.influx.url": "http://influxdb:8086",
     "connect.influx.db": "monitoring",
     "connect.influx.username": "influxdb",
-    "connect.influx.kcql": "INSERT INTO perfquery SELECT * FROM fabric WITHTIMESTAMP Timestamp",
+    "connect.influx.kcql": "INSERT INTO perfquery SELECT * FROM fabric",
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter.schemas.enable": "false",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",
