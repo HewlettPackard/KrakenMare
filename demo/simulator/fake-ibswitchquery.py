@@ -1,8 +1,15 @@
 import subprocess
 import json
 import time
+# This can also do csv but all is commented out
+# import csv
 import os
 from random import *
+import paho.mqtt.client as mqtt
+# Read broker address from environment variable. This setting is in the Dockerfile when used that way
+broker_address=os.environ['MOSQUITTO_IP']
+client = mqtt.Client("P1")
+client.connect(broker_address)
 
 # Infinite loop
 while True:
@@ -20,8 +27,9 @@ while True:
       # [.95,1] + 1000 which is an error condition
       # For data counters add randint[1000,4000]
       # for packet counters add randint[100,400]
+      # Set time to milliseconds since the epoch for InfluxDB
       now=time.time()
-      nowint=int(round(now))
+      nowint=int(round(time.time() * 1000))
 
       for switch in query_data['Switch']:
          hca=str(switch['HCA'])
@@ -31,6 +39,7 @@ while True:
          output="/tmp/" + guid +".perfquery.json"
          with open(output, 'r') as g:
             query_output = json.load (g)
+         g.close()
 
          query_output['Timestamp'] = nowint
          x = random()
@@ -63,11 +72,31 @@ while True:
          query_output['PortRcvPkts'] += randint(100,400)
          query_output['PortXmitWait'] += randint(100,200)
 
+# Write output to the next input
          with open(output, 'w') as g:
             json.dump(query_output,g)
 
-         print('Calling mosquitto_pub...')
-         subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",output])
+# Write the json data to mqtt broker
+         data_out=json.dumps(query_output)
+         print('Publishing via mqtt')
+         client.publish("ibswitch",data_out)
+# If paho mqtt client is not available then mosquitto_pub can be used with the output file.
+#         subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",output])
+
+# This can also do csv but all is commented out
+# Write values out using csv formatting to send to mqtt
+#         outputc="/tmp/" + guid +".perfquery.csv"
+#         outputFile = open(outputc,'w')
+#         outputcsv = csv.writer(outputFile)
+#         rows_dict_list = list(query_output.values()) # Convert JSON dict to a list of just the values
+#         outputcsv.writerow(rows_dict_list)
+#         outputFile.close()
+
+#         print('Calling mosquitto_pub...')
+#         payload = ','.join([str(elem) for elem in rows_dict_list])
+#         client.publish("ibswitch",payload)
+# If paho mqtt client is not available then mosquitto_pub can be used with the output file.
+#         subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",outputc])
 
    # Infinite loop
    time.sleep(10)
