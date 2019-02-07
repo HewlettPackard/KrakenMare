@@ -1,8 +1,6 @@
 import subprocess
 import json
 import time
-# This can also do csv but all is commented out
-# import csv
 import os
 from random import *
 import paho.mqtt.client as mqtt
@@ -20,15 +18,13 @@ while True:
 
       # For each switch found in the JSON data generate perfquery with -a to summarize the ports
       # This simulates a poor quality fabric in heavy use
-      # Using random numbers on 0,1 we update the error counters as
-      # [0,.75] no update
-      # [.75,.85] + 1
-      # [.85,.95] + 10 which is a warning condition
-      # [.95,1] + 1000 which is an error condition
+      # Using random numbers on 0,1 we update three error counters as down below.
+      # SymbolErrorCounter increments fastest
+      # LinkedDownedCounter increments slower both fewer and less
+      # PortXmitDiscards increments slowest both fewer and less
       # For data counters add randint[1000,4000]
       # for packet counters add randint[100,400]
       # Set time to milliseconds since the epoch for InfluxDB
-      now=time.time()
       nowint=int(round(time.time() * 1000))
 
       for switch in query_data['Switch']:
@@ -43,27 +39,27 @@ while True:
 
          query_output['Timestamp'] = nowint
          x = random()
-         if x > .95:
+         if x > .98:
             query_output['SymbolErrorCounter'] += 1000
-         elif x > .85:
+         elif x > .88:
             query_output['SymbolErrorCounter'] += 10
-         elif x > .75:
+         elif x > .78:
             query_output['SymbolErrorCounter'] += 1
 
          x = random()
-         if x > .95:
-            query_output['LinkDownedCounter'] += 1000
-         elif x > .85:
-            query_output['LinkDownedCounter'] += 10
-         elif x > .75:
+         if x > .99:
+            query_output['LinkDownedCounter'] += 100
+         elif x > .89:
+            query_output['LinkDownedCounter'] += 5
+         elif x > .79:
             query_output['LinkDownedCounter'] += 1
 
          x = random()
-         if x > .95:
-            query_output['PortXmitDiscards'] += 100
-         elif x > .85:
+         if x > .99:
+            query_output['PortXmitDiscards'] += 10
+         elif x > .89:
             query_output['PortXmitDiscards'] += 5
-         elif x > .8:
+         elif x > .79:
             query_output['PortXmitDiscards'] += 2
 
          query_output['PortXmitData'] += randint(1000,4000)
@@ -75,28 +71,12 @@ while True:
 # Write output to the next input
          with open(output, 'w') as g:
             json.dump(query_output,g)
+         g.close()
 
 # Write the json data to mqtt broker
          data_out=json.dumps(query_output)
          print('Publishing via mqtt')
          client.publish("ibswitch",data_out)
-# If paho mqtt client is not available then mosquitto_pub can be used with the output file.
-#         subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",output])
-
-# This can also do csv but all is commented out
-# Write values out using csv formatting to send to mqtt
-#         outputc="/tmp/" + guid +".perfquery.csv"
-#         outputFile = open(outputc,'w')
-#         outputcsv = csv.writer(outputFile)
-#         rows_dict_list = list(query_output.values()) # Convert JSON dict to a list of just the values
-#         outputcsv.writerow(rows_dict_list)
-#         outputFile.close()
-
-#         print('Calling mosquitto_pub...')
-#         payload = ','.join([str(elem) for elem in rows_dict_list])
-#         client.publish("ibswitch",payload)
-# If paho mqtt client is not available then mosquitto_pub can be used with the output file.
-#         subprocess.call(["mosquitto_pub", "-h", os.environ['MOSQUITTO_IP'], "-t","ibswitch","-f",outputc])
 
    # Infinite loop
    time.sleep(10)
