@@ -33,7 +33,7 @@ Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=htt
 
 STEP3
 
-export DOCKER_HOST_IP="$(resolveip -s $HOSTNAME)" or your system IP if resolveip is not installed
+export DOCKER_HOST_IP=$(resolveip -s $HOSTNAME) or your system IP if resolveip is not installed
 
 `cd demo && docker-compose up --build --remove-orphans -d`
 
