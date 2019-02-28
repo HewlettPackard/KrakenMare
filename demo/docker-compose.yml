@@ -288,6 +288,7 @@ services:
       - "8086:8086"
     restart: always
 
+
   grafana:
     image: grafana/grafana
     hostname: grafana
@@ -309,4 +310,15 @@ services:
       - broker-1
     environment:
       KAFKA_BROKER_IP: '${DOCKER_HOST_IP}'
+    restart: always
+
+  mousttic-1:
+    build:
+      context: ../mousttic
+      dockerfile: Dockerfile
+    hostname: mousttic-1
+    depends_on:
+      - mosquitto
+    environment:
+      MOSQUITTO_IP: '${DOCKER_HOST_IP}'
     restart: always
