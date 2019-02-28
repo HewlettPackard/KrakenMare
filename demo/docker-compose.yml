@@ -299,3 +299,14 @@ services:
     - ./grafana/provisioning/:/etc/grafana/provisioning
     - ./grafana/dashboards/:/etc/grafana/dashboards
     restart: always
+
+  kafka-embedded-client-1:
+    build:
+      context: ../kafka-client
+      dockerfile: Dockerfile
+    hostname: kafka-emb1
+    depends_on:
+      - broker-1
+    environment:
+      KAFKA_BROKER_IP: '${DOCKER_HOST_IP}'
+    restart: always
