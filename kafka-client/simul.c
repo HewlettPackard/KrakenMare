@@ -2,7 +2,7 @@
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-#include "rdkafka.h"
+#include <rdkafka.h>
 //json generation
 #include <jansson.h>
 
@@ -123,6 +123,7 @@ int main (int argc, char **argv) {
     return 1;
   }
 
+  
   char* json_msg = NULL;
 	
   while ( run && msg ) {
