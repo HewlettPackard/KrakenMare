@@ -10,7 +10,7 @@
 #  mousttic (mqtt embedded-client)
 #
 
-version: '2'
+version: '3'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.0.0
@@ -96,7 +96,7 @@ services:
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
     restart: always
-      
+
   schema_registry:
     image: confluentinc/cp-schema-registry:5.0.0
     hostname: schema_registry
@@ -111,7 +111,7 @@ services:
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
     restart: always
-      
+
   connect:
     build:
       context: kafka-connect

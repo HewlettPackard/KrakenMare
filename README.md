@@ -40,3 +40,7 @@ export DOCKER_HOST_IP=$(resolveip -s $HOSTNAME) or your system IP if resolveip i
 or 
 
 `cd demo && sudo -E docker-compose up --build --remove-orphans -d`
+
+To use the modular docker-compose files an example is
+
+`cd demo &&  docker-compose -f kafka-compose.yml -f connect-compose.yml -f sim-influx-grafana-compose.yml up --build --remove-orphans -d`
