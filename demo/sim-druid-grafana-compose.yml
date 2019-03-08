@@ -1,0 +1,60 @@
+#
+# Docker Compose with the following services:
+#  mosquitto
+#  simulator
+#  druid
+#  grafana
+#
+
+version: '3'
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    hostname: mosquitto
+    ports: 
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  simulator:
+    build:
+      context: simulator
+      dockerfile: Dockerfile
+    hostname: simulator
+    depends_on:
+      - mosquitto
+    environment:
+      MOSQUITTO_IP: '${DOCKER_HOST_IP}'
+    restart: always
+
+  druid:
+    build:
+      context: druid
+      dockerfile: Dockerfile
+      args:
+        - implyversion=2.8.16
+    hostname: druid
+    depends_on:
+      - zookeeper
+    ports:
+      - "1527:1527"
+      - "8181-8183:8181-8183"
+      - "8090-8110:8090-8110"
+      - "8200:8200"
+      - "9095:9095"
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    hostname: grafana
+    depends_on:
+      - druid
+    ports:
+      - "3000:3000"
+    volumes:
+    - ./grafana/provisioning/:/etc/grafana/provisioning
+    - ./grafana/dashboards/:/etc/grafana/dashboards
+    environment:
+      GF_INSTALL_PLUGINS: abhisant-druid-datasource
+    restart: always
