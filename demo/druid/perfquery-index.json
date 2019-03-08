@@ -1,0 +1,58 @@
+{
+  "type" : "kafka",
+  "dataSchema" : {
+    "dataSource" : "perfquery",
+    "parser" : {
+      "type" : "string",
+      "parseSpec" : {
+        "format" : "json",
+        "dimensionsSpec" : {
+          "dimensions" : [
+            { "type": "long", "name": "ExcessiveBufferOverrunErrors"},
+            { "type": "string", "name": "GUID"},
+            { "type": "long", "name": "LinkDownedCounter"},
+            { "type": "long", "name": "LinkErrorRecoveryCounter"},
+            { "type": "long", "name": "LocalLinkIntegrityErrors"},
+            { "type": "long", "name": "PortRcvConstraintErrors"},
+            { "type": "long", "name": "PortRcvData"},
+            { "type": "long", "name": "PortRcvErrors"},
+            { "type": "long", "name": "PortRcvPkts"},
+            { "type": "long", "name": "PortRcvRemotePhysicalErrors"},
+            { "type": "long", "name": "PortRcvSwitchRelayErrors"},
+            { "type": "long", "name": "PortSelect"},
+            { "type": "long", "name": "PortXmitConstraintErrors"},
+            { "type": "long", "name": "PortXmitData"},
+            { "type": "long", "name": "PortXmitDiscards"},
+            { "type": "long", "name": "PortXmitPkts"},
+            { "type": "long", "name": "PortXmitWait"},
+            { "type": "long", "name": "SymbolErrorCounter"},
+            { "type": "long", "name": "VL15Dropped"}
+          ]
+        },
+        "timestampSpec": {
+          "column": "Timestamp",
+          "format": "millis"
+        }
+      }
+    },
+    "metricsSpec" : [],
+    "granularitySpec" : {
+      "type" : "uniform",
+      "segmentGranularity" : "minute",
+      "queryGranularity" : "none",
+      "rollup" : false
+    }
+  },
+  "ioConfig": {
+    "topic": "fabric",
+    "replicas": 2,
+    "taskDuration": "PT10M",
+    "completionTimeout": "PT20M",
+    "consumerProperties": {
+      "bootstrap.servers": "broker-1:9092,broker-2:9093,broker-3:9094"
+      }
+  },
+  "tuningConfig" : {
+    "type" : "kafka"
+  }
+}
