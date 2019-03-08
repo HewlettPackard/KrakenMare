@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.hpe.pathforward</groupId>
+	<artifactId>framework</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+
+		<cmu.version>0.0.1-SNAPSHOT</cmu.version>
+		<kafka.version>2.1.0</kafka.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.hpe.cmu</groupId>
+			<artifactId>cmu-server-event</artifactId>
+			<version>${cmu.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hpe.cmu</groupId>
+			<artifactId>cmu-server-api</artifactId>
+			<version>${cmu.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hpe.cmu</groupId>
+			<artifactId>cmu-server-rest</artifactId>
+			<version>${cmu.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hpe.cmu</groupId>
+			<artifactId>cmu-utils</artifactId>
+			<version>${cmu.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-streams</artifactId>
+			<version>${kafka.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+	</dependencies>
+
+</project>
