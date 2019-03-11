@@ -1,0 +1,30 @@
+#
+# Docker Compose with the following services:
+#  framework
+#  redis
+#
+
+version: '3'
+services:
+  framework:
+    build:
+      context: ../framework
+      dockerfile: Dockerfile
+    hostname: framework
+    depends_on:
+      - redis
+      - broker-1
+      - broker-2
+      - broker-3
+    ports: 
+      - "8080:8080"
+    environment:
+      BOOTSTRAP_SERVERS: 'broker-1:9092,broker-2:9093,broker-3:9094'
+    restart: always
+
+  redis:
+    image: redis:5.0.3
+    hostname: redis
+    ports:
+      - "6379:6379"
+    restart: always

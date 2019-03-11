@@ -1,18 +1,21 @@
 package com.hpe.pathforward.agent;
 
-import java.util.Date;
+public class Agent {
 
-import com.hpe.cmu.core.Resource;
-import com.hpe.cmu.core.exception.InvalidAttributeException;
+	private final long id;
+	private final String name;
 
-public class Agent extends Resource {
+	public Agent(String name, long id) {
+		this.name = name;
+		this.id = id;
+	}
 
-	private static final long serialVersionUID = -8360318815713463421L;
+	public long getId() {
+		return id;
+	}
 
-	public Agent(String name, long id) throws InvalidAttributeException {
-		super(name, null);
-		this.setId(id);
-		setCreationTime(new Date());
+	public String getName() {
+		return name;
 	}
 
 }
