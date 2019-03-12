@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.hpe.pathforward</groupId>
+	<groupId>com.hpe.bluedragon</groupId>
 	<artifactId>framework</artifactId>
 	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
@@ -103,7 +103,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>com.hpe.pathforward.Main</mainClass>
+					<mainClass>com.hpe.bluedragon.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,6 +1,6 @@
-package com.hpe.pathforward.agent;
+package com.hpe.bluedragon.agent;
 
-import static com.hpe.pathforward.Main.PROPERTIES;
+import static com.hpe.bluedragon.Main.PROPERTIES;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -38,7 +38,7 @@ public class AgentClient {
 	static void startAgentRegistrationConsumer() {
 		Thread t = new Thread(() -> {
 			try (Consumer<String, Agent> consumer = createConsumer()) {
-				String topic = PROPERTIES.getProperty("pf.registration.result-topic");
+				String topic = PROPERTIES.getProperty("bd.registration.result-topic");
 				consumer.subscribe(Collections.singletonList(topic));
 
 				final ConsumerRecords<String, Agent> consumerRecords = consumer.poll(Duration.ofSeconds(30));
@@ -53,7 +53,7 @@ public class AgentClient {
 
 	static void sendAgentRegistrationMessage() throws Exception {
 		try (Producer<String, String> producer = createProducer()) {
-			String topic = PROPERTIES.getProperty("pf.registration.request-topic");
+			String topic = PROPERTIES.getProperty("bd.registration.request-topic");
 			final ProducerRecord<String, String> record = new ProducerRecord<>(topic, "myAgentName");
 			/* RecordMetadata metadata = */ producer.send(record).get();
 

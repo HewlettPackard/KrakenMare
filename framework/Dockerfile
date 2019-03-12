@@ -2,13 +2,13 @@ FROM maven:3.6.0-jdk-8
 
 COPY mvn-settings.xml /root/.m2/settings.xml
 
-RUN mkdir -p /opt/framework
-WORKDIR /opt/framework
+RUN mkdir -p /opt/bluedragon
+WORKDIR /opt/bluedragon
 
-COPY pom.xml /opt/framework/
+COPY pom.xml /opt/bluedragon/
 RUN mvn install
 
-COPY src /opt/framework/src
+COPY src /opt/bluedragon/src
 RUN mvn package
 
 EXPOSE 8080

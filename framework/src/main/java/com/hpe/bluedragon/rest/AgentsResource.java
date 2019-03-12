@@ -1,4 +1,4 @@
-package com.hpe.pathforward.rest;
+package com.hpe.bluedragon.rest;
 
 import java.util.Set;
 
@@ -12,8 +12,8 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.pathforward.agent.Agent;
-import com.hpe.pathforward.framework.Framework;
+import com.hpe.bluedragon.agent.Agent;
+import com.hpe.bluedragon.framework.Framework;
 
 @Path("agents")
 @Produces(MediaType.APPLICATION_JSON)

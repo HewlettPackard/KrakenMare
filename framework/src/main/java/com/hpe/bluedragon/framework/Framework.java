@@ -1,6 +1,6 @@
-package com.hpe.pathforward.framework;
+package com.hpe.bluedragon.framework;
 
-import static com.hpe.pathforward.Main.PROPERTIES;
+import static com.hpe.bluedragon.Main.PROPERTIES;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -25,10 +25,10 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.pathforward.agent.Agent;
-import com.hpe.pathforward.agent.AgentFactory;
-import com.hpe.pathforward.serde.JsonPOJODeserializer;
-import com.hpe.pathforward.serde.JsonPOJOSerializer;
+import com.hpe.bluedragon.agent.Agent;
+import com.hpe.bluedragon.agent.AgentFactory;
+import com.hpe.bluedragon.serde.JsonPOJODeserializer;
+import com.hpe.bluedragon.serde.JsonPOJOSerializer;
 
 public class Framework {
 
@@ -40,8 +40,8 @@ public class Framework {
 	private KafkaStreams streams;
 
 	public void startFramework() throws InterruptedException {
-		final String requestTopicName = PROPERTIES.getProperty("pf.registration.request-topic");
-		final String resultTopicName = PROPERTIES.getProperty("pf.registration.result-topic");
+		final String requestTopicName = PROPERTIES.getProperty("bd.registration.request-topic");
+		final String resultTopicName = PROPERTIES.getProperty("bd.registration.result-topic");
 
 		LOG.info("Creating topics...");
 		try (AdminClient adminClient = AdminClient.create(PROPERTIES)) {
