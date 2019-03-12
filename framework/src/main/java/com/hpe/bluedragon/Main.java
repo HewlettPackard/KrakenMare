@@ -41,6 +41,17 @@ public class Main {
 				PROPERTIES.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersEnv);
 			}
 		}
+
+		// redis server can be overridden via ENV or properties
+		String redisServerProp = System.getProperty("REDIS_SERVER");
+		if (!Strings.isNullOrEmpty(redisServerProp)) {
+			PROPERTIES.put("redis.server", redisServerProp);
+		} else {
+			String redisServerEnv = System.getenv("REDIS_SERVER");
+			if (!Strings.isNullOrEmpty(redisServerEnv)) {
+				PROPERTIES.put("redis.server", redisServerEnv);
+			}
+		}
 	}
 
 	static class App extends ResourceConfig {

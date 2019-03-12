@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hpe.bluedragon.api.Framework;
 import com.hpe.bluedragon.core.Agent;
-import com.hpe.bluedragon.repositories.AgentRepository;
+import com.hpe.bluedragon.repositories.AgentRedisRepository;
 import com.hpe.bluedragon.serde.JsonPOJODeserializer;
 import com.hpe.bluedragon.serde.JsonPOJOSerializer;
 
@@ -33,7 +33,7 @@ public class FrameworkImpl implements Framework {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkImpl.class);
 
-	private final AgentRepository agents = new AgentRepository();
+	private final AgentRedisRepository agents = new AgentRedisRepository();
 
 	private KafkaStreams streams;
 

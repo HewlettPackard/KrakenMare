@@ -8,6 +8,8 @@
 #  schema-registry 
 #  kafka-embedded-client
 #  mousttic (mqtt embedded-client)
+#  redis
+#  framework
 #
 
 version: '3'
@@ -225,6 +227,7 @@ services:
     ports: 
       - "8080:8080"
     environment:
+      REDIS_SERVER: "redis:6379"
       BOOTSTRAP_SERVERS: 'broker-1:9092,broker-2:9093,broker-3:9094'
     restart: always
 
