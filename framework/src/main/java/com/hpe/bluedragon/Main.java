@@ -15,7 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.hpe.bluedragon.framework.Framework;
+import com.hpe.bluedragon.api.Framework;
+import com.hpe.bluedragon.impl.FrameworkImpl;
 
 public class Main {
 
@@ -44,7 +45,7 @@ public class Main {
 
 	static class App extends ResourceConfig {
 
-		public App(final Framework framework) {
+		public App(final FrameworkImpl framework) {
 			packages(getClass().getPackage().getName());
 			// dependencies injection
 			register(new AbstractBinder() {
@@ -61,7 +62,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		LOG.info("Starting framework...");
-		final Framework framework = new Framework();
+		final FrameworkImpl framework = new FrameworkImpl();
 		framework.startFramework();
 
 		LOG.info("Starting web server...");

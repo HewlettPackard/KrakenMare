@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.agent;
+package com.hpe.bluedragon.core;
 
 public class Agent {
 

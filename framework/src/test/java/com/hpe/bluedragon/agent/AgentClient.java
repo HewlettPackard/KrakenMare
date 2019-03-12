@@ -18,6 +18,8 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.bluedragon.core.Agent;
+
 public class AgentClient {
 
 	public final static Logger LOG = LoggerFactory.getLogger(AgentClient.class);

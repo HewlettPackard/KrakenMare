@@ -24,6 +24,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonPOJODeserializer<T> implements Deserializer<T> {
+
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	private Class<T> tClass;
@@ -58,6 +59,6 @@ public class JsonPOJODeserializer<T> implements Deserializer<T> {
 
 	@Override
 	public void close() {
-
 	}
+
 }

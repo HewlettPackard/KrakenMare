@@ -1,11 +1,9 @@
-package com.hpe.bluedragon.framework;
+package com.hpe.bluedragon.impl;
 
 import static com.hpe.bluedragon.Main.PROPERTIES;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.AdminClient;
@@ -25,17 +23,17 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.agent.Agent;
-import com.hpe.bluedragon.agent.AgentFactory;
+import com.hpe.bluedragon.api.Framework;
+import com.hpe.bluedragon.core.Agent;
+import com.hpe.bluedragon.repositories.AgentRepository;
 import com.hpe.bluedragon.serde.JsonPOJODeserializer;
 import com.hpe.bluedragon.serde.JsonPOJOSerializer;
 
-public class Framework {
+public class FrameworkImpl implements Framework {
 
-	public final static Logger LOG = LoggerFactory.getLogger(Framework.class);
+	public final static Logger LOG = LoggerFactory.getLogger(FrameworkImpl.class);
 
-	private final AgentFactory factory = new AgentFactory();
-	private final Set<Agent> agents = new LinkedHashSet<>();
+	private final AgentRepository agents = new AgentRepository();
 
 	private KafkaStreams streams;
 
@@ -98,13 +96,14 @@ public class Framework {
 	}
 
 	private Agent registerNewAgent(String name) {
-		Agent agent = factory.create(name);
-		agents.add(agent);
+		Agent agent = agents.create(name);
+		agents.save(agent);
 		return agent;
 	}
 
-	public Set<Agent> getAgents() {
-		return agents;
+	@Override
+	public List<Agent> getAgents() {
+		return agents.getAll();
 	}
 
 }

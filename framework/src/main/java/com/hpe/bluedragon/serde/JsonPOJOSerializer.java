@@ -24,6 +24,7 @@ import org.apache.kafka.common.serialization.Serializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonPOJOSerializer<T> implements Serializer<T> {
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	/**

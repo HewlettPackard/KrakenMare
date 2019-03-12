@@ -1,6 +1,6 @@
 package com.hpe.bluedragon.rest;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -12,8 +12,8 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.agent.Agent;
-import com.hpe.bluedragon.framework.Framework;
+import com.hpe.bluedragon.api.Framework;
+import com.hpe.bluedragon.core.Agent;
 
 @Path("agents")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,7 +26,7 @@ public class AgentsResource {
 	private Framework framework;
 
 	@GET
-	public Set<Agent> getAll() {
+	public List<Agent> getAll() {
 		LOG.info("Entering getAll()");
 		return framework.getAgents();
 	}
