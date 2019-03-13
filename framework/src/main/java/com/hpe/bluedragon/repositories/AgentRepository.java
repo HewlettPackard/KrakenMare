@@ -21,7 +21,7 @@ public class AgentRepository implements Repository<Agent> {
 	public Agent create(String name) {
 		long id = index.getAndIncrement();
 		LOG.info("Creating new agent: name='{}', id='{}'", name, id);
-		return new Agent(name + "-" + id, id);
+		return new Agent(id, name + "-" + id);
 	}
 
 	@Override
@@ -30,13 +30,24 @@ public class AgentRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public boolean delete(Agent entity) {
-		return agents.remove(entity);
+	public boolean delete(Agent agent) {
+		return agents.remove(agent);
 	}
 
 	@Override
 	public List<Agent> getAll() {
 		return agents;
+	}
+
+	@Override
+	public Agent update(Agent agent) {
+		// no-op
+		return agent;
+	}
+
+	@Override
+	public Agent get(long id) {
+		return agents.stream().filter(a -> a.getId() == id).findFirst().get();
 	}
 
 }

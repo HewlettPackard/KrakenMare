@@ -8,11 +8,15 @@ public interface Repository<T> {
 
 	boolean save(T entity);
 
+	T update(T entity);
+
 	boolean delete(T entity);
+
+	T get(long id);
 
 	List<T> getAll();
 
-	default int count() {
+	default long count() {
 		return getAll().size();
 	}
 
