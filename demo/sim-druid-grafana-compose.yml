@@ -32,17 +32,20 @@ services:
     build:
       context: druid
       dockerfile: Dockerfile
-      args:
-        - implyversion=2.8.16
     hostname: druid
     depends_on:
       - zookeeper
     ports:
-      - "1527:1527"
-      - "8181-8183:8181-8183"
-      - "8090-8110:8090-8110"
-      - "8200:8200"
-      - "9095:9095"
+# - 8081: HTTP (coordinator)
+# - 8082: HTTP (broker)
+# - 8083: HTTP (historical)
+# - 8090: HTTP (overlord)
+# - 3306: MySQL
+      - "8181:8081"
+      - "8182:8082"
+      - "8183:8083"
+      - "8190:8090"
+      - "3306:3306"
     restart: always
 
   grafana:
@@ -56,5 +59,7 @@ services:
     - ./grafana/provisioning/:/etc/grafana/provisioning
     - ./grafana/dashboards/:/etc/grafana/dashboards
     environment:
+      HTTP_PROXY: http://web-proxy.corp.hpecorp.net:8080
+      HTTPS_PROXY: http://web-proxy.corp.hpecorp.net:8080
       GF_INSTALL_PLUGINS: abhisant-druid-datasource
     restart: always
