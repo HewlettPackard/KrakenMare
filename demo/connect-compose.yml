@@ -19,7 +19,6 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
-    restart: always
 
   connect:
     build:
@@ -33,7 +32,7 @@ services:
       - broker-3
       - schema_registry
       - mosquitto
-      - influxdb
+      - druid
     ports:
       - "8083:8083"
     environment:
@@ -58,4 +57,3 @@ services:
       CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/custom-plugins"
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.0.0.jar
-    restart: always

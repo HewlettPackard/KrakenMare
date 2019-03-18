@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
   "links": [],
   "panels": [
     {
@@ -23,7 +22,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "InfluxDB",
+      "datasource": "Druid",
       "fill": 1,
       "gridPos": {
         "h": 12,
@@ -31,7 +30,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 4,
+      "id": 8,
       "legend": {
         "avg": false,
         "current": false,
@@ -55,30 +54,44 @@
       "steppedLine": false,
       "targets": [
         {
-          "groupBy": [
+          "aggregators": [
             {
-              "params": [
-                "GUID"
-              ],
-              "type": "tag"
+              "fieldName": "SymbolErrorCounter",
+              "name": "Counter",
+              "type": "longSum"
             }
           ],
-          "measurement": "perfquery",
-          "orderByTime": "ASC",
-          "policy": "default",
+          "currentAggregator": {
+            "type": "count"
+          },
+          "currentFilter": {
+            "type": "selector"
+          },
+          "currentPostAggregator": {
+            "fn": "+",
+            "type": "arithmetic"
+          },
+          "currentSelect": {
+            "dimension": "",
+            "metric": ""
+          },
+          "customGranularity": "minute",
+          "dimension": "GUID",
+          "druidDS": "perfquery",
+          "druidMetric": "Counter",
+          "errors": {
+            "aggregators": "You must supply at least one aggregator"
+          },
+          "limit": 9999,
+          "queryType": "topN",
           "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "SymbolErrorCounter"
-                ],
-                "type": "field"
-              }
-            ]
+          "selectDimensions": [
+            "GUID"
           ],
-          "tags": []
+          "selectMetrics": [
+            "Counter"
+          ],
+          "shouldOverrideGranularity": true
         }
       ],
       "thresholds": [],
@@ -130,7 +143,7 @@
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {

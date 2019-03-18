@@ -39,7 +39,7 @@ deploy-dev: &deploy-dev
     url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
     on_stop: stop-dev
   script:
-    - (cd demo && docker-compose up --build --remove-orphans --detach)
+    - (cd demo && ./compose.sh up)
   except:
     - master
 
@@ -51,7 +51,7 @@ stop-dev:
     <<: *u176i108
     action: stop
   script:
-    - (cd demo && docker-compose down --remove-orphans)
+    - (cd demo && ./compose.sh down)
   when: manual
 
 deploy-master: &deploy-master
@@ -64,6 +64,6 @@ deploy-master: &deploy-master
     name: u176i109
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   script:
-    - (cd demo && docker-compose down --remove-orphans && docker-compose up --build --detach)
+    - (cd demo && ./compose.sh down --remove-orphans && ./compose.sh up)
   only:
     - master

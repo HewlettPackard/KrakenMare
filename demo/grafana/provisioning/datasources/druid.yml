@@ -1,14 +1,14 @@
 apiVersion: 1
 
 deleteDatasources:
-  - name: InfluxDB
+  - name: Druid
     orgId: 1
 
 datasources:
-- name: InfluxDB
-  type: influxdb
+- name: Druid
+  type: abhisant-druid-datasource
   access: proxy
-  url: http://influxdb:8086
+  url: http://druid:8082
   password:
   user:
   database: monitoring
@@ -17,12 +17,6 @@ datasources:
   basicAuthPassword:
   withCredentials:
   isDefault: true
-  jsonData:
-     tlsAuth: false
-     tlsAuthWithCACert: false
-  secureJsonData:
-    tlsCACert: ""
-    tlsClientCert: ""
-    tlsClientKey: ""
   version: 1
   editable: true
+
