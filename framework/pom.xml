@@ -120,6 +120,15 @@
 					<mainClass>com.hpe.bluedragon.Main</mainClass>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Workaround for "Error: Could not find or load main class org.apache.maven.surefire.booter.ForkedBooter" -->
+					<!-- https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class -->
+					<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
