@@ -10,7 +10,8 @@ COPY pom.xml /opt/bluedragon/
 RUN mvn install
 
 COPY src /opt/bluedragon/src
-RUN mvn package
+# tests requires a Redis instance: skip them (they are run in the CI)
+RUN mvn package -DskipTests
 
 EXPOSE 8080
 
