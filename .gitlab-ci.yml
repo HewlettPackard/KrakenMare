@@ -18,7 +18,15 @@ test-framework:
     paths:
       - .mvnrepo
   script:
-  - mvn -f framework/pom.xml -DREDIS_SERVER=redis:6379 test
+  - mvn -f framework/pom.xml -P coverage -DREDIS_SERVER=redis:6379 test jacoco:report
+  - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      junit:
+        - framework/target/surefire-reports/TEST-*.xml
+    expire_in: 2 weeks
 
 deploy-dev: &deploy-dev
   stage: deploy

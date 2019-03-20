@@ -21,6 +21,7 @@
 		<!-- test -->
 		<junit.version>5.4.0</junit.version>
 		<jedis-mock.version>0.1.10</jedis-mock.version>
+		<jacoco.version>0.8.3</jacoco.version>
 	</properties>
 
 	<dependencies>
@@ -121,5 +122,28 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
