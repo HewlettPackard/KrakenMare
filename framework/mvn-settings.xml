@@ -12,7 +12,7 @@
 			<id>hpe-http-proxy</id>
 			<active>true</active>
 			<protocol>http</protocol>
-			<host>web-proxy.corp.hpecorp.net</host>
+			<host>web-proxy.bbn.hpecorp.net</host>
 			<port>8080</port>
 			<username></username>
 			<password></password>
@@ -22,7 +22,7 @@
 			<id>hpe-https-proxy</id>
 			<active>true</active>
 			<protocol>https</protocol>
-			<host>web-proxy.corp.hpecorp.net</host>
+			<host>web-proxy.bbn.hpecorp.net</host>
 			<port>8080</port>
 			<username></username>
 			<password></password>
