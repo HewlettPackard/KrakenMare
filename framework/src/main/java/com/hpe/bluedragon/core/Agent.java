@@ -1,5 +1,8 @@
 package com.hpe.bluedragon.core;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +33,15 @@ public class Agent {
 		long id = Long.parseLong(map.get("id"));
 		String name = map.get("name");
 		return new Agent(id, name);
+	}
+
+	public static Agent fromList(List<String> list) {
+		final Map<String, String> hash = new HashMap<>(list.size() / 2, 1);
+		final Iterator<String> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			hash.put(iterator.next(), iterator.next());
+		}
+		return fromMap(hash);
 	}
 
 }

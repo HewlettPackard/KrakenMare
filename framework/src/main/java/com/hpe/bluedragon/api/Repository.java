@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface Repository<T> {
 
+	void reset();
+
 	T create(String id);
 
 	boolean save(T entity);

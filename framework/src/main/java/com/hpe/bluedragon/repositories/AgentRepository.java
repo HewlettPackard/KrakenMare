@@ -18,6 +18,12 @@ public class AgentRepository implements Repository<Agent> {
 	private final List<Agent> agents = new ArrayList<>();
 
 	@Override
+	public void reset() {
+		index.set(0);
+		agents.clear();
+	}
+
+	@Override
 	public Agent create(String name) {
 		long id = index.getAndIncrement();
 		LOG.info("Creating new agent: name='{}', id='{}'", name, id);

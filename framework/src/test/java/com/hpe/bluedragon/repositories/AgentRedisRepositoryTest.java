@@ -9,31 +9,28 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.github.fppt.jedismock.RedisServer;
+import com.hpe.bluedragon.Main;
 import com.hpe.bluedragon.core.Agent;
 
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 
 public class AgentRedisRepositoryTest {
 
-	private static RedisServer server = null;
+	private static Jedis jedis = null;
 	private static AgentRedisRepository repo = null;
 
 	@BeforeEach
 	void before() throws IOException {
-		server = RedisServer.newRedisServer(); // bind to a random port
-		server.start();
-
-		// Jedis jedis = new Jedis(HostAndPort.parseString(Main.PROPERTIES.getProperty("redis.server")));
-		Jedis jedis = new Jedis(server.getHost(), server.getBindPort());
-		repo = new AgentRedisRepository(jedis);
+		jedis = new Jedis(HostAndPort.parseString(Main.PROPERTIES.getProperty("redis.server")));
+		repo = new AgentRedisRepository(jedis, true);
 	}
 
 	@AfterEach
 	void after() {
-		server.stop();
-		server = null;
 		repo = null;
+		jedis.close();
+		jedis = null;
 	}
 
 	@Test

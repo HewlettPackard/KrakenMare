@@ -1,8 +1,8 @@
 package com.hpe.bluedragon.repositories;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,6 @@ import com.hpe.bluedragon.api.Repository;
 import com.hpe.bluedragon.core.Agent;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 
@@ -25,7 +24,14 @@ public class AgentRedisRepository implements Repository<Agent> {
 	private final String agentDataKey = "myAgentDataKey";
 
 	public AgentRedisRepository(Jedis jedis) {
+		this(jedis, false);
+	}
+
+	public AgentRedisRepository(Jedis jedis, boolean reset) {
 		this.jedis = jedis;
+		if (reset) {
+			reset();
+		}
 	}
 
 	@Override
@@ -80,26 +86,27 @@ public class AgentRedisRepository implements Repository<Agent> {
 		return jedis.llen(agentsKey);
 	}
 
-	// TODO: make this in a transaction?
 	@Override
 	public List<Agent> getAll() {
-		List<Agent> agents = new ArrayList<>();
-		List<String> allUserIds = jedis.lrange(agentsKey, 0, -1);
-		if (allUserIds != null && !allUserIds.isEmpty()) {
-			List<Response<Map<String, String>>> responseList = new ArrayList<>();
+		String script = "local collect = {}\n" +
+				"local keys = redis.call('lrange', '" + agentsKey + "', 0, -1)\n" +
+				"for _, key in ipairs(keys) do \n" +
+				"    local value = redis.call('hgetAll', '" + agentDataKey + ":' .. key)\n" +
+				"    if value then\n" +
+				"        table.insert(collect, value)\n" +
+				"    end \n" +
+				"end \n" +
+				"return collect";
 
-			Pipeline pipeline = jedis.pipelined();
-			for (String id : allUserIds) {
-				String agentKey = agentDataKey + ":" + id;
-				responseList.add(pipeline.hgetAll(agentKey));
-			}
-			pipeline.sync();
-
-			for (Response<Map<String, String>> response : responseList) {
-				agents.add(Agent.fromMap(response.get()));
-			}
-		}
+		@SuppressWarnings("unchecked")
+		List<List<String>> result = (List<List<String>>) jedis.eval(script);
+		List<Agent> agents = result.stream().map(Agent::fromList).collect(Collectors.toList());
 		return agents;
+	}
+
+	@Override
+	public void reset() {
+		jedis.del(counterKey, agentsKey, agentDataKey);
 	}
 
 }
