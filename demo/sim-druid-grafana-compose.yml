@@ -56,8 +56,4 @@ services:
     volumes:
     - ./grafana/provisioning/:/etc/grafana/provisioning
     - ./grafana/dashboards/:/etc/grafana/dashboards
-    environment:
-      HTTP_PROXY: http://web-proxy.bbn.hpecorp.net:8080
-      HTTPS_PROXY: http://web-proxy.bbn.hpecorp.net:8080
-      NO_PROXY: druid
-      GF_INSTALL_PLUGINS: abhisant-druid-datasource
+    - ./grafana/plugins/:/var/lib/grafana/plugins/

@@ -6,7 +6,7 @@ deleteDatasources:
 
 datasources:
 - name: Druid
-  type: abhisant-druid-datasource
+  type: paypal-druid-datasource
   access: proxy
   url: http://druid:8082
   password:
