@@ -19,6 +19,7 @@ export default class DruidDatasource {
   periodGranularity: any;
   GRANULARITIES = [
     ['second', moment.duration(1, 'second')],
+    ['ten_second', moment.duration(10, 'second')],
     ['minute', moment.duration(1, 'minute')],
     ['fifteen_minute', moment.duration(15, 'minute')],
     ['thirty_minute', moment.duration(30, 'minute')],
@@ -72,6 +73,9 @@ export default class DruidDatasource {
         if (granularity === 'day') {
           granularity = { "type": "period", "period": "P1D", "timeZone": this.periodGranularity }
         }
+      }
+      if (granularity === 'ten_second') {
+        granularity = { "type": "period", "period": "PT10S" }
       }
       return this.doQuery(roundedFrom, to, granularity, target);
     });

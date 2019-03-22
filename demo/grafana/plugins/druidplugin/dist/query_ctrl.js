@@ -6,7 +6,7 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
                 function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
             return extendStatics(d, b);
-        }
+        };
         return function (d, b) {
             extendStatics(d, b);
             function __() { this.constructor = d; }
@@ -62,7 +62,7 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                     _this.defaultFilterType = "selector";
                     _this.defaultAggregatorType = "count";
                     _this.defaultPostAggregator = { type: 'arithmetic', 'fn': '+' };
-                    _this.customGranularities = ['second', 'minute', 'fifteen_minute', 'thirty_minute', 'hour', 'day', 'week', 'month', 'quarter', 'year', 'all'];
+                    _this.customGranularities = ['second', 'ten_second', 'minute', 'fifteen_minute', 'thirty_minute', 'hour', 'day', 'week', 'month', 'quarter', 'year', 'all'];
                     _this.defaultCustomGranularity = 'minute';
                     _this.defaultSelectDimension = "";
                     _this.defaultSelectMetric = "";

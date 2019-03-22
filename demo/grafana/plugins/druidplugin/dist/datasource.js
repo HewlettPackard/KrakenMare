@@ -20,6 +20,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath"], function (expor
                 function DruidDatasource(instanceSettings, $q, backendSrv, templateSrv) {
                     this.GRANULARITIES = [
                         ['second', moment_1.default.duration(1, 'second')],
+                        ['ten_second', moment_1.default.duration(10, 'second')],
                         ['minute', moment_1.default.duration(1, 'minute')],
                         ['fifteen_minute', moment_1.default.duration(15, 'minute')],
                         ['thirty_minute', moment_1.default.duration(30, 'minute')],
@@ -66,6 +67,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath"], function (expor
                             if (granularity === 'day') {
                                 granularity = { "type": "period", "period": "P1D", "timeZone": _this.periodGranularity };
                             }
+                        }
+                        if (granularity === 'ten_second') {
+                            granularity = { "type": "period", "period": "PT10S" };
                         }
                         return _this.doQuery(roundedFrom, to, granularity, target);
                     });

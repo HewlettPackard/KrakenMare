@@ -13,6 +13,7 @@ export enum Granularity {
   all = 'all',
   none = 'none',
   second = 'second',
+  ten_second = 'ten_second',
   minute = 'minute',
   fifteen_minute = 'fifteen_minute',
   thirty_minute = 'thirty_minute',
