@@ -14,8 +14,7 @@
   },
   "editable": true,
   "gnetId": null,
-  "graphTooltip": 0,
-  "id": 1,
+  "graphTooltip": 2,
   "links": [],
   "panels": [
     {
@@ -31,7 +30,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 8,
+      "id": 10,
       "legend": {
         "alignAsTable": true,
         "avg": false,
@@ -41,6 +40,7 @@
         "min": true,
         "rightSide": true,
         "show": true,
+        "sideWidth": 320,
         "total": false,
         "values": true
       },
@@ -83,9 +83,8 @@
           "dimension": "GUID",
           "druidDS": "perfquery",
           "druidMetric": "Counter",
-          "errors": {
-            "aggregators": "You must supply at least one aggregator"
-          },
+          "errors": {},
+          "hide": false,
           "limit": 9999,
           "queryType": "topN",
           "refId": "A",
@@ -103,6 +102,130 @@
       "timeRegions": [],
       "timeShift": null,
       "title": "Symbol Error Counter",
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "decimals": null,
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Druid",
+      "fill": 1,
+      "gridPos": {
+        "h": 12,
+        "w": 19,
+        "x": 0,
+        "y": 12
+      },
+      "id": 8,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "sideWidth": 320,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 0.5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "aggregators": [
+            {
+              "fieldName": "PortXmitData",
+              "name": "Counter",
+              "type": "longSum"
+            }
+          ],
+          "currentAggregator": {
+            "type": "count"
+          },
+          "currentFilter": {
+            "type": "selector"
+          },
+          "currentPostAggregator": {
+            "fn": "+",
+            "type": "arithmetic"
+          },
+          "currentSelect": {
+            "dimension": "",
+            "metric": ""
+          },
+          "customGranularity": "ten_second",
+          "dimension": "GUID",
+          "druidDS": "perfquery",
+          "druidMetric": "Counter",
+          "errors": {
+            "aggregators": "You must supply at least one aggregator"
+          },
+          "hide": false,
+          "limit": 9999,
+          "queryType": "topN",
+          "refId": "A",
+          "selectDimensions": [
+            "GUID"
+          ],
+          "selectMetrics": [
+            "Counter"
+          ],
+          "shouldOverrideGranularity": true
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Port Xmit Data",
       "tooltip": {
         "shared": true,
         "sort": 2,
