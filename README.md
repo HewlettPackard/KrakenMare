@@ -35,11 +35,7 @@ STEP3
 
 export DOCKER_HOST_IP=$(resolveip -s $HOSTNAME) or your system IP if resolveip is not installed
 
-`cd demo && docker-compose up --build --remove-orphans -d`
-
-or 
-
-`cd demo && docker-compose up --build --remove-orphans -d`
+`demo/compose.sh up`
 
 To use the modular docker-compose files an example is
 
