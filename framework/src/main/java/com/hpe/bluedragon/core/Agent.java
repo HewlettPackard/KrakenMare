@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 
 public class Agent {
@@ -12,7 +14,8 @@ public class Agent {
 	private final long id;
 	private final String name;
 
-	public Agent(long id, String name) {
+	@JsonCreator
+	public Agent(@JsonProperty("id") long id, @JsonProperty("name") String name) {
 		this.id = id;
 		this.name = name;
 	}

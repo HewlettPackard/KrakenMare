@@ -3,7 +3,9 @@ package com.hpe.bluedragon.impl;
 import static com.hpe.bluedragon.Main.PROPERTIES;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.AdminClient;
@@ -44,11 +46,16 @@ public class KafkaRegistrationStream {
 		final Serde<String> stringSerde = Serdes.String();
 
 		final Serializer<Agent> agentSerializer = new JsonPOJOSerializer<>();
+		// TODO: do better, we should not need to explicitly configure deserializer type here...
 		final Deserializer<Agent> agentDeserializer = new JsonPOJODeserializer<>();
+		Map<String, Object> serdeProps = new HashMap<>();
+		serdeProps.put("JsonPOJOClass", Agent.class);
+		agentDeserializer.configure(serdeProps, false);
+
 		final Serde<Agent> agentSerde = Serdes.serdeFrom(agentSerializer, agentDeserializer);
 
 		final StreamsBuilder builder = new StreamsBuilder();
-		final KStream<String, String> source = builder.stream(REQUEST_TOPIC, Consumed.with(stringSerde, stringSerde));
+		final KStream<String, Agent> source = builder.stream(REQUEST_TOPIC, Consumed.with(stringSerde, agentSerde));
 
 		source.mapValues(this::registerNewAgent)
 				.to(RESULT_TOPIC, Produced.with(stringSerde, agentSerde));
@@ -56,6 +63,7 @@ public class KafkaRegistrationStream {
 		final Topology topology = builder.build();
 		LOG.info(topology.describe().toString());
 
+		PROPERTIES.put("default.deserialization.exception.handler", "org.apache.kafka.streams.errors.LogAndContinueExceptionHandler");
 		streams = new KafkaStreams(topology, PROPERTIES);
 
 		streams.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
@@ -64,8 +72,8 @@ public class KafkaRegistrationStream {
 		});
 	}
 
-	private Agent registerNewAgent(String name) {
-		Agent agent = repository.create(name);
+	private Agent registerNewAgent(Agent payload) {
+		Agent agent = repository.create(payload.getName());
 		repository.save(agent);
 		return agent;
 	}
