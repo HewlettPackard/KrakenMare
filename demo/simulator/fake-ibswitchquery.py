@@ -17,6 +17,7 @@ def on_log(client, userdata, level, buf):
     print("log: %s" % buf)
 
 
+# TODO: for now we listen to any response, not only ours 
 def on_registration_result(client, userdata, message):
     global registered, agent_name
     print("message received: %s " % message.payload)
@@ -33,7 +34,8 @@ registration_client.connect(broker_address)
 registration_client.loop_start()
 
 registration_client.subscribe("registration-result")
-registration_client.publish("registration-request", "{\"name\": \"simulator\"}")
+# use highest QoS for now
+registration_client.publish("registration-request", "{\"name\": \"simulator\"}", 2)
 
 while not registered:
    time.sleep(0.1)
@@ -73,6 +75,7 @@ while True:
             query_output = json.load (g)
          g.close()
 
+         query_output['Name'] = agent_name
          query_output['Timestamp'] = nowint
          x = random()
          if x > .98:

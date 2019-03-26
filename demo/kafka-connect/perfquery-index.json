@@ -8,8 +8,9 @@
         "format" : "json",
         "dimensionsSpec" : {
           "dimensions" : [
-            { "type": "long", "name": "ExcessiveBufferOverrunErrors"},
+            { "type": "string", "name": "Name"},
             { "type": "string", "name": "GUID"},
+            { "type": "long", "name": "ExcessiveBufferOverrunErrors"},
             { "type": "long", "name": "LinkDownedCounter"},
             { "type": "long", "name": "LinkErrorRecoveryCounter"},
             { "type": "long", "name": "LocalLinkIntegrityErrors"},

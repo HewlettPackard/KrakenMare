@@ -35,6 +35,8 @@ services:
       dockerfile: Dockerfile
     hostname: simulator
     depends_on:
+      - framework
+      - connect
       - mosquitto
     environment:
       MOSQUITTO_IP: mosquitto
