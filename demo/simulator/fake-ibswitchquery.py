@@ -4,15 +4,51 @@ import time
 import os
 from random import *
 import paho.mqtt.client as mqtt
-# Read broker address from environment variable. This setting is in the Dockerfile when used that way
-broker_address=os.environ['MOSQUITTO_IP']
-client = mqtt.Client("P1")
-client.connect(broker_address)
 
+# Read broker address from environment variable. This setting is in the Dockerfile when used that way
+broker_address = os.environ['MOSQUITTO_IP']
+
+# Register to the framework
+registered = False;
+agent_name = "undefined"
+
+
+def on_log(client, userdata, level, buf):
+    print("log: %s" % buf)
+
+
+def on_registration_result(client, userdata, message):
+    global registered, agent_name
+    print("message received: %s " % message.payload)
+    print("message topic: %s" % message.topic)
+    data = json.loads(message.payload)
+    registered = True
+    agent_name = data.get("name")
+
+
+registration_client = mqtt.Client("RegistrationClient")
+registration_client.on_log=on_log
+registration_client.on_message = on_registration_result
+registration_client.connect(broker_address)
+registration_client.loop_start()
+
+registration_client.subscribe("registration-result")
+registration_client.publish("registration-request", "{\"name\": \"simulator\"}")
+
+while not registered:
+   time.sleep(0.1)
+   print("waiting for registration result...")
+
+registration_client.loop_stop()
+print("registered with name: %s" % agent_name)
+
+
+client = mqtt.Client("DataClient")
+client.connect(broker_address)
 # Infinite loop
 while True:
    # Read formatted JSON data that describes the switches in the IRU (c stands for CMC)
-   for cmc in ['r1i0c-ibswitch','r1i1c-ibswitch']:
+   for cmc in ['r1i0c-ibswitch', 'r1i1c-ibswitch']:
       with open(cmc, 'r') as f:
          query_data = json.load (f)
 
@@ -25,14 +61,14 @@ while True:
       # For data counters add randint[1000,4000]
       # for packet counters add randint[100,400]
       # Set time to milliseconds since the epoch for InfluxDB
-      nowint=int(round(time.time() * 1000))
+      nowint = int(round(time.time() * 1000))
 
       for switch in query_data['Switch']:
-         hca=str(switch['HCA'])
-         port=str(switch['Port'])
-         guid=str(switch['Node_GUID'])
+         hca = str(switch['HCA'])
+         port = str(switch['Port'])
+         guid = str(switch['Node_GUID'])
          # Read in the old query outuput
-         output="/tmp/" + guid +".perfquery.json"
+         output = "/tmp/" + guid + ".perfquery.json"
          with open(output, 'r') as g:
             query_output = json.load (g)
          g.close()
@@ -62,21 +98,21 @@ while True:
          elif x > .79:
             query_output['PortXmitDiscards'] += 2
 
-         query_output['PortXmitData'] += randint(1000,4000)
-         query_output['PortRcvData'] += randint(1000,4000)
-         query_output['PortXmitPkts'] += randint(100,400)
-         query_output['PortRcvPkts'] += randint(100,400)
-         query_output['PortXmitWait'] += randint(100,200)
+         query_output['PortXmitData'] += randint(1000, 4000)
+         query_output['PortRcvData'] += randint(1000, 4000)
+         query_output['PortXmitPkts'] += randint(100, 400)
+         query_output['PortRcvPkts'] += randint(100, 400)
+         query_output['PortXmitWait'] += randint(100, 200)
 
 # Write output to the next input
          with open(output, 'w') as g:
-            json.dump(query_output,g)
+            json.dump(query_output, g)
          g.close()
 
 # Write the json data to mqtt broker
-         data_out=json.dumps(query_output)
+         data_out = json.dumps(query_output)
          print('Publishing via mqtt')
-         client.publish("ibswitch",data_out)
+         client.publish("ibswitch", data_out)
 
    # Infinite loop
    time.sleep(10)
