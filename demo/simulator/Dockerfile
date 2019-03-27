@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.9
 
 RUN apk add python2 py2-pip
 RUN pip install paho-mqtt
