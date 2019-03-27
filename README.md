@@ -37,16 +37,8 @@ NOTE: If you have another DNS (local e.g.) then add it to the dns list. If you r
 
 STEP3
 
-*** for HPE intranet network only, setup proxy... ***
-
-if you're on the HPE LAN adds the -f docker-proxy.yml option to the following line
-
 `demo/compose.sh up`
 
-To use the modular docker-compose files an example is
+which uses the modular docker-compose files and does
 
 `cd demo &&  docker-compose -f kafka-compose.yml -f connect-compose.yml -f sim-influx-grafana-compose.yml up --build --remove-orphans -d`
-
-STEP4
-
-To test the installation, launch a browser and reach http://localhost:3000 (admin/admin by default) and check you have data in Dashboard/Home Monitoring

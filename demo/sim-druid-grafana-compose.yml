@@ -17,6 +17,18 @@ services:
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
+  test-tools:
+    build:
+      context: test-tools
+      dockerfile: Dockerfile
+    hostname: test
+    depends_on:
+      - mosquitto
+      - kafka-embedded-client-1
+    environment:
+      MOSQUITTO_IP: mosquitto
+      KAFKA_BROKER_IP: broker-1
+
   simulator:
     build:
       context: simulator

@@ -1,5 +1,5 @@
 #precise, aka Ubuntu12 is the baseline for the SLAPM SDK.
-FROM ubuntu:precise
+FROM ubuntu:precise as kafkabuild
 
 RUN apt-get update && apt-get upgrade
 
@@ -27,4 +27,10 @@ WORKDIR /
 
 #the 'fabric' topic is already generated in the demo project by the python simulator, this code will simply publish to this assumed
 #already existing topic.
-ENTRYPOINT export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && /librdkafka/examples/simul $KAFKA_BROKER_IP fabric Hello_Kafka
+FROM ubuntu:precise
+COPY --from=kafkabuild /usr/local/lib/* /usr/local/lib/
+RUN mkdir -p /usr/local/include/librdkafka
+COPY --from=kafkabuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
+COPY --from=kafkabuild /librdkafka/examples/simul /simul
+ENV LD_LIBRARY_PATH /usr/local/lib
+ENTRYPOINT /simul $KAFKA_BROKER_IP fabric Hello_Kafka
