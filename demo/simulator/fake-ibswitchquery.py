@@ -3,6 +3,7 @@ import json
 import time
 import os
 from random import *
+import kafka
 import paho.mqtt.client as mqtt
 
 # Read broker address from environment variable. This setting is in the Dockerfile when used that way
@@ -12,6 +13,29 @@ broker_address = os.environ['MOSQUITTO_IP']
 registered = False;
 agent_name = "undefined"
 
+# wait for Kafka registration topic to exist
+kafka_client = None
+try:
+    kafka_client = kafka.KafkaClient(broker_address)
+except kafka.errors.KafkaUnavailableError:
+    print "waiting for Kafka broker..."
+
+while not kafka_client:
+    time.sleep(1)
+    try:
+        kafka_client = kafka.KafkaClient(broker_address)
+    except kafka.errors.KafkaUnavailableError:
+        print "waiting for Kafka broker..."
+
+while not "registration-result" in kafka_client.topics:
+    print("waiting for registration-result topic...")
+    time.sleep(1)
+    # TODO: not sure how to refresh topic list, so recreate a client for now...
+    kafka_client.close();
+    kafka_client = kafka.KafkaClient(broker_address)
+
+# TODO: we still need to wait: investigate why
+time.sleep(60)
 
 def on_log(client, userdata, level, buf):
     print("log: %s" % buf)
@@ -26,7 +50,6 @@ def on_registration_result(client, userdata, message):
     registered = True
     agent_name = data.get("name")
 
-
 registration_client = mqtt.Client("RegistrationClient")
 registration_client.on_log=on_log
 registration_client.on_message = on_registration_result
@@ -38,8 +61,8 @@ registration_client.subscribe("registration-result")
 registration_client.publish("registration-request", "{\"name\": \"simulator\"}", 2)
 
 while not registered:
-   time.sleep(0.1)
-   print("waiting for registration result...")
+    time.sleep(0.1)
+    print("waiting for registration result...")
 
 registration_client.loop_stop()
 print("registered with name: %s" % agent_name)
