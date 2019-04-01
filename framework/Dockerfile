@@ -6,12 +6,13 @@ WORKDIR /opt/bluedragon
 COPY pom.xml /opt/bluedragon/
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"
-RUN mvn install
+RUN mvn dependency:go-offline
 
 COPY src /opt/bluedragon/src
 # tests requires a Redis instance: skip them (they are run in the CI)
-RUN mvn package -DskipTests
+RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
+COPY target/framework-0.0.1-SNAPSHOT-jar-with-dependencies.jar framework.jar
 
 EXPOSE 8080
 
-CMD ["mvn", "exec:java"]
+CMD ["java", "-cp", "framework.jar", "com.hpe.bluedragon.Main"]
