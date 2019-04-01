@@ -38,8 +38,6 @@ deploy-dev: &deploy-dev
   stage: deploy
   tags:
     - u176i108
-  variables:
-    DOCKER_HOST_IP: 16.19.176.108
   environment: &u176i108
     name: u176i108
     url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
@@ -68,8 +66,6 @@ deploy-master: &deploy-master
   stage: deploy
   tags:
     - u176i109
-  variables:
-    DOCKER_HOST_IP: 16.19.176.109
   environment: &u176i109
     name: u176i109
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
