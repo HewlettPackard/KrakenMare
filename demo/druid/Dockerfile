@@ -1,8 +1,6 @@
 FROM openjdk:8-jdk
 
-RUN export http_proxy=http://web-proxy.bbn.hpecorp.net:8080 \
-    && export https_proxy=http://web-proxy.bbn.hpecorp.net:8080 \
-    && wget https://static.imply.io/release/imply-2.8.16.tar.gz \
+RUN wget https://static.imply.io/release/imply-2.8.16.tar.gz \
     && tar -xzf imply-2.8.16.tar.gz \
     && mv imply-2.8.16 /opt/druid/
 

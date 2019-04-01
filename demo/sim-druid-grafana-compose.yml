@@ -11,7 +11,7 @@ services:
   mosquitto:
     image: eclipse-mosquitto:latest
     hostname: mosquitto
-    ports: 
+    ports:
       - "1883:1883"
       - "9001:9001"
     volumes:
@@ -25,7 +25,29 @@ services:
     depends_on:
       - mosquitto
     environment:
-      MOSQUITTO_IP: '${DOCKER_HOST_IP}'
+      MOSQUITTO_IP: mosquitto
+
+  kafka-embedded-client-1:
+    build:
+      context: ../kafka-client
+      dockerfile: Dockerfile
+    hostname: kafka-emb1
+    depends_on:
+      - broker-1
+    environment:
+      KAFKA_BROKER_IP: broker-1
+      restart: always
+
+  mousttic-1:
+    build:
+      context: ../mousttic
+      dockerfile: Dockerfile
+    hostname: mousttic-1
+    depends_on:
+      - mosquitto
+    environment:
+      MOSQUITTO_IP: mosquitto
+    restart: always
 
   druid:
     build:

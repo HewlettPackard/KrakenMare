@@ -1,9 +1,6 @@
 #precise, aka Ubuntu12 is the baseline for the SLAPM SDK.
 FROM ubuntu:precise
 
-ENV http_proxy http://web-proxy.corp.hpecorp.net:8080
-ENV https_proxy http://web-proxy.corp.hpecorp.net:8080
-
 RUN apt-get update && apt-get upgrade
 
 #only required for building

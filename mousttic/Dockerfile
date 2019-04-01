@@ -1,9 +1,6 @@
 #precise, aka Ubuntu12 is the baseline for the SLAPM SDK.
 FROM ubuntu:precise
 
-ENV http_proxy http://web-proxy.corp.hpecorp.net:8080
-ENV https_proxy http://web-proxy.corp.hpecorp.net:8080
-
 RUN echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu precise main" >> /etc/apt/sources.list && apt-get update
 
 #only required for building

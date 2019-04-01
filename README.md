@@ -8,6 +8,8 @@ STEP2 -
 
 *** for HPE intranet network only, setup proxy... ***
 
+TBD: See https://docs.docker.com/network/proxy/ to improve the proxy support
+
 - `mkdir -p /etc/systemd/system/docker.service.d`
 - create a file "/etc/systemd/system/docker.service.d/http-proxy.conf
 - cat /etc/systemd/system/docker.service.d/http-proxy.conf
@@ -31,12 +33,20 @@ Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=htt
 - `systemctl daemon-reload`
 - `systemctl restart docker`
 
+NOTE: If you have another DNS (local e.g.) then add it to the dns list. If you refer to your own DNS as 127.0.0.1, then change it to your own IP address so that it's propagated correctly in the containers you'll be creating.
+
 STEP3
 
-export DOCKER_HOST_IP=$(resolveip -s $HOSTNAME) or your system IP if resolveip is not installed
+*** for HPE intranet network only, setup proxy... ***
+
+if you're on the HPE LAN adds the -f docker-proxy.yml option to the following line
 
 `demo/compose.sh up`
 
 To use the modular docker-compose files an example is
 
 `cd demo &&  docker-compose -f kafka-compose.yml -f connect-compose.yml -f sim-influx-grafana-compose.yml up --build --remove-orphans -d`
+
+STEP4
+
+To test the installation, launch a browser and reach http://localhost:3000 (admin/admin by default) and check you have data in Dashboard/Home Monitoring

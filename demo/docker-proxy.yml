@@ -1,0 +1,39 @@
+version: '3'
+services:
+  connect:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  simulator:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  framework:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         MAVEN_OPTS: -Dhttps.proxyHost=web-proxy.bbn.hpecorp.net -Dhttps.proxyPort=8080
+
+  druid:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  kafka-embedded-client-1:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  mousttic-1:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
