@@ -6,8 +6,8 @@ from random import *
 import kafka
 import paho.mqtt.client as mqtt
 
-# Read broker address from environment variable. This setting is in the Dockerfile when used that way
-broker_address = os.environ['MOSQUITTO_IP']
+mqtt_broker = "mosquitto"
+kafka_broker = "broker-1"
 
 # Register to the framework
 registered = False;
@@ -16,14 +16,14 @@ agent_name = "undefined"
 # wait for Kafka registration topic to exist
 kafka_client = None
 try:
-    kafka_client = kafka.KafkaClient(broker_address)
+    kafka_client = kafka.KafkaClient(kafka_broker)
 except kafka.errors.KafkaUnavailableError:
     print "waiting for Kafka broker..."
 
 while not kafka_client:
     time.sleep(1)
     try:
-        kafka_client = kafka.KafkaClient(broker_address)
+        kafka_client = kafka.KafkaClient(kafka_broker)
     except kafka.errors.KafkaUnavailableError:
         print "waiting for Kafka broker..."
 
@@ -32,7 +32,7 @@ while not "registration-result" in kafka_client.topics:
     time.sleep(1)
     # TODO: not sure how to refresh topic list, so recreate a client for now...
     kafka_client.close();
-    kafka_client = kafka.KafkaClient(broker_address)
+    kafka_client = kafka.KafkaClient(kafka_broker)
 
 # TODO: we still need to wait: investigate why
 time.sleep(60)
@@ -53,7 +53,7 @@ def on_registration_result(client, userdata, message):
 registration_client = mqtt.Client("RegistrationClient")
 registration_client.on_log=on_log
 registration_client.on_message = on_registration_result
-registration_client.connect(broker_address)
+registration_client.connect(mqtt_broker)
 registration_client.loop_start()
 
 registration_client.subscribe("registration-result")
@@ -69,7 +69,7 @@ print("registered with name: %s" % agent_name)
 
 
 client = mqtt.Client("DataClient")
-client.connect(broker_address)
+client.connect(mqtt_broker)
 # Infinite loop
 while True:
    # Read formatted JSON data that describes the switches in the IRU (c stands for CMC)

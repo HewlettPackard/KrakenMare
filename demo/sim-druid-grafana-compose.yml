@@ -38,8 +38,6 @@ services:
       - framework
       - connect
       - mosquitto
-    environment:
-      MOSQUITTO_IP: mosquitto
 
   kafka-embedded-client-1:
     build:
