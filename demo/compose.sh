@@ -7,7 +7,7 @@ files="-f kafka-compose.yml -f sim-druid-grafana-compose.yml -f connect-compose.
 if [ "$action" == "up" ]; then
 	echo "Checking whether we are on the HPE LAN and needing a proxy..."
 	if [ ! -x /usr/bin/wget ]; then 
-		echo "Unable to find wget in your env, intsall it to have automatic HPE proxy detection"
+		echo "Unable to find wget in your env, install it to have automatic HPE proxy detection"
 	else
 		wget -q --dns-timeout=2 autocache.hpecorp.net -O /dev/null
 		if [ $? -eq 0 ]; then
