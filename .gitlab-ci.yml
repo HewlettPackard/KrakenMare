@@ -42,6 +42,7 @@ deploy-dev: &deploy-dev
     name: u176i108
     url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
     on_stop: stop-dev
+  dependencies: []
   before_script:
     - export https_proxy=$https_proxy
     - export http_proxy=$http_proxy
@@ -58,6 +59,7 @@ stop-dev:
   environment:
     <<: *u176i108
     action: stop
+  dependencies: []
   script:
     - (cd demo && ./compose.sh down)
   when: manual
@@ -69,6 +71,7 @@ deploy-master: &deploy-master
   environment: &u176i109
     name: u176i109
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
+  dependencies: []
   script:
     - (cd demo && ./compose.sh down --remove-orphans && ./compose.sh up)
   only:
