@@ -16,6 +16,31 @@ if [ "$action" == "up" ]; then
 			echo "HPE proxies set up"
 		fi
 	fi
+	dever=`docker --version`
+	demaj=`echo $dever | cut -d' ' -f3 | cut -d'.' -f1`
+	demin=`echo $dever | cut -d' ' -f3 | cut -d'.' -f2`
+	if [ $demaj -lt 17 ]; then
+		echo "Minimal supported docker engine is 17.09 (found $demaj)"
+		exit -1
+	elif [ $demaj -eq 17 ] && [ $demin -lt 9 ]; then
+		echo "Minimal supported docker engine is 17.09 (found $demaj.$demin)"
+		exit -1
+	else
+		echo "Using $dever"
+	fi
+
+	dcver=`docker-compose --version`
+	dcmaj=`echo $dcver | cut -d' ' -f3 | cut -d'.' -f1`
+	dcmin=`echo $dcver | cut -d' ' -f3 | cut -d'.' -f2`
+	if [ $dcmaj -lt 1 ]; then
+		echo "Minimal supported docker-compose is 1.17 (found $dcmaj)"
+		exit -1
+	elif [ $dcmaj -eq 1 ] && [ $dcmin -lt 17 ]; then
+		echo "Minimal supported docker-compose is 1.17 (found $dcmaj.$dcmin)"
+		exit -1
+	else
+		echo "Using $dcver"
+	fi
 
 	docker-compose up --build --remove-orphans -d
 elif [ "$action" == "down" ]; then
