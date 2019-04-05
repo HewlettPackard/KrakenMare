@@ -73,6 +73,6 @@ deploy-master: &deploy-master
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   dependencies: []
   script:
-    - ./compose.sh down --remove-orphans && compose.sh up
+    - ./compose.sh down --remove-orphans && ./compose.sh up
   only:
     - master
