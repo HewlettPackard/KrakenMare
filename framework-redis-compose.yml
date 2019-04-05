@@ -8,7 +8,7 @@ version: '3'
 services:
   framework:
     build:
-      context: ../framework
+      context: framework
       dockerfile: Dockerfile
     hostname: framework
     depends_on:

@@ -48,7 +48,7 @@ deploy-dev: &deploy-dev
     - export http_proxy=$http_proxy
     - echo $https_proxy
   script:
-    - (cd demo && ./compose.sh up)
+    - ./compose.sh up
   except:
     - master
 
@@ -61,7 +61,7 @@ stop-dev:
     action: stop
   dependencies: []
   script:
-    - (cd demo && ./compose.sh down)
+    - ./compose.sh down
   when: manual
 
 deploy-master: &deploy-master
@@ -73,6 +73,6 @@ deploy-master: &deploy-master
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   dependencies: []
   script:
-    - (cd demo && ./compose.sh down --remove-orphans && ./compose.sh up)
+    - ./compose.sh down --remove-orphans && compose.sh up
   only:
     - master
