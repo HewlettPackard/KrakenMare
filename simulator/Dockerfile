@@ -1,6 +1,6 @@
-FROM alpine:3.9
+FROM ubuntu:18.04
 
-RUN apk add python2 py2-pip
+RUN apt update && apt install -y python python-pip
 RUN pip install paho-mqtt kafka-python
 
 COPY fake-ibswitchquery.py r1i0c-ibswitch r1i1c-ibswitch /simulator/

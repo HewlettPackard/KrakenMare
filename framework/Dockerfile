@@ -1,4 +1,4 @@
-FROM maven:3.6.0-jdk-8-alpine
+FROM maven:3.6.0-jdk-8
 
 RUN mkdir -p /opt/bluedragon
 WORKDIR /opt/bluedragon
