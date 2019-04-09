@@ -78,7 +78,7 @@ curl -X POST "connect:8083/connectors" \
     "tasks.max": "1",
     "connect.mqtt.connection.clean": "true",
     "connect.mqtt.connection.timeout": "1000",
-    "connect.mqtt.kcql": "INSERT INTO registration-request SELECT * FROM registration-request WITHCONVERTER=`com.datamountaineer.streamreactor.connect.converters.source.JsonSimpleConverter`",
+    "connect.mqtt.kcql": "INSERT INTO registration-request SELECT * FROM registration-request/+ WITHCONVERTER=`com.datamountaineer.streamreactor.connect.converters.source.JsonSimpleConverter`",
     "key.converter": "org.apache.kafka.connect.json.JsonConverter",
     "key.converter.schemas.enable": "false",
     "value.converter": "org.apache.kafka.connect.json.JsonConverter",

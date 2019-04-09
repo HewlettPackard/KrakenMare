@@ -58,10 +58,10 @@ registration_client.loop_start()
 
 registration_client.subscribe("registration-result")
 # use highest QoS for now
-registration_client.publish("registration-request", "{\"name\": \"simulator\"}", 2)
+registration_client.publish("registration-request/r1ib", "{\"name\": \"simulator\"}", 2, True)
 
 while not registered:
-    time.sleep(0.1)
+    time.sleep(1)
     print("waiting for registration result...")
 
 registration_client.loop_stop()
