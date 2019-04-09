@@ -48,7 +48,6 @@ services:
       - broker-1
     environment:
       KAFKA_BROKER_IP: broker-1
-      restart: always
 
   mousttic-1:
     build:
@@ -59,7 +58,6 @@ services:
       - mosquitto
     environment:
       MOSQUITTO_IP: mosquitto
-    restart: always
 
   druid:
     build:

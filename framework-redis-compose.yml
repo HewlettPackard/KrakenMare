@@ -21,11 +21,9 @@ services:
     environment:
       REDIS_SERVER: "redis:6379"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
-    restart: always
 
   redis:
     image: redis:5.0.3
     hostname: redis
     ports:
       - "6379:6379"
-    restart: always
