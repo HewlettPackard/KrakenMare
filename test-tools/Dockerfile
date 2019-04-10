@@ -1,4 +1,4 @@
-FROM ubuntu:precise as testbuild
+FROM ubuntu:18.04 as testbuild
 
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
@@ -12,7 +12,7 @@ COPY --from=demo_kafka-embedded-client-1 /usr/local/include/librdkafka/* /usr/lo
 RUN mkdir -p /usr/src
 RUN cd /usr/src && wget -q --no-check-certificate https://github.com/edenhill/kafkacat/archive/1.3.1.tar.gz -O - | tar xzf - && cd kafkacat-1.3.1 && ./configure && make && make install && mv kafkacat /usr/local/bin/
 
-FROM ubuntu:precise
+FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
 COPY --from=demo_kafka-embedded-client-1 /usr/local/lib/* /usr/local/lib/
