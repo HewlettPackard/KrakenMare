@@ -1,7 +1,7 @@
 FROM ubuntu:precise as testbuild
 
 # Test env deps
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
 # Build deps
 RUN apt-get install -y gcc make
@@ -13,7 +13,7 @@ RUN mkdir -p /usr/src
 RUN cd /usr/src && wget -q --no-check-certificate https://github.com/edenhill/kafkacat/archive/1.3.1.tar.gz -O - | tar xzf - && cd kafkacat-1.3.1 && ./configure && make && make install && mv kafkacat /usr/local/bin/
 
 FROM ubuntu:precise
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
 COPY --from=demo_kafka-embedded-client-1 /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/

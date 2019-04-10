@@ -1,7 +1,7 @@
 #precise, aka Ubuntu12 is the baseline for the SLAPM SDK.
 FROM ubuntu:precise as kafkabuild
 
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get upgrade -y
 
 #only required for building
 RUN apt-get install -y --force-yes gcc g++ make \
