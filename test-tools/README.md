@@ -12,6 +12,10 @@ Launch the test tools side car container with:
 
 `docker run -ti --network demo_default --rm demo_test-tools /bin/bash`
 
+or run-test-containers.sh from the directory above
+
+#../run-tests-containers.sh
+
 Once in the container test mosquitto with:
 
 `mosquitto_sub -h mosquitto -t hello_topic`

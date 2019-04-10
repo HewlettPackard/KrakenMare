@@ -65,3 +65,7 @@ a4eaebd90fca        eclipse-mosquitto:latest          "/docker-entrypoint.…"  
 ```
 
 To stop the stack, use the `./compose.sh down` command
+
+If you want to start the test containers (featuring kafkacat and mosquitto_*ub) , use 
+
+./run-tests-container.sh
