@@ -7,7 +7,7 @@
 version: '3'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.0.0
+    image: confluentinc/cp-zookeeper:5.2.0
     hostname: zookeeper
     ports:
       - "2181:2181"
@@ -16,7 +16,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker-1:
-    image: confluentinc/cp-enterprise-kafka:5.0.0
+    image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-1
     depends_on:
       - zookeeper
@@ -40,7 +40,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   broker-2:
-    image: confluentinc/cp-enterprise-kafka:5.0.0
+    image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-2
     depends_on:
       - zookeeper
@@ -64,7 +64,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   broker-3:
-    image: confluentinc/cp-enterprise-kafka:5.0.0
+    image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-3
     depends_on:
       - zookeeper
