@@ -25,12 +25,11 @@ RUN cd /librdkafka/examples && make
 
 WORKDIR /
 
-#the 'fabric' topic is already generated in the demo project by the python simulator, this code will simply publish to this assumed
-#already existing topic.
+# The demo configuration allows topics to be created. By the act of publishing we create the hello topic
 FROM ubuntu:precise
 COPY --from=kafkabuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka
 COPY --from=kafkabuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
 COPY --from=kafkabuild /librdkafka/examples/simul /simul
 ENV LD_LIBRARY_PATH /usr/local/lib
-ENTRYPOINT /simul $KAFKA_BROKER_IP fabric Hello_Kafka
+ENTRYPOINT /simul $KAFKA_BROKER_IP hello Hello_Kafka

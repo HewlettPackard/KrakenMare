@@ -42,6 +42,7 @@ char* text_to_json(const char* mymsg) {
   json_t *root = json_object();
     
   json_object_set_new( root, "message" , json_string(mymsg));
+  //The comment below is no longer accurate - jhanson 15 Apr 2019
   //kafka-connect is sending all messages from the 'fabric' topic into the perfquery influxDB table
   //provided they have a GUID. see connect.influx.kcql into configure-influxdb.sh
   json_object_set_new( root, "GUID" , json_string("0xdeadbeef"));
