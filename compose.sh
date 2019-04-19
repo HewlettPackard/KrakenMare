@@ -8,6 +8,10 @@ nb_services=$#
 export COMPOSE_PROJECT_NAME=demo
 
 export COMPOSE_FILE=all-compose.yml:secrets-compose.yml
+# Hardcoded for now
+export REDFISHIP=${REDFISHIP:-16.19.180.65}
+export REDFISHACC=${REDFISHACC:-cmu}
+export REDFISHPWD=${REDFISHPWD:-HPinvent}
 
 if [ "$action" == "up" ]; then
 	echo "Checking whether we are on the HPE LAN and needing a proxy..."

@@ -648,3 +648,15 @@ networks:
     driver_opts:
       encrypted: "false"
       
+  redfish:
+    build:
+      context: redfish
+      dockerfile: Dockerfile
+      args:
+        REDFISHIP: "$REDFISHIP"
+        REDFISHACC: "$REDFISHACC"
+        REDFISHPWD: "$REDFISHPWD"
+    hostname: redfish
+    ports:
+      - "6464:6464"
+    <<: *deploy
