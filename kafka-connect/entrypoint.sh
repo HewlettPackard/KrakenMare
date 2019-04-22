@@ -18,6 +18,8 @@ wait_and_configure_druid(){
 
   # Load the indexer for simulator data
   curl -XPOST -H'Content-Type: application/json' -d @/etc/kafka-connect/perfquery-index.json http://druid:8090/druid/indexer/v1/supervisor
+  # Load the indexer for collectd data
+  curl -XPOST -H'Content-Type: application/json' -d @/etc/kafka-connect/collectd-index.json http://druid:8090/druid/indexer/v1/supervisor
 
 }
 

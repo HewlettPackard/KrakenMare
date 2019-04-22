@@ -3,7 +3,8 @@
 action=$1
 
 export COMPOSE_PROJECT_NAME=demo
-export COMPOSE_FILE=kafka-compose.yml:sim-druid-grafana-compose.yml:connect-compose.yml:framework-redis-compose.yml
+export COMPOSE_FILE=kafka-compose.yml:sim-druid-grafana-compose.yml:connect-compose.yml:framework-redis-compose.yml:collectd-compose.yml
+export HOST_IP=`ip -4 addr show scope global dev docker0 | grep inet | awk '{print \$2}' | cut -d / -f 1`
 
 if [ "$action" == "up" ]; then
 	echo "Checking whether we are on the HPE LAN and needing a proxy..."

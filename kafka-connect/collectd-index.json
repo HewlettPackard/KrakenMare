@@ -1,0 +1,52 @@
+{
+  "type": "kafka",
+  "dataSchema": {
+    "dataSource": "collectd",
+    "parser": {
+      "type": "string",
+      "parseSpec": {
+        "format": "json",
+        "dimensionsSpec": {
+          "dimensions": [
+            "type_instance",
+            "plugin",
+            {
+              "name": "values",
+              "type": "float"
+            },
+            "host",
+            {
+              "name": "interval",
+              "type": "long"
+            },
+            "type"
+          ]
+        },
+        "timestampSpec": {
+          "column": "time",
+          "format": "millis"
+        }
+      }
+    },
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "rollup": false,
+      "queryGranularity": "none"
+    },
+    "metricsSpec": []
+  },
+  "ioConfig": {
+    "type": "kafka",
+    "topic": "collectd",
+    "consumerProperties": {
+      "bootstrap.servers": "broker-1:9092"
+    }
+  },
+  "tuningConfig": {
+    "type": "kafka",
+    "forceExtendableShardSpecs": true,
+    "maxParseExceptions": 100,
+    "maxSavedParseExceptions": 10
+  }
+}
