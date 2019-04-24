@@ -5,6 +5,7 @@ import os
 from random import *
 import kafka
 import paho.mqtt.client as mqtt
+import uuid
 
 mqtt_broker = "mosquitto"
 kafka_broker = "broker-1"
@@ -57,8 +58,13 @@ registration_client.connect(mqtt_broker)
 registration_client.loop_start()
 
 registration_client.subscribe("registration-result")
+# Generate a uuid to send over as the name
+registration_payload = {}
+registration_payload["name"] = "r1ib-simulator"
+registration_payload["uuid"] = str(uuid.uuid4())
+data_out = json.dumps(registration_payload)
 # use highest QoS for now
-registration_client.publish("registration-request/r1ib", "{\"name\": \"simulator\"}", 2, True)
+registration_client.publish("registration-request/r1ib", data_out, 2, True)
 
 while not registered:
     time.sleep(1)
