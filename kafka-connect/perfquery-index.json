@@ -1,13 +1,13 @@
 {
-  "type" : "kafka",
-  "dataSchema" : {
-    "dataSource" : "perfquery",
-    "parser" : {
-      "type" : "string",
-      "parseSpec" : {
-        "format" : "json",
-        "dimensionsSpec" : {
-          "dimensions" : [
+  "type": "kafka",
+  "dataSchema": {
+    "dataSource": "perfquery",
+    "parser": {
+      "type": "string",
+      "parseSpec": {
+        "format": "json",
+        "dimensionsSpec": {
+          "dimensions": [
             { "type": "string", "name": "Name"},
             { "type": "string", "name": "GUID"},
             { "type": "long", "name": "ExcessiveBufferOverrunErrors"},
@@ -39,16 +39,14 @@
     "metricsSpec" : [],
     "granularitySpec" : {
       "type" : "uniform",
-      "segmentGranularity" : "minute",
+      "segmentGranularity" : "HOUR",
       "queryGranularity" : "none",
       "rollup" : false
     }
   },
   "ioConfig": {
+    "type": "kafka",
     "topic": "fabric",
-    "replicas": 2,
-    "taskDuration": "PT10M",
-    "completionTimeout": "PT20M",
     "consumerProperties": {
       "bootstrap.servers": "broker-1:9092,broker-2:9093,broker-3:9094"
       }
