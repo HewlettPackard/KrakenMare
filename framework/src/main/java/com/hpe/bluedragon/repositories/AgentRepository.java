@@ -2,6 +2,7 @@ package com.hpe.bluedragon.repositories;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -24,10 +25,10 @@ public class AgentRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent create(String name) {
+	public Agent create(String name, UUID uuid) {
 		long id = index.getAndIncrement();
-		LOG.info("Creating new agent: name='{}', id='{}'", name, id);
-		return new Agent(id, name + "-" + id);
+		LOG.info("Creating new agent: id='{}', name='{}', uuid='{}'", id, name, uuid);
+		return new Agent(id, uuid, name + "-" + id);
 	}
 
 	@Override

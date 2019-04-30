@@ -2,6 +2,7 @@ package com.hpe.bluedragon.repositories;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -35,10 +36,10 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent create(String name) {
+	public Agent create(String name, UUID uuid) {
 		long id = jedis.incr(counterKey);
-		LOG.info("Creating new agent: name='{}', id='{}'", name, id);
-		return new Agent(id, name + "-" + id);
+		LOG.info("Creating new agent: id='{}', name='{}', uuid='{}'", id, name, uuid);
+		return new Agent(id, uuid, name + "-" + id);
 	}
 
 	@Override

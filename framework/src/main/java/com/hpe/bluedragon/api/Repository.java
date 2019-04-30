@@ -1,12 +1,18 @@
 package com.hpe.bluedragon.api;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface Repository<T> {
 
 	void reset();
 
-	T create(String id);
+	default T create(String id) {
+		UUID uuid = UUID.randomUUID();
+		return create(id, uuid);
+	}
+
+	T create(String id, UUID uuid);
 
 	boolean save(T entity);
 
