@@ -47,9 +47,13 @@
       gpgcheck: no
 
 
-  - name: Install yum-utils
+  - name: Install yum-utils,wget,git and tmux
     yum:
-      name: yum-utils
+      name:
+        - yum-utils
+        - wget
+        - git
+        - tmux
       state: latest
 
 
@@ -96,20 +100,3 @@
       daemon_reload: yes
       name: docker
 
-  - name: Add the user 'bdu'
-    user:
-      name: bdu
-      password: "{{password}}"
-      groups: docker,wheel
-      append: yes
-
-  - name: Download docker-compose
-    get_url:
-      url: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}
-      dest: /usr/local/bin/docker-compose
-
-  - name: Allow execution of /usr/local/bin/docker-compose..
-    file:
-      path: /usr/local/bin/docker-compose
-      mode : "u+x"
-  
