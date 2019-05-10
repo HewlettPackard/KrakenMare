@@ -39,7 +39,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 	public Agent create(String name, UUID uuid) {
 		long id = jedis.incr(counterKey);
 		LOG.info("Creating new agent: id='{}', name='{}', uuid='{}'", id, name, uuid);
-		return new Agent(id, uuid, name + "-" + id);
+		return new Agent(id, uuid, name);
 	}
 
 	@Override

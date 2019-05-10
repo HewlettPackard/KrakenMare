@@ -28,7 +28,7 @@ public class AgentRepository implements Repository<Agent> {
 	public Agent create(String name, UUID uuid) {
 		long id = index.getAndIncrement();
 		LOG.info("Creating new agent: id='{}', name='{}', uuid='{}'", id, name, uuid);
-		return new Agent(id, uuid, name + "-" + id);
+		return new Agent(id, uuid, name);
 	}
 
 	@Override
