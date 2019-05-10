@@ -86,15 +86,24 @@
       state: latest
       disable_gpg_check: yes
 
-  - name : Setup HPE proxy for Docker in  /etc/systemd/system/docker.service.d/http-proxy.conf
+  - name : Setup HPE proxy for Docker Registry  in  /etc/systemd/system/docker.service.d/http-proxy.conf
     blockinfile:
       path: /etc/systemd/system/docker.service.d/http-proxy.conf
       create: yes
       block: |
         [Service]
         Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080" 
-  
+    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined 
 
+  - name : Setup HPE proxy for Docker in  /etc/systemd/system/docker.service.d/http-proxy.conf
+    blockinfile:
+      path: /etc/systemd/system/docker.service.d/http-proxy.conf
+      create: yes
+      state: absent
+      block: |
+        [Service]
+        Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080" 
+    when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
 
   - name: Create /etc/docker/ if it doesn't exist
     file:
@@ -112,12 +121,12 @@
       backup: yes
       content: |
         {
-          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567","http://{{ docker_mirror_registry_adress }}:{{ docker_mirror_registry_port }}"],
-          "registry-mirrors": ["http://{{ docker_mirror_registry_adress }}:{{ docker_mirror_registry_port }}"],
-          "dns" : ["16.110.135.51", "8.8.8.8"],
+          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567","http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
+          "registry-mirrors": ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
+          "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-    when: docker_mirror_registry_adress is defined and docker_mirror_registry_port is defined
+    when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
 
   - name : Setup docker
     copy:
@@ -126,10 +135,10 @@
       content: |
         {
           "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567"],
-          "dns" : ["16.110.135.51", "8.8.8.8"],
+          "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-    when: docker_mirror_registry_adress is undefined or docker_mirror_registry_port is undefined 
+    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined 
 
 
   - name: Run deamon-reload then restart Docker service 

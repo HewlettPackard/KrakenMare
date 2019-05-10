@@ -80,9 +80,9 @@ If the client is a docker registry
 ```bash
 ansible-playbook bdu-client-playbook.yml -i hosts
 ```
-else you need to specify mirror registry adress and port
+else you need to specify mirror registry address and port
 ```bash
-ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{docker_mirror_registry_adress : '16.19.176.126', docker_mirror_registry_port : '5000'}"
+ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{docker_mirror_registry_address : '16.19.176.126', docker_mirror_registry_port : '5000'}"
 ```
 
 Others extra-variables you can specify :  
