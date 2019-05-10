@@ -13,14 +13,16 @@
     #password is bdu
     # ansible all -i localhost, -m debug -a "msg={{ 'bdu' | password_hash('sha512', 'SALT') }}"
     password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
+    proxy : http://web-proxy.corp.hpecorp.net:8080
   
+    proxy_ansible : http://grewebcachevip.bastion.europe.hp.com:8080
 
 
 
 
   environment:
-    http_proxy: http://grewebcachevip.bastion.europe.hp.com:8080
-    https_proxy: http://grewebcachevip.bastion.europe.hp.com:8080
+    http_proxy: "{{ proxy_ansible }}"
+    https_proxy: "{{ proxy_ansible }}"
 
 
 # End of variables
@@ -92,7 +94,7 @@
       create: yes
       block: |
         [Service]
-        Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080" 
+        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" 
     when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined 
 
   - name : Setup HPE proxy for Docker in  /etc/systemd/system/docker.service.d/http-proxy.conf
@@ -102,7 +104,7 @@
       state: absent
       block: |
         [Service]
-        Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080" 
+        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" 
     when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
 
   - name: Create /etc/docker/ if it doesn't exist
