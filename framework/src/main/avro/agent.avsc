@@ -1,0 +1,8 @@
+{"namespace": "com.hpe.krakenmare.core",
+ "type": "record",
+ "name": "Agent",
+ "fields": [
+     {"name": "id", "type": "long"},
+     {"name": "name", "type": "string"}
+ ]
+}
