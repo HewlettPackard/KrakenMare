@@ -61,28 +61,33 @@ cd ../ && rm -rf ansible-2.7.10/
 ---
 
 # To deploy the ansible playbooks
-Prerequisites client: RHEL 8 and **python3 preinstalled**    
-Prerequisites server: RHEL 8, python3, tar, ansible .  
-You need an host file on the server node:  
+Prerequisites client: RHEL 8 ,**python3 preinstalled** and ssh access  
+Prerequisites server: RHEL 8, python3, tar, ansible . More informations in [/playbooks/README.md](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/README.md) 
+
+For now I can deploy the pipeline on client which have RHEL 8 and python via ssh. I specify the ip and  where is the python interpreter in [/playbooks/hosts](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/hosts).  
+
 **hosts**   
 ```ini 
 [bdu-client]
-16.19.176.125 ansible_python_interpreter=/usr/bin/python3  
-16.19.176.126 ansible_python_interpreter=/usr/bin/python3  
-
+16.19.176.125 ansible_python_interpreter=/usr/bin/python3 docker_mirror_registry_address="16.19.176.126" docker_mirror_registry_port="5000"
+16.19.176.126 ansible_python_interpreter=/usr/bin/python3
 ```
 
 hosts should be in **/etc/ansible/hosts**  else you need to specify the path with -i <PATH> in the command line
 
 
 
+Then I deploy using this command line:
 If the client is a docker registry
 ```bash
 ansible-playbook bdu-client-playbook.yml -i hosts
 ```
-else you need to specify mirror registry address and port
+
+---
+
+To specify extra variables use :
 ```bash
-ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{docker_mirror_registry_address : '16.19.176.126', docker_mirror_registry_port : '5000'}"
+ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{proxy : 'http://web-proxy.bbn.hpecorp.net:8080'}"
 ```
 
 Others extra-variables you can specify :  
@@ -90,3 +95,6 @@ Others extra-variables you can specify :
 * RHEL_Version : rh8rc4_x86_64
 * iso_server : 16.16.184.151
 * docker_compose_Version : 1.24.0
+* proxy : http://web-proxy.corp.hpecorp.net:8080
+* proxy_ansible : http://grewebcachevip.bastion.europe.hp.com:8080
+
