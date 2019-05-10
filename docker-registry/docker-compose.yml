@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  registry:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: registry-mirroring
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+    ports: 
+      - "5000:5000"
+    container_name: registry-mirror
