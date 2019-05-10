@@ -2,9 +2,9 @@
 - name: Ansible setup for the scalability analysis
   hosts: bdu-client
 
+  
 # Edit variables.
   vars:
-    
 
     RHEL_Version: rh8rc4_x86_64
     iso_server: 16.16.184.151
@@ -33,7 +33,6 @@
 ########################################
 
   tasks:
-
   - name: Mount repo from iso to /data/repositories
     mount:
       path: /data/repositories
@@ -107,7 +106,20 @@
     with_items:
       - /etc/docker
 
-  - name : Setup HPE proxy for Docker in  /etc/docker/daemon.json
+  - name : Setup docker and use a local mirror registry 
+    copy:
+      dest: /etc/docker/daemon.json
+      backup: yes
+      content: |
+        {
+          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567","http://{{ docker_mirror_registry_adress }}:{{ docker_mirror_registry_port }}"],
+          "registry-mirrors": ["http://{{ docker_mirror_registry_adress }}:{{ docker_mirror_registry_port }}"],
+          "dns" : ["16.110.135.51", "8.8.8.8"],
+          "dns-search" : ["emea.hpqcorp.net"]
+        }
+    when: docker_mirror_registry_adress is defined and docker_mirror_registry_port is defined
+
+  - name : Setup docker
     copy:
       dest: /etc/docker/daemon.json
       backup: yes
@@ -117,6 +129,7 @@
           "dns" : ["16.110.135.51", "8.8.8.8"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
+    when: docker_mirror_registry_adress is undefined or docker_mirror_registry_port is undefined 
 
 
   - name: Run deamon-reload then restart Docker service 

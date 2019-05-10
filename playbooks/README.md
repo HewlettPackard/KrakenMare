@@ -13,10 +13,7 @@ mkdir -p /data/repositories && mount 16.16.184.151:/data/repositories /data/repo
 Update repo list.
 Create a file named dvd.repo in /etc/yum.repos.d
 ```bash
-touch /etc/yum.repos.d/dvd.repo
-```
-Add these lines to dvd.repo
-```bash
+cat << EOF > /etc/yum.repos.d/dvd.repo
 [MyRepo2]
 name=MyRepo2
 baseurl=file:///data/repositories/rh8rc2_x86_64/AppStream
@@ -28,6 +25,7 @@ name=MyRepo
 baseurl=file:///data/repositories/rh8rc2_x86_64/BaseOS
 enabled=1
 gpgcheck=0
+EOF
 ```
 Update packages list
 ```bash
@@ -60,8 +58,35 @@ cd ../ && rm -rf ansible-2.7.10/
 ```
 
 
-
+---
 
 # To deploy the ansible playbooks
-ansible-playbook playbooks/bdu-client-playbook.yml -i ./playbooks/host.yml 
+Prerequisites client: RHEL 8 and **python3 preinstalled**    
+Prerequisites server: RHEL 8, python3, tar, ansible .  
+You need an host file on the server node:  
+**hosts**   
+```ini 
+[bdu-client]
+16.19.176.125 ansible_python_interpreter=/usr/bin/python3  
+16.19.176.126 ansible_python_interpreter=/usr/bin/python3  
 
+```
+
+hosts should be in **/etc/ansible/hosts**  else you need to specify the path with -i <PATH> in the command line
+
+
+
+If the client is a docker registry
+```bash
+ansible-playbook bdu-client-playbook.yml -i hosts
+```
+else you need to specify mirror registry adress and port
+```bash
+ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{docker_mirror_registry_adress : '16.19.176.126', docker_mirror_registry_port : '5000'}"
+```
+
+Others extra-variables you can specify :  
+
+* RHEL_Version : rh8rc4_x86_64
+* iso_server : 16.16.184.151
+* docker_compose_Version : 1.24.0

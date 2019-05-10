@@ -1,0 +1,4 @@
+[bdu-client]
+16.19.176.125 ansible_python_interpreter=/usr/bin/python3
+16.19.176.126 ansible_python_interpreter=/usr/bin/python3
+
