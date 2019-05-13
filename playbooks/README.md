@@ -137,5 +137,5 @@ ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-v
 ```
 To use a docker mirror registry
 ```bash
-ansible-playbook bdu-client-playbook.yml --extra-vars "{ hosts : 'n0011' ,docker_mirror_registry_address : '172.16.7.253', docker_mirror_registry_port : '5000' }"
+ansible-playbook bdu-client-playbook.yml --extra-vars "{ hosts : 'n0012,n0011' ,docker_mirror_registry_address : '172.16.7.253', docker_mirror_registry_port : '5000' }"
 ```
