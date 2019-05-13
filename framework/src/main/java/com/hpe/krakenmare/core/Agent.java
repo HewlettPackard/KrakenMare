@@ -10,6 +10,13 @@ import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.SchemaStore;
 import org.apache.avro.specific.SpecificData;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class Agent extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
@@ -51,8 +58,8 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
     return DECODER.decode(b);
   }
 
-  @Deprecated public long id;
-  @Deprecated public java.lang.String name;
+   private long id;
+   private java.lang.String name;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -305,6 +312,28 @@ public java.lang.Object get(int field$) {
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
+  }
+
+  public Map<String, String> toMap() {
+    return ImmutableMap.of(
+      "id", String.valueOf(id),
+      "name", String.valueOf(name)
+    );
+  }
+
+  public static Agent fromMap(Map<String, String> map) {
+    java.lang.Long id = Long.parseLong(map.get("id"));
+    java.lang.String name = map.get("name");
+    return new Agent(id, name);
+  }
+
+  public static Agent fromList(List<String> list) {
+    final Map<String, String> hash = new HashMap<>(list.size() / 2, 1);
+    final Iterator<String> iterator = list.iterator();
+    while (iterator.hasNext()) {
+      hash.put(iterator.next(), iterator.next());
+    }
+    return fromMap(hash);
   }
 
 }
