@@ -1,28 +1,28 @@
 ---
 - name: Ansible setup for the scalability analysis
-  hosts: bdu-client
+  hosts: "{{ hosts }}"
 
-  
 # Edit variables.
   vars:
+    ansible_python_interpreter : '/usr/bin/python3'
 
     RHEL_Version: rh8rc4_x86_64
-    iso_server: 16.16.184.151
+    iso_server: 172.16.7.253
+    iso_source_path: /opt/cmu/repositories
+    iso_mount_point : /opt/cmu/repositories
     docker_compose_Version : 1.24.0
-    #generated with : 
+    #generated with :
     #password is bdu
     # ansible all -i localhost, -m debug -a "msg={{ 'bdu' | password_hash('sha512', 'SALT') }}"
     password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
     proxy : http://web-proxy.corp.hpecorp.net:8080
-  
-    proxy_ansible : http://grewebcachevip.bastion.europe.hp.com:8080
 
 
 
 
   environment:
-    http_proxy: "{{ proxy_ansible }}"
-    https_proxy: "{{ proxy_ansible }}"
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
 
 
 # End of variables
@@ -35,10 +35,10 @@
 ########################################
 
   tasks:
-  - name: Mount repo from iso to /data/repositories
+  - name: Mount repo from {{iso_server}}:{{ iso_source_path }} to {{iso_mount_point}}
     mount:
-      path: /data/repositories
-      src: "{{iso_server}}:/data/repositories"
+      path: "{{ iso_mount_point }}"
+      src: "{{iso_server}}:{{ iso_source_path }}"
       state: mounted
       fstype: nfs
 
@@ -47,7 +47,7 @@
     yum_repository:
       name: AppStream
       description: Repo AppStream from {{RHEL_Version}}
-      baseurl: file:///data/repositories/{{RHEL_Version}}/AppStream
+      baseurl: file://{{ iso_mount_point }}/{{RHEL_Version}}/AppStream
       file: dvd
       enabled: yes
       gpgcheck: no
@@ -56,7 +56,7 @@
     yum_repository:
       name: BaseOS
       description: Repo BaseOS from {{RHEL_Version}}
-      baseurl: file:///data/repositories/{{RHEL_Version}}/BaseOS
+      baseurl: file://{{ iso_mount_point }}/{{RHEL_Version}}/BaseOS
       file: dvd
       enabled: yes
       gpgcheck: no
@@ -94,8 +94,8 @@
       create: yes
       block: |
         [Service]
-        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" 
-    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined 
+        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}"
+    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined
 
   - name : Setup HPE proxy for Docker in  /etc/systemd/system/docker.service.d/http-proxy.conf
     blockinfile:
@@ -104,7 +104,7 @@
       state: absent
       block: |
         [Service]
-        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" 
+        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}"
     when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
 
   - name: Create /etc/docker/ if it doesn't exist
@@ -117,7 +117,7 @@
     with_items:
       - /etc/docker
 
-  - name : Setup docker and use a local mirror registry 
+  - name : Setup docker and use a local mirror registry
     copy:
       dest: /etc/docker/daemon.json
       backup: yes
@@ -140,10 +140,10 @@
           "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined 
+    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined
 
 
-  - name: Run deamon-reload then restart Docker service 
+  - name: Run deamon-reload then restart Docker service
     systemd:
       state: restarted
       daemon_reload: yes

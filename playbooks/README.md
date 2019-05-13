@@ -61,40 +61,81 @@ cd ../ && rm -rf ansible-2.7.10/
 ---
 
 # To deploy the ansible playbooks
+
+## Prerequisites
+
 Prerequisites client: RHEL 8 ,**python3 preinstalled** and ssh access  
-Prerequisites server: RHEL 8, python3, tar, ansible . More informations in [/playbooks/README.md](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/README.md) 
+Prerequisites server: RHEL 8, python3, tar, ansible 2.7.10     
+More informations in [/playbooks/README.md](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/README.md)
 
-For now I can deploy the pipeline on client which have RHEL 8 and python via ssh. I specify the ip and  where is the python interpreter in [/playbooks/hosts](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/hosts).  
+## Hosts
+Example of **hosts** made by CMU
 
-**hosts**   
-```ini 
-[bdu-client]
-16.19.176.125 ansible_python_interpreter=/usr/bin/python3 docker_mirror_registry_address="16.19.176.126" docker_mirror_registry_port="5000"
-16.19.176.126 ansible_python_interpreter=/usr/bin/python3
+```ini
+# PLEASE NOTE: this is an automatically-generated file.
+
+hptc494
+n0001
+...
+n0177
+u176i125
+u176i126
+u176i127
+u176i128
+
+[chassis1]
+n0001
+n0002
+n0003
+...
+n0177
+
+[public]
+hptc494
+u176i125
+u176i126
+u176i127
+u176i128
+
+[rh8u0_bios]
+n0011
+...
+n0169
+
 ```
 
-hosts should be in **/etc/ansible/hosts**  else you need to specify the path with -i <PATH> in the command line
+hosts should be in **/etc/ansible/hosts**  else you need to specify the path with ` -i <PATH> ` in the command line
 
 
+## Default values
 
-Then I deploy using this command line:
-If the client is a docker registry
+Default values for bdu-client-playbook.yml:
+    * ansible_python_interpreter : '/usr/bin/python3'
+    * RHEL_Version: rh8rc4_x86_64
+    * iso_server: 172.16.7.253
+    * iso_source_path: /opt/cmu/repositories
+    * iso_mount_point : /opt/cmu/repositories
+    * docker_compose_Version : 1.24.0
+    * proxy : http://web-proxy.corp.hpecorp.net:8080
+    * docker_mirror_registry_address : NULL
+    * docker_mirror_registry_port : NULL
+
+Note that you can override values in the command line with ` --extra-vars " <JSON syntax> " `, few examples below .
+
+## Command line
+
+Command line examples:  
+**hosts** in --extra-vars is **compulsory**
+
 ```bash
-ansible-playbook bdu-client-playbook.yml -i hosts
+ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-vars "{ hosts : 'all' } "   
+# 'all' refer to all keys without section in hosts
 ```
 
----
-
-To specify extra variables use :
 ```bash
-ansible-playbook bdu-client-playbook.yml -i hosts --extra-vars "{proxy : 'http://web-proxy.bbn.hpecorp.net:8080'}"
+ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-vars "{ hosts : ['chassis1','public','n0170'] , ansible_python_interpreter : '/path/to/python'  , proxy : 'http://web-proxy.corp.hpecorp.net:8080 }"
 ```
-
-Others extra-variables you can specify :  
-
-* RHEL_Version : rh8rc4_x86_64
-* iso_server : 16.16.184.151
-* docker_compose_Version : 1.24.0
-* proxy : http://web-proxy.corp.hpecorp.net:8080
-* proxy_ansible : http://grewebcachevip.bastion.europe.hp.com:8080
-
+To use a docker mirror registry
+```bash
+ansible-playbook bdu-client-playbook.yml --extra-vars "{ hosts : 'n0011' ,docker_mirror_registry_address : '172.16.7.253', docker_mirror_registry_port : '5000' }"
+```
