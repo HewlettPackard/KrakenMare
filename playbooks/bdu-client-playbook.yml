@@ -95,17 +95,6 @@
       block: |
         [Service]
         Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}"
-    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined
-
-  - name : Setup HPE proxy for Docker in  /etc/systemd/system/docker.service.d/http-proxy.conf
-    blockinfile:
-      path: /etc/systemd/system/docker.service.d/http-proxy.conf
-      create: yes
-      state: absent
-      block: |
-        [Service]
-        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}"
-    when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
 
   - name: Create /etc/docker/ if it doesn't exist
     file:
@@ -147,6 +136,7 @@
     systemd:
       state: restarted
       daemon_reload: yes
+      enabled : yes
       name: docker
 
   - name: Add the user 'bdu'
