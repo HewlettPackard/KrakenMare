@@ -1,13 +1,9 @@
-version: '3.7'
+version: '3'
 services:
   registry-mirror:
     image: registry
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
-      - HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080/
-      - HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080/
-      - FTP_PROXY=http://web-proxy.corp.hpecorp.net:8080/
-      - NO_PROXY=localhost,127.0.0.0/8
     volumes:
       - ./config-mirror-registry.yml:/etc/docker/registry/config.yml
     ports: 
