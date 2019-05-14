@@ -12,7 +12,9 @@ kafka_broker = "broker-1"
 
 # Register to the framework
 registered = False;
-agent_name = "undefined"
+agent_id = -1
+agent_uuid = str(uuid.uuid4())
+agent_name = "r1ib-simulator"
 
 # wait for Kafka registration topic to exist
 kafka_client = None
@@ -41,15 +43,18 @@ time.sleep(60)
 def on_log(client, userdata, level, buf):
     print("log: %s" % buf)
 
-
-# TODO: for now we listen to any response, not only ours 
 def on_registration_result(client, userdata, message):
-    global registered, agent_name
+    global registered, agent_id, agent_uuid
     print("message received: %s " % message.payload)
     print("message topic: %s" % message.topic)
     data = json.loads(message.payload)
-    registered = True
-    agent_name = data.get("name")
+    data_uuid = data.get("uuid")
+    if data_uuid == agent_uuid:
+        print("got registration-result with matching UUID: %s" % data_uuid)
+        registered = True
+        agent_id = data.get("id")
+    else:
+        print("ignoring registration-result with foreign UUID: %s" % data_uuid)
 
 registration_client = mqtt.Client("RegistrationClient")
 registration_client.on_log=on_log
@@ -60,10 +65,11 @@ registration_client.loop_start()
 registration_client.subscribe("registration-result")
 # Generate a uuid to send over as the name
 registration_payload = {}
-registration_payload["name"] = "r1ib-simulator"
-registration_payload["uuid"] = str(uuid.uuid4())
+registration_payload["name"] = agent_name
+registration_payload["uuid"] = agent_uuid
 data_out = json.dumps(registration_payload)
 # use highest QoS for now
+print("sending registration payload: %s" % data_out)
 registration_client.publish("registration-request/r1ib", data_out, 2, True)
 
 while not registered:
@@ -71,7 +77,7 @@ while not registered:
     print("waiting for registration result...")
 
 registration_client.loop_stop()
-print("registered with name: %s" % agent_name)
+print("registered with name '%s' and id '%d'" % (agent_name, agent_id))
 
 
 client = mqtt.Client("DataClient")

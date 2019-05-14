@@ -7,4 +7,5 @@ COPY fake-ibswitchquery.py r1i0c-ibswitch r1i1c-ibswitch /simulator/
 COPY seed/* /tmp/
 
 WORKDIR /simulator
+ENV PYTHONUNBUFFERED=1
 ENTRYPOINT python fake-ibswitchquery.py
