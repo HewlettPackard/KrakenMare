@@ -15,7 +15,7 @@ simul:
 	$(CC) simul.c $(CFLAGS) $(LDFLAGS) -o simul
 
 registration:
-	$(CC) registration.c $(CFLAGS) $(LDFLAGS) -o registration -Wl,-rpath,/usr/local/lib
+	$(CC) registration.c $(CFLAGS) $(LDFLAGS) -o registration -Wl,-rpath,/usr/local/lib -luuid
 clean:
 	rm -rf *.o *~ hello_world simul registration
 
