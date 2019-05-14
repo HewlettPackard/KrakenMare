@@ -18,6 +18,8 @@ COPY pom.xml /opt/krakenmare/
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"
 # run a first assembly to cache maven dependencies in the image
+# /src/main/avro shall exist or avro-maven-plugin will fail
+RUN mkdir -p /opt/krakenmare/src/main/avro
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
 COPY src /opt/krakenmare/src
