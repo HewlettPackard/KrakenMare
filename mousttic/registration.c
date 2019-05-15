@@ -131,12 +131,13 @@ json_t *load_json(const char *text) {
   }
 }
 
-char* text_to_json(const char* name, const char* mymsg) {
+char* text_to_json(const char* uuid, const char* name, const char* mymsg) {
 
   char* s = NULL;
 
   json_t *root = json_object();
 
+  json_object_set_new(root, "uuid", json_string(uuid));
   json_object_set_new(root, "name", json_string(name));
   json_object_set_new(root, "message", json_string(mymsg));
 
@@ -188,17 +189,15 @@ void parse_me(const char* msg)
     }
 
     if (strncmp(registration_uuid, my_uuid, strlen(my_uuid)) == 0) {
-      if ((registration_name != NULL) && (registration_uuid != NULL) && (registration_id != -1)) {
-        sprintf(my_name, "%s", registration_name);
-        sprintf(my_uuid, "%s", registration_uuid);
-        my_id = registration_id;
-        fprintf(stdout, "registered with name '%s', uuid '%s' and id '%d'\n", registration_name, registration_uuid, registration_id);
-        fflush(stdout);
-        registered = 1;
-      } else {
-        fprintf(stdout, "ignoring message not for us: %s != %s\n", my_uuid, registration_uuid);
-        fflush(stdout);
-      }
+      sprintf(my_name, "%s", registration_name);
+      sprintf(my_uuid, "%s", registration_uuid);
+      my_id = registration_id;
+      fprintf(stdout, "registered with name '%s', uuid '%s' and id '%d'\n", registration_name, registration_uuid, registration_id);
+      fflush(stdout);
+      registered = 1;
+    } else {
+      fprintf(stdout, "ignoring message not for us: %s != %s\n", my_uuid, registration_uuid);
+      fflush(stdout);
     }
   }
 }
@@ -304,7 +303,7 @@ int main(int argc, char *argv[])
     sleep(1);
   }
 
-  char* json_msg = text_to_json(my_name, options.msg);
+  char* json_msg = text_to_json(my_uuid, my_name, options.msg);
 
   msg_id = 0;
   while ((options.repeat == -1) || (msg_id < options.repeat)) {
