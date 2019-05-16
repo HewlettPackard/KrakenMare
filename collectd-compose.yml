@@ -11,7 +11,6 @@ services:
       context: collectd
       dockerfile: Dockerfile
     depends_on:
-      - zookeeper
       - broker-1
       - broker-2
       - broker-3
