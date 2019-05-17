@@ -4,7 +4,7 @@ FROM ubuntu:precise as kafkabuild
 RUN apt-get update && apt-get upgrade -y
 
 #only required for building
-RUN apt-get install -y --force-yes gcc g++ make \
+RUN apt-get update && apt-get install -y --force-yes gcc g++ make \
 && apt-get install -y autoconf libtool wget \
 && cd / && wget --no-check-certificate https://api.github.com/repos/akheron/jansson/tarball/f4498d2856fff130366e1dacc74d66d3502e0e5c -O - | tar xzf - \
 && apt-get install -y --force-yes gdb valgrind cppcheck

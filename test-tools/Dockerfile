@@ -4,7 +4,7 @@ FROM ubuntu:18.04 as testbuild
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
 # Build deps
-RUN apt-get install -y gcc make
+RUN apt-get update && apt-get install -y gcc make
 COPY --from=demo_kafka-embedded-client-1 /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
 COPY --from=demo_kafka-embedded-client-1 /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
