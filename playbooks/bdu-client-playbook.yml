@@ -1,24 +1,11 @@
 ---
 - name: Ansible setup for the scalability analysis
-  hosts: "{{ hosts }}"
+  hosts: all
+
 
 # Edit variables.
-  vars:
-    ansible_python_interpreter : '/usr/bin/python3'
-
-    RHEL_Version: rh8rc4_x86_64
-    iso_server: 172.16.7.253
-    iso_source_path: /opt/cmu/repositories
-    iso_mount_point : /opt/cmu/repositories
-    docker_compose_Version : 1.24.0
-    #generated with :
-    #password is bdu
-    # ansible all -i localhost, -m debug -a "msg={{ 'bdu' | password_hash('sha512', 'SALT') }}"
-    password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
-    proxy : http://web-proxy.corp.hpecorp.net:8080
-
-
-
+  vars_files:
+    - vars.yml
 
   environment:
     http_proxy: "{{ proxy }}"
@@ -26,13 +13,6 @@
 
 
 # End of variables
-
-
-
-
-########################################
-#NOTHING TO CHANGE UNDER THIS LINE
-########################################
 
   tasks:
   - name: Mount repo from {{iso_server}}:{{ iso_source_path }} to {{iso_mount_point}}
@@ -42,6 +22,15 @@
       state: mounted
       fstype: nfs
 
+  - name: Create /etc/yum.repos.d/ if it doesn't exist
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0775
+    with_items:
+      - /etc/yum.repos.d/
 
   - name: Add repository to yum (1/2)
     yum_repository:
@@ -69,7 +58,16 @@
         - wget
         - git
         - tmux
+        - python3-pip
+        
       state: latest
+  
+  - name: Add pip to use swarm_init from Ansible
+    pip:
+      name: 
+        - docker
+      executable: pip-3
+
 
 
   - name: Add docker-ce repository to yum
@@ -94,7 +92,7 @@
       create: yes
       block: |
         [Service]
-        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}"
+        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" "NO_PROXY={{ docker_mirror_registry_address }}"
 
   - name: Create /etc/docker/ if it doesn't exist
     file:
@@ -106,38 +104,17 @@
     with_items:
       - /etc/docker
 
-  - name : Setup docker and use a local mirror registry
+  - name : Setup docker and use a local mirror registry and classic docker registry
     copy:
       dest: /etc/docker/daemon.json
       backup: yes
       content: |
         {
-          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567","http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
+          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567","http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}","http://{{ docker_mirror_registry_address }}:{{ docker_registry_port }}"],
           "registry-mirrors": ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
           "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-    when: docker_mirror_registry_address is defined and docker_mirror_registry_port is defined
-
-  - name : Setup docker
-    copy:
-      dest: /etc/docker/daemon.json
-      backup: yes
-      content: |
-        {
-          "insecure-registries" : ["o184i024.gre.smktg.hpecorp.net:4567"],
-          "dns" : ["16.110.135.51", "16.110.135.52"],
-          "dns-search" : ["emea.hpqcorp.net"]
-        }
-    when: docker_mirror_registry_address is undefined or docker_mirror_registry_port is undefined
-
-
-  - name: Run deamon-reload then restart Docker service
-    systemd:
-      state: restarted
-      daemon_reload: yes
-      enabled : yes
-      name: docker
 
   - name: Add the user 'bdu'
     user:
@@ -155,3 +132,14 @@
     file:
       path: /usr/local/bin/docker-compose
       mode : "u+x,o+x"
+
+
+
+  #---------------------------WARNING---------------------------------------------------------
+  ##Always at the end, ansible run in docker and we restart the docker daemon on the host machine
+  - name: Run deamon-reload then restart Docker service
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      enabled : yes
+      name: docker

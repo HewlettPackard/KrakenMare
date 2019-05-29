@@ -1,0 +1,345 @@
+#
+# Docker Compose with the following services:
+#  zookeeper
+#  kafka broker 1-3
+#
+
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.2.0
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  broker-1:
+    image: confluentinc/cp-enterprise-kafka:5.2.0
+    hostname: broker-1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-1:9092'
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_JMX_PORT: 9992
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-1:9092
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'false'
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  broker-2:
+    image: confluentinc/cp-enterprise-kafka:5.2.0
+    hostname: broker-2
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-2:9093'
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_JMX_PORT: 9993
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-2:9093
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'false'
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  broker-3:
+    image: confluentinc/cp-enterprise-kafka:5.2.0
+    hostname: broker-3
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-3:9094'
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_JMX_PORT: 9994
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-3:9094
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'false'
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+#
+# Docker Compose with the following services:
+#  mosquitto
+#  simulator
+#  druid
+#  grafana
+#
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    hostname: mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  test-tools:
+    image: ${registry_name}:5001/test-tools
+    build:
+      context: test-tools
+      dockerfile: Dockerfile
+      args:
+        kafka_prefix: ${registry_name}:5001/
+    hostname: test
+    depends_on:
+      - mosquitto
+      - kafka-embedded-client-1
+    environment:
+      MOSQUITTO_IP: mosquitto
+      KAFKA_BROKER_IP: broker-1
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  simulator:
+    image: ${registry_name}:5001/simulator
+    build:
+      context: simulator
+      dockerfile: Dockerfile
+    hostname: simulator
+    depends_on:
+      - framework
+      - connect
+      - mosquitto
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  kafka-embedded-client-1:
+    image: ${registry_name}:5001/kafka-embedded-client-1
+    build:
+      context: kafka-client
+      dockerfile: Dockerfile
+    hostname: kafka-emb1
+    depends_on:
+      - broker-1
+    environment:
+      KAFKA_BROKER_IP: broker-1
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  mousttic-1:
+    image: ${registry_name}:5001/mousttic-1
+    build:
+      context: mousttic
+      dockerfile: Dockerfile
+    hostname: mousttic-1
+    depends_on:
+      - mosquitto
+    environment:
+      MOSQUITTO_IP: mosquitto
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  druid:
+    image: ${registry_name}:5001/druid
+    build:
+      context: druid
+      dockerfile: Dockerfile
+    hostname: druid
+    depends_on:
+      - zookeeper
+    ports:
+# - 8081: HTTP (coordinator)
+# - 8082: HTTP (broker)
+# - 8083: HTTP (historical)
+# - 8090: HTTP (overlord)
+# - 3306: MySQL
+      - "8181:8081"
+      - "8182:8082"
+      - "8183:8083"
+      - "8190:8090"
+      - "8200:8200"
+      - "3306:3306"
+      - "9095:9095"
+      - "1527:1527"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+
+  grafana:
+    image: grafana/grafana
+    hostname: grafana
+    depends_on:
+      - druid
+    ports:
+      - "3000:3000"
+    volumes:
+    - ./grafana/provisioning/:/etc/grafana/provisioning
+    - ./grafana/dashboards/:/etc/grafana/dashboards
+    - ./grafana/plugins/:/var/lib/grafana/plugins/
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+#
+# Docker Compose with the following services:
+#  kafka connect
+#  schema-registry 
+#
+  schema_registry:
+    image: confluentinc/cp-schema-registry:5.2.0
+    hostname: schema_registry
+    depends_on:
+      - zookeeper
+      - broker-1
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  connect:
+    image: ${registry_name}:5001/connect
+    build:
+      context: kafka-connect
+      dockerfile: Dockerfile
+    hostname: connect
+    depends_on:
+      - zookeeper
+      - broker-1
+      - broker-2
+      - broker-3
+      - schema_registry
+      - mosquitto
+      - druid
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: 'broker-1:9092'
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema_registry:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema_registry:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/custom-plugins"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+#
+# Docker Compose with the following services:
+#  framework
+#  redis
+#
+  framework:
+    image: ${registry_name}:5001/framework
+    build:
+      context: framework
+      dockerfile: Dockerfile
+    hostname: framework
+    depends_on:
+      - redis
+      - broker-1
+      - broker-2
+      - broker-3
+    ports: 
+      - "8080:8080"
+    environment:
+      REDIS_SERVER: "redis:6379"
+      BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  redis:
+    image: redis:5.0.3
+    hostname: redis
+    ports:
+      - "6379:6379"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+#
+# Docker Compose with the following services:
+#  collectd
+#
+# No hostname is asserted. We want the docker host's name for this container
+  collectd:
+    image: ${registry_name}:5001/collectd
+    build:
+      context: collectd
+      dockerfile: Dockerfile
+    depends_on:
+      - broker-1
+      - broker-2
+      - broker-3
+    deploy:
+      placement:
+        constraints:
+          - node.labels.injectors == true
+

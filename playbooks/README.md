@@ -35,7 +35,7 @@ yum repolist && yum update
 
 
 
-## 2. Compile Ansible from source
+## 2. Compile Ansible from source 
 Install tar
 ```bash
 yum --assumeyes install tar
@@ -64,9 +64,8 @@ cd ../ && rm -rf ansible-2.7.10/
 
 ## Prerequisites
 
-Prerequisites client: RHEL 8 ,**python3 preinstalled** and ssh access  
-Prerequisites server: RHEL 8, python3, tar, ansible 2.7.10     
-More informations in [/playbooks/README.md](http://o184i024.gre.smktg.hpecorp.net/pathforward/wp1.3/blob/75-deploy-using-ansible-technology/playbooks/README.md)
+Prerequisites client: RHEL 8 ,**python3 preinstalled** 
+Prerequisites server: RHEL 8, python3, docker and ssh access   
 
 ## Hosts
 Example of **hosts** made by CMU
@@ -109,33 +108,32 @@ hosts should be in **/etc/ansible/hosts**  else you need to specify the path wit
 
 ## Default values
 
-Default values for bdu-client-playbook.yml:
-    * ansible_python_interpreter : '/usr/bin/python3'
-    * RHEL_Version: rh8rc4_x86_64
-    * iso_server: 172.16.7.253
-    * iso_source_path: /opt/cmu/repositories
-    * iso_mount_point : /opt/cmu/repositories
-    * docker_compose_Version : 1.24.0
-    * proxy : http://web-proxy.corp.hpecorp.net:8080
-    * docker_mirror_registry_address : NULL
-    * docker_mirror_registry_port : NULL
+Default values in vars.yml:
 
-Note that you can override values in the command line with ` --extra-vars " <JSON syntax> " `, few examples below .
+* docker_mirror_registry_address : 172.16.7.253
+* docker_mirror_registry_port : 5000
+* docker_registry_port : 5001
+* proxy : http://web-proxy.corp.hpecorp.net:8080
+
+* ansible_python_interpreter : '/usr/bin/python3'
+* RHEL_Version: rh8rc4_x86_64
+* iso_server: 172.16.7.253
+* iso_source_path: /opt/cmu/repositories
+* iso_mount_point : /opt/cmu/repositories
+* docker_compose_Version : 1.24.0
+
+NOTE: You can override default values in the command line with ` --extra-vars " <JSON syntax> " `, few examples below .
 
 ## Command line
 
 Command line examples:  
-**hosts** in --extra-vars is **compulsory**
-
 ```bash
-ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-vars "{ hosts : 'all' } "   
-# 'all' refer to all keys without section in hosts
+ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-vars "{ proxy : 'http://web-proxy.corp.hpecorp.net:8080 }"
 ```
 
+To override the address of the docker registry
 ```bash
-ansible-playbook bdu-client-playbook.yml -i /opt/cmu/etc/ansible/hosts --extra-vars "{ hosts : ['chassis1','public','n0170'] , ansible_python_interpreter : '/path/to/python'  , proxy : 'http://web-proxy.corp.hpecorp.net:8080 }"
+ansible-playbook bdu-client-playbook.yml --extra-vars "{ docker_mirror_registry_address : '172.16.7.253' }"
 ```
-To use a docker mirror registry
-```bash
-ansible-playbook bdu-client-playbook.yml --extra-vars "{ hosts : 'n0012,n0011' ,docker_mirror_registry_address : '172.16.7.253', docker_mirror_registry_port : '5000' }"
-```
+
+NOTE: Docker_mirror_registry and docker_registry are on the same physical server

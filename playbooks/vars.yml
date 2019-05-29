@@ -1,0 +1,20 @@
+docker_mirror_registry_address : "{{ hostvars[inventory_hostname]['groups']['registry'][0] }}"
+docker_mirror_registry_port : 5000
+docker_registry_port : 5001
+proxy : http://web-proxy.corp.hpecorp.net:8080
+
+
+
+ansible_python_interpreter : '/usr/bin/python3'
+RHEL_Version: rh8rc4_x86_64
+iso_server: 172.16.7.253
+iso_source_path: /opt/cmu/repositories
+iso_mount_point : /opt/cmu/repositories
+docker_compose_Version : 1.24.0
+#generated with :
+#password is bdu
+# ansible all -i localhost, -m debug -a "msg={{ 'bdu' | password_hash('sha512', 'SALT') }}"
+password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
+
+#Chrony configuration
+time_server: ntp.hpecorp.net

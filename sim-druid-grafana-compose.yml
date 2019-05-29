@@ -21,6 +21,8 @@ services:
     build:
       context: test-tools
       dockerfile: Dockerfile
+      args:
+        kafka_prefix: ${COMPOSE_PROJECT_NAME}_
     hostname: test
     depends_on:
       - mosquitto

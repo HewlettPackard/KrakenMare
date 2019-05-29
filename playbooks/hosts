@@ -1,3 +1,5 @@
-[bdu-client]
-16.19.176.125 ansible_python_interpreter=/usr/bin/python3 docker_mirror_registry_address="16.19.176.126" docker_mirror_registry_port="5000"
-16.19.176.126 ansible_python_interpreter=/usr/bin/python3
+[registry]
+[supervisory_cloud]
+[injectors]
+[swarm_manager]
+[swarm_nodes]

@@ -1,0 +1,78 @@
+---
+- name: Init Swarm Manager
+  hosts: swarm_manager
+
+  vars_files:
+    - vars.yml
+  
+  vars:
+    swarm_manager_name : "{{ hostvars[inventory_hostname]['groups']['swarm_manager'][0] }}"
+    ip_manager :  "{{ hostvars[swarm_manager_name]['ansible_facts']['default_ipv4']['address'] }}"
+
+
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+
+  tasks:
+
+    - name: Init a new swarm with default parameters
+      docker_swarm:
+        state: present
+      register: swarm_info
+
+
+- name: Join the manager for swarm_nodes
+  hosts: swarm_nodes
+
+  vars_files:
+    - vars.yml
+
+  vars:
+    swarm_manager_name : "{{ hostvars[inventory_hostname]['groups']['swarm_manager'][0] }}"
+    token_worker : "{{ hostvars[swarm_manager_name]['swarm_info']['swarm_facts']['JoinTokens']['Worker'] }}"
+    ip_manager :  "{{ hostvars[swarm_manager_name]['ansible_facts']['default_ipv4']['address'] }}"
+
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+  tasks:
+
+    - name: Add nodes
+      docker_swarm:
+        state: join
+        join_token: "{{ token_worker }}"
+        advertise_addr: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
+        remote_addrs:
+          - "{{ ip_manager }}:2377"
+#      debug:
+#        var: inventory_hostname
+
+- name: Add labels to nodes
+  hosts: swarm_manager
+
+  vars_files:
+    - vars.yml
+
+  vars:
+    all_nodes : "{{ hostvars[inventory_hostname]['groups']['all'] }}"
+    label_list : "{{ hostvars[inventory_hostname]['groups'] }}"
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+
+  tasks:
+
+    - name: Add labels
+      shell: docker node update --label-add {{ item.0.key }}=true {{ item.1 }}
+      loop: "{{ label_list | dict2items | subelements('value') }}"
+
+    - name: Removes 'all' labels
+      shell: docker node update --label-rm all {{ item }}
+      with_items: "{{ all_nodes }}"
+
+    
+    
