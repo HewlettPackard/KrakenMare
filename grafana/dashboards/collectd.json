@@ -23,6 +23,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Druid",
+      "decimals": 1,
       "fill": 1,
       "gridPos": {
         "h": 12,
@@ -33,14 +34,12 @@
       "id": 10,
       "legend": {
         "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "hideEmpty": false,
+        "avg": true,
+        "current": true,
         "max": true,
         "min": true,
         "rightSide": true,
         "show": true,
-        "sideWidth": 320,
         "total": false,
         "values": true
       },
@@ -60,114 +59,19 @@
         {
           "aggregators": [
             {
-              "fieldName": "values",
-              "name": "CPU load",
-              "type": "longSum"
-            }
-          ],
-          "currentAggregator": {
-            "type": "count"
-          },
-          "currentFilter": {
-            "type": "selector"
-          },
-          "currentPostAggregator": {
-            "fn": "+",
-            "type": "arithmetic"
-          },
-          "currentSelect": {
-            "dimension": "",
-            "metric": ""
-          },
-          "customGranularity": "ten_second",
-          "dimension": "host",
-          "druidDS": "collectd",
-          "druidMetric": "values",
-          "errors": {
-            "aggregators": "You must supply at least one aggregator"
-          },
-          "filters": [
-            {
-              "dimension": "plugin",
-              "type": "selector",
-              "value": "cpu"
-            }
-          ],
-          "hide": false,
-          "limit": 9999,
-          "maxDataPoints": 50,
-          "queryType": "timeseries",
-          "refId": "A",
-          "selectDimensions": [
-            "host"
-          ],
-          "selectMetrics": [
-            "values"
-          ],
-          "selectThreshold": 10000,
-          "shouldOverrideGranularity": true
-        },
-        {
-          "aggregators": [
-            {
-              "fieldName": "values",
-              "name": "Memory used",
-              "type": "longSum"
-            }
-          ],
-          "currentAggregator": {
-            "type": "count"
-          },
-          "currentFilter": {
-            "type": "selector"
-          },
-          "currentPostAggregator": {
-            "fn": "+",
-            "type": "arithmetic"
-          },
-          "currentSelect": {
-            "dimension": "",
-            "metric": ""
-          },
-          "customGranularity": "ten_second",
-          "dimension": "host",
-          "druidDS": "collectd",
-          "druidMetric": "values",
-          "errors": {
-            "aggregators": "You must supply at least one aggregator"
-          },
-          "filters": [
-            {
-              "dimension": "plugin",
-              "type": "selector",
-              "value": "memory"
+              "fieldName": "cpu:active",
+              "name": "cpu:active",
+              "type": "doubleSum"
             },
             {
-              "dimension": "type_instance",
-              "type": "selector",
-              "value": "used"
-            }
-          ],
-          "hide": false,
-          "limit": 9999,
-          "maxDataPoints": 50,
-          "queryType": "timeseries",
-          "refId": "B",
-          "selectDimensions": [
-            "host"
-          ],
-          "selectMetrics": [
-            "values"
-          ],
-          "selectThreshold": 10000,
-          "shouldOverrideGranularity": true
-        },
-        {
-          "aggregators": [
+              "fieldName": "memory:used",
+              "name": "memory:used",
+              "type": "doubleSum"
+            },
             {
-              "fieldName": "values",
-              "name": "Memory cached",
-              "type": "longSum"
+              "fieldName": "memory:free",
+              "name": "memory:free",
+              "type": "doubleSum"
             }
           ],
           "currentAggregator": {
@@ -187,32 +91,15 @@
           "customGranularity": "ten_second",
           "dimension": "host",
           "druidDS": "collectd",
-          "druidMetric": "values",
+          "druidMetric": "Counter1",
           "errors": {},
-          "filters": [
-            {
-              "dimension": "plugin",
-              "type": "selector",
-              "value": "memory"
-            },
-            {
-              "dimension": "type_instance",
-              "type": "selector",
-              "value": "cached"
-            }
-          ],
-          "hide": false,
-          "limit": 9999,
-          "maxDataPoints": 50,
-          "queryType": "timeseries",
-          "refId": "C",
-          "selectDimensions": [
+          "filters": [],
+          "groupBy": [
             "host"
           ],
-          "selectMetrics": [
-            "values"
-          ],
-          "selectThreshold": 10000,
+          "limit": 9999,
+          "queryType": "groupBy",
+          "refId": "A",
           "shouldOverrideGranularity": true
         }
       ],
@@ -223,7 +110,7 @@
       "title": "System metrics",
       "tooltip": {
         "shared": true,
-        "sort": 2,
+        "sort": 0,
         "value_type": "individual"
       },
       "type": "graph",
@@ -236,16 +123,16 @@
       },
       "yaxes": [
         {
-          "format": "none",
-          "label": null,
+          "decimals": 1,
+          "format": "percent",
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
           "show": true
         },
         {
-          "decimals": null,
-          "format": "none",
+          "format": "short",
           "label": null,
           "logBase": 1,
           "max": null,

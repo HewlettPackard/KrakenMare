@@ -1,9 +1,8 @@
 package com.hpe.bluedragon.agent;
 
-import static com.hpe.bluedragon.Main.PROPERTIES;
-
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -18,11 +17,13 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.bluedragon.Main;
 import com.hpe.bluedragon.core.Agent;
 
 public class AgentClient {
 
-	public final static Logger LOG = LoggerFactory.getLogger(AgentClient.class);
+	private final static Logger LOG = LoggerFactory.getLogger(AgentClient.class);
+	private final static Properties PROPERTIES = Main.cloneProperties();
 
 	private static Producer<String, String> createProducer() {
 		PROPERTIES.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

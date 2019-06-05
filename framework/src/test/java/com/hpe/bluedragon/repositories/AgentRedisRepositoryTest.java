@@ -22,7 +22,7 @@ public class AgentRedisRepositoryTest {
 
 	@BeforeEach
 	void before() throws IOException {
-		jedis = new Jedis(HostAndPort.parseString(Main.PROPERTIES.getProperty("redis.server")));
+		jedis = new Jedis(HostAndPort.parseString(Main.getProperty("redis.server")));
 		repo = new AgentRedisRepository(jedis, true);
 	}
 

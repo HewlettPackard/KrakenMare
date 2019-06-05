@@ -1,6 +1,9 @@
 #!/bin/bash
 
 action=$1
+shift
+services=$@
+nb_services=$#
 
 export COMPOSE_PROJECT_NAME=demo
 export COMPOSE_FILE=kafka-compose.yml:sim-druid-grafana-compose.yml:connect-compose.yml:framework-redis-compose.yml:collectd-compose.yml
@@ -44,7 +47,12 @@ if [ "$action" == "up" ]; then
 		echo "Using $dcver"
 	fi
 
-	docker-compose up --build --remove-orphans -d
+	if [ $nb_services -eq 0 ]; then
+		echo "Starting all services"
+	else
+		echo "Starting $nb_services services: $services"
+	fi
+	docker-compose up --build --remove-orphans -d $services
 elif [ "$action" == "down" ]; then
 	docker-compose down --remove-orphans
 else

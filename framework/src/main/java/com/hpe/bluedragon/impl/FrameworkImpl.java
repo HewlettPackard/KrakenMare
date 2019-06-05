@@ -17,15 +17,19 @@ public class FrameworkImpl implements Framework {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkImpl.class);
 
-	private final Jedis jedis = new Jedis(HostAndPort.parseString(Main.PROPERTIES.getProperty("redis.server")));
+	private final Jedis jedis = new Jedis(HostAndPort.parseString(Main.getProperty("redis.server")));
 	private final AgentRedisRepository agents = new AgentRedisRepository(jedis);
 	private final KafkaRegistrationStream registrationStream = new KafkaRegistrationStream(agents);
 
+	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
+
 	public void startFramework() throws InterruptedException {
 		registrationStream.start();
+		collectdStream.start();
 	}
 
 	public void stopFramework() {
+		collectdStream.close();
 		registrationStream.close();
 	}
 

@@ -22,7 +22,7 @@ public class Main {
 
 	public final static Logger LOG = LoggerFactory.getLogger(Main.class);
 
-	public final static Properties PROPERTIES = new Properties();
+	private final static Properties PROPERTIES = new Properties();
 	static {
 		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 		try (InputStream input = classloader.getResourceAsStream("config.properties")) {
@@ -52,6 +52,14 @@ public class Main {
 				PROPERTIES.put("redis.server", redisServerEnv);
 			}
 		}
+	}
+
+	public static Properties cloneProperties() {
+		return (Properties) PROPERTIES.clone();
+	}
+
+	public static String getProperty(String key) {
+		return PROPERTIES.getProperty(key);
 	}
 
 	static class App extends ResourceConfig {

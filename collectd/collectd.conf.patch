@@ -150,7 +150,7 @@
  
  #<Plugin nfs>
  #	ReportV2 false
-@@ -1731,12 +1731,12 @@ LoadPlugin network
+@@ -1731,12 +1731,13 @@ LoadPlugin network
  #	</Node>
  #</Plugin>
  
@@ -164,6 +164,7 @@
 +  Property "metadata.broker.list" "broker-1:9092"
 +  <Topic "collectd">
 +    Format JSON
++    Key "localhost"
 +  </Topic>
 +</Plugin>
  

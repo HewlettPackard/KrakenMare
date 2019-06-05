@@ -24,4 +24,4 @@ COPY --from=testbuild /usr/local/bin/* /usr/local/bin/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-ENTRYPOINT sleep infinity
+CMD sleep infinity

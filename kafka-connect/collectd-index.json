@@ -8,18 +8,15 @@
         "format": "json",
         "dimensionsSpec": {
           "dimensions": [
-            "type_instance",
-            "plugin",
-            {
-              "name": "values",
-              "type": "float"
-            },
-            "host",
-            {
-              "name": "interval",
-              "type": "long"
-            },
-            "type"
+            { "type": "string", "name": "host"},
+            { "type": "float", "name": "interval"},
+            { "type": "float", "name": "cpu:active"},
+            { "type": "float", "name": "memory:used"},
+            { "type": "float", "name": "memory:buffered"},
+            { "type": "float", "name": "memory:cached"},
+            { "type": "float", "name": "memory:slab_recl"},
+            { "type": "float", "name": "memory:slab_unrecl"},
+            { "type": "float", "name": "memory:free"}
           ]
         },
         "timestampSpec": {
@@ -38,7 +35,7 @@
   },
   "ioConfig": {
     "type": "kafka",
-    "topic": "collectd",
+    "topic": "collectd-druid",
     "consumerProperties": {
       "bootstrap.servers": "broker-1:9092"
     }
