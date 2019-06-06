@@ -4,7 +4,7 @@ FROM ${kafka_prefix}kafka-embedded-client-1 as kafka-client
 FROM ubuntu:18.04 as testbuild
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget
 # Build deps
 RUN apt-get update && apt-get install -y gcc make
 COPY --from=kafka-client /usr/local/lib/* /usr/local/lib/
@@ -16,7 +16,7 @@ RUN cd /usr/src && wget -q --no-check-certificate https://github.com/edenhill/ka
 
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y bash strace tcpdump mosquitto-clients wget
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget
 COPY --from=kafka-client /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
 COPY --from=kafka-client /usr/local/include/librdkafka/* /usr/local/include/librdkafka/

@@ -2,7 +2,7 @@
 FROM ubuntu:18.04 as collectdbuild
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y bash wget diffutils patch
+RUN apt-get update && apt-get install -y bash wget diffutils patch
 # Build deps
 RUN apt-get update && apt-get install -y gcc g++ make \
 	&& apt-get install -y autoconf libtool wget \

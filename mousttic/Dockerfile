@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --force-yes gcc make libmosquittopp-dev
 && cd / && wget --no-check-certificate https://api.github.com/repos/akheron/jansson/tarball/f4498d2856fff130366e1dacc74d66d3502e0e5c -O - | tar xzf - 
 
 #only required for debugging....
-RUN apt-get install -y --force-yes mosquitto-clients gdb valgrind cppcheck
+RUN apt-get update && apt-get install -y --force-yes mosquitto-clients gdb valgrind cppcheck
 
 RUN mv /akheron-jansson* /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
 
