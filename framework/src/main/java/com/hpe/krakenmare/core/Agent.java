@@ -5,9 +5,9 @@
  */
 package com.hpe.krakenmare.core;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
-import org.apache.avro.Conversion;
-import org.apache.avro.Schema;
+import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
@@ -19,14 +19,16 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class Agent extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 2002177767851162591L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Agent\",\"namespace\":\"com.hpe.krakenmare.core\",\"fields\":[{\"name\":\"id\",\"type\":\"long\"},{\"name\":\"name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]}");
+  private static final long serialVersionUID = -267090262578619837L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Agent\",\"namespace\":\"com.hpe.krakenmare.core\",\"fields\":[{\"name\":\"id\",\"type\":\"long\"},{\"name\":\"uuid\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"name\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
+static {
+    MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.UUIDConversion());
+  }
 
   private static final BinaryMessageEncoder<Agent> ENCODER =
       new BinaryMessageEncoder<Agent>(MODEL$, SCHEMA$);
@@ -35,7 +37,16 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       new BinaryMessageDecoder<Agent>(MODEL$, SCHEMA$);
 
   /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<Agent> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
    * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
    */
   public static BinaryMessageDecoder<Agent> getDecoder() {
     return DECODER;
@@ -44,25 +55,35 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
   /**
    * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
    * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<Agent> createDecoder(SchemaStore resolver) {
     return new BinaryMessageDecoder<Agent>(MODEL$, SCHEMA$, resolver);
   }
 
-  /** Serializes this Agent to a ByteBuffer. */
+  /**
+   * Serializes this Agent to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
   public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
     return ENCODER.encode(this);
   }
 
-  /** Deserializes a Agent from a ByteBuffer. */
+  /**
+   * Deserializes a Agent from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a Agent instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
   public static Agent fromByteBuffer(
       java.nio.ByteBuffer b) throws java.io.IOException {
     return DECODER.decode(b);
   }
 
    private long id;
-   private java.lang.String uuid;
-   private java.lang.String name;
+   private java.util.UUID uuid;
+   private java.lang.CharSequence name;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -77,12 +98,13 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * @param uuid The new value for uuid
    * @param name The new value for name
    */
-  public Agent(java.lang.Long id, java.lang.String uuid, java.lang.String name) {
+  public Agent(java.lang.Long id, java.util.UUID uuid, java.lang.CharSequence name) {
     this.id = id;
     this.uuid = uuid;
     this.name = name;
   }
 
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -94,13 +116,26 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
     }
   }
 
+  private static final org.apache.avro.Conversion<?>[] conversions =
+      new org.apache.avro.Conversion<?>[] {
+      null,
+      new org.apache.avro.Conversions.UUIDConversion(),
+      null,
+      null
+  };
+
+  @Override
+  public org.apache.avro.Conversion<?> getConversion(int field) {
+    return conversions[field];
+  }
+
   // Used by DatumReader.  Applications should not call.
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: id = (java.lang.Long)value$; break;
-    case 1: uuid = (java.lang.String)value$; break;
-    case 2: name = (java.lang.String)value$; break;
+    case 1: uuid = (java.util.UUID)value$; break;
+    case 2: name = (java.lang.CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -109,15 +144,16 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * Gets the value of the 'id' field.
    * @return The value of the 'id' field.
    */
-  public java.lang.Long getId() {
+  public long getId() {
     return id;
   }
+
 
   /**
    * Sets the value of the 'id' field.
    * @param value the value to set.
    */
-  public void setId(java.lang.Long value) {
+  public void setId(long value) {
     this.id = value;
   }
 
@@ -125,15 +161,16 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * Gets the value of the 'uuid' field.
    * @return The value of the 'uuid' field.
    */
-  public java.lang.String getUuid() {
+  public java.util.UUID getUuid() {
     return uuid;
   }
+
 
   /**
    * Sets the value of the 'uuid' field.
    * @param value the value to set.
    */
-  public void setUuid(java.lang.String value) {
+  public void setUuid(java.util.UUID value) {
     this.uuid = value;
   }
 
@@ -141,26 +178,17 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * Gets the value of the 'name' field.
    * @return The value of the 'name' field.
    */
-  public java.lang.String getName() {
+  public java.lang.CharSequence getName() {
     return name;
   }
+
 
   /**
    * Sets the value of the 'name' field.
    * @param value the value to set.
    */
-  public void setName(java.lang.String value) {
+  public void setName(java.lang.CharSequence value) {
     this.name = value;
-  }
-
-  @Override
-  public Conversion<?> getConversion(int fieldIndex) {
-      Schema fieldSchema = SCHEMA$.getFields().get(fieldIndex).schema();
-      if ((fieldSchema.getLogicalType() != null)
-              && (fieldSchema.getLogicalType().getName() == "uuid")){
-          return new org.apache.avro.Conversions.UUIDConversion();
-      }
-      return null;
   }
 
   /**
@@ -177,7 +205,11 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * @return A new Agent RecordBuilder
    */
   public static com.hpe.krakenmare.core.Agent.Builder newBuilder(com.hpe.krakenmare.core.Agent.Builder other) {
-    return new com.hpe.krakenmare.core.Agent.Builder(other);
+    if (other == null) {
+      return new com.hpe.krakenmare.core.Agent.Builder();
+    } else {
+      return new com.hpe.krakenmare.core.Agent.Builder(other);
+    }
   }
 
   /**
@@ -186,7 +218,11 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
    * @return A new Agent RecordBuilder
    */
   public static com.hpe.krakenmare.core.Agent.Builder newBuilder(com.hpe.krakenmare.core.Agent other) {
-    return new com.hpe.krakenmare.core.Agent.Builder(other);
+    if (other == null) {
+      return new com.hpe.krakenmare.core.Agent.Builder();
+    } else {
+      return new com.hpe.krakenmare.core.Agent.Builder(other);
+    }
   }
 
   /**
@@ -196,8 +232,8 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
     implements org.apache.avro.data.RecordBuilder<Agent> {
 
     private long id;
-    private java.lang.String uuid;
-    private java.lang.String name;
+    private java.util.UUID uuid;
+    private java.lang.CharSequence name;
 
     /** Creates a new Builder */
     private Builder() {
@@ -212,15 +248,15 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       super(other);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
-        fieldSetFlags()[0] = true;
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
       if (isValidValue(fields()[1], other.uuid)) {
         this.uuid = data().deepCopy(fields()[1].schema(), other.uuid);
-        fieldSetFlags()[1] = true;
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.name)) {
         this.name = data().deepCopy(fields()[2].schema(), other.name);
-        fieldSetFlags()[2] = true;
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
     }
 
@@ -229,7 +265,7 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
      * @param other The existing instance to copy.
      */
     private Builder(com.hpe.krakenmare.core.Agent other) {
-            super(SCHEMA$);
+      super(SCHEMA$);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = true;
@@ -248,9 +284,10 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       * Gets the value of the 'id' field.
       * @return The value.
       */
-    public java.lang.Long getId() {
+    public long getId() {
       return id;
     }
+
 
     /**
       * Sets the value of the 'id' field.
@@ -286,16 +323,17 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       * Gets the value of the 'uuid' field.
       * @return The value.
       */
-    public java.lang.String getUuid() {
+    public java.util.UUID getUuid() {
       return uuid;
     }
+
 
     /**
       * Sets the value of the 'uuid' field.
       * @param value The value of 'uuid'.
       * @return This builder.
       */
-    public com.hpe.krakenmare.core.Agent.Builder setUuid(java.lang.String value) {
+    public com.hpe.krakenmare.core.Agent.Builder setUuid(java.util.UUID value) {
       validate(fields()[1], value);
       this.uuid = value;
       fieldSetFlags()[1] = true;
@@ -325,16 +363,17 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       * Gets the value of the 'name' field.
       * @return The value.
       */
-    public java.lang.String getName() {
+    public java.lang.CharSequence getName() {
       return name;
     }
+
 
     /**
       * Sets the value of the 'name' field.
       * @param value The value of 'name'.
       * @return This builder.
       */
-    public com.hpe.krakenmare.core.Agent.Builder setName(java.lang.String value) {
+    public com.hpe.krakenmare.core.Agent.Builder setName(java.lang.CharSequence value) {
       validate(fields()[2], value);
       this.name = value;
       fieldSetFlags()[2] = true;
@@ -366,9 +405,11 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
       try {
         Agent record = new Agent();
         record.id = fieldSetFlags()[0] ? this.id : (java.lang.Long) defaultValue(fields()[0]);
-        record.uuid = fieldSetFlags()[1] ? this.uuid : (java.lang.String) defaultValue(fields()[1]);
-        record.name = fieldSetFlags()[2] ? this.name : (java.lang.String) defaultValue(fields()[2]);
+        record.uuid = fieldSetFlags()[1] ? this.uuid : (java.util.UUID) defaultValue(fields()[1]);
+        record.name = fieldSetFlags()[2] ? this.name : (java.lang.CharSequence) defaultValue(fields()[2]);
         return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
       } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
@@ -392,7 +433,7 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
   }
-
+  
   public Map<String, String> toMap() {
     return ImmutableMap.of(
       "id", String.valueOf(id),
@@ -403,8 +444,8 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
 
   public static Agent fromMap(Map<String, String> map) {
     java.lang.Long id = Long.parseLong(map.get("id"));
-    java.lang.String uuid = map.get("uuid");
-    java.lang.String name = map.get("name");
+    java.util.UUID uuid = (java.util.UUID) getConversion("uuid").fromCharSequence(map.get("uuid"), null, null);
+    java.lang.CharSequence name = (java.lang.CharSequence) getConversion("name").fromCharSequence(map.get("name"), null, null);
     return new Agent(id, uuid, name);
   }
 
@@ -418,3 +459,13 @@ public class Agent extends org.apache.avro.specific.SpecificRecordBase implement
   }
 
 }
+
+
+
+
+
+
+
+
+
+

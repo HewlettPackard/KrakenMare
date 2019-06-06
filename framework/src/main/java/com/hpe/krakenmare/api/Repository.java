@@ -12,7 +12,7 @@ public interface Repository<T> {
 		return create(id, uuid);
 	}
 
-	T create(String id, UUID uuid);
+	T create(CharSequence id, UUID uuid);
 
 	boolean save(T entity);
 
