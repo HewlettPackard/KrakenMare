@@ -21,6 +21,8 @@ package $schema.getNamespace();
 
 import org.apache.avro.specific.SpecificData;
 #if (!$schema.isError())
+import org.apache.avro.Conversion;
+import org.apache.avro.Schema;
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
@@ -214,6 +216,16 @@ public class ${this.mangle($schema.getName())}#if ($schema.isError()) extends or
 #end
 
 #end
+  @Override
+  public Conversion<?> getConversion(int fieldIndex) {
+      Schema fieldSchema = SCHEMA$.getFields().get(fieldIndex).schema();
+      if ((fieldSchema.getLogicalType() != null)
+              && (fieldSchema.getLogicalType().getName() == "uuid")){
+          return new org.apache.avro.Conversions.UUIDConversion();
+      }
+      return null;
+  }
+
   /**
    * Creates a new ${this.mangle($schema.getName())} RecordBuilder.
    * @return A new ${this.mangle($schema.getName())} RecordBuilder

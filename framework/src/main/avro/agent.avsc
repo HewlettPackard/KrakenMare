@@ -3,6 +3,7 @@
  "name": "Agent",
  "fields": [
      {"name": "id", "type": "long"},
+     {"name": "uuid", "type": "string", "logicalType":"UUID"},
      {"name": "name", "type": "string"}
  ]
 }
