@@ -20,6 +20,7 @@
     - name: Init a new swarm with default parameters
       docker_swarm:
         state: present
+        advertise_addr: "{{ ip_addr | default() }}"
       register: swarm_info
 
 
@@ -44,7 +45,7 @@
       docker_swarm:
         state: join
         join_token: "{{ token_worker }}"
-        advertise_addr: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
+        advertise_addr: "{{ ip_addr | default(ansible_default_ipv4) }}"
         remote_addrs:
           - "{{ ip_manager }}:2377"
 #      debug:
