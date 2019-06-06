@@ -19,7 +19,8 @@ n0045
 
 #Define all the candidate to the swarm leader
 [swarm_manager]
-n0044
+u176i125 ip_addr=172.16.7.249
+
 
 #Define all the nodes you will use
 [swarm_nodes]
