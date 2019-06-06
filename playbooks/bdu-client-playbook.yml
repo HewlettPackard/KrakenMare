@@ -1,4 +1,39 @@
 ---
+- name: Preparation phase
+  hosts: localhost
+
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+
+# End of variables
+
+  tasks:
+  - name: Download docker-ce repository to yum
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /tmp/docker.repo
+
+    
+  - name: Download the containerd.io-1.2.5-3.1.el7.{{ ansible_architecture }} rpm from a remote repo
+    get_url:
+      url:  https://download.docker.com/linux/centos/7/{{ ansible_architecture }}/stable/Packages/containerd.io-1.2.5-3.1.el7.{{ ansible_architecture }}.rpm
+      dest: /tmp/containerd.rpm
+
+  - name: Download docker-compose
+    get_url:
+    #Example: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64
+
+      url: "https://github.com/docker/compose/releases/download/{{ docker_compose_Version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+      dest: /tmp/docker-compose
+
+
 - name: Ansible setup for the scalability analysis
   hosts: all
 
@@ -69,15 +104,22 @@
       executable: pip-3
 
 
-
   - name: Add docker-ce repository to yum
-    get_url:
-      url: https://download.docker.com/linux/centos/docker-ce.repo
+    copy:
       dest: /etc/yum.repos.d/docker-ce.repo
+      backup: yes
+      src: /tmp/docker.repo
 
-  - name: Install the containerd.io-1.2.5-3.1.el7.{{ ansible_architecture }} rpm from a remote repo
+  - name: Copy containerd.rpm from Ansible Control Node
+    copy:
+      dest: /tmp/containerd.rpm
+      backup: yes
+      src: /tmp/containerd.rpm
+
+
+  - name: Install the containerd rpm 
     yum:
-      name: https://download.docker.com/linux/centos/7/{{ ansible_architecture }}/stable/Packages/containerd.io-1.2.5-3.1.el7.{{ ansible_architecture }}.rpm
+      name: /tmp/containerd.rpm
       state: present
 
   - name: Install docker-ce
@@ -115,7 +157,7 @@
           "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-
+##BDU user
   - name: Add the user 'bdu'
     user:
       name: bdu
@@ -123,9 +165,11 @@
       groups: docker,wheel
       append: yes
 
-  - name: Download docker-compose
-    get_url:
-      url: "https://github.com/docker/compose/releases/download/{{ docker_compose_Version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+## Docker-compose
+  - name: Copy docker-compose from Ansible Control Node
+    copy:
+      src: /tmp/docker-compose
+      backup: yes
       dest: /usr/local/bin/docker-compose
 
   - name: Allow execution of /usr/local/bin/docker-compose
@@ -143,3 +187,4 @@
       daemon_reload: yes
       enabled : yes
       name: docker
+
