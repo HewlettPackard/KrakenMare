@@ -1,0 +1,19 @@
+---
+- name: Chronyd configuration 
+  hosts: all
+
+  vars_files:
+    - vars.yml
+
+    
+  tasks:   
+    - name: modifying chrony.conf
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^pool\ '
+        line: "server {{ time_server }} iburst"
+    - name: restart chrony
+      systemd:
+        state: restarted
+        name: chronyd
+

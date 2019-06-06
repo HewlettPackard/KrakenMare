@@ -17,9 +17,11 @@ docker build --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag 
 #The last task restarts docker and therefore exits brutally, FIXME
 docker run --rm --volume $BD_HOME:/playbooks/ --network=host ansible ansible-playbook /playbooks/bdu-client-playbook.yml --inventory /playbooks/hosts --forks 10
 
-docker run --rm --volume $BD_HOME:/playbooks/  --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --inventory /playbooks/hosts --forks 10 || exit 1
-docker run --rm --volume $BD_HOME:/playbooks/  --network=host ansible ansible-playbook /playbooks/swarm_init.yml --inventory /playbooks/hosts --forks 10 || exit 1
+docker run --rm --volume $BD_HOME:/playbooks/  --network=host ansible ansible-playbook /playbooks/ansible-clock.yml --inventory /playbooks/hosts --forks 10 || exit 1
 
+docker run --rm --volume $BD_HOME:/playbooks/  --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --inventory /playbooks/hosts --forks 10 || exit 1
+
+docker run --rm --volume $BD_HOME:/playbooks/  --network=host ansible ansible-playbook /playbooks/swarm_init.yml --inventory /playbooks/hosts --forks 10 || exit 1
 
 #Launch registry as late as possible ( docker swarm leave --force reset all exposed ports see #145)
 docker-compose --file ../docker-registry/mirror-registry.yml --file ../docker-registry/docker-proxy.yml up -d --build || exit 1
