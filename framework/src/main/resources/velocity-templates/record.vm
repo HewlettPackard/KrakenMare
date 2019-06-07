@@ -550,16 +550,22 @@ static {
   }
 
   public static ${this.mangle($schema.getName())} fromMap(Map<String, String> map) {
+    ${this.mangle($schema.getName())} record = new ${this.mangle($schema.getName())}();
 #foreach ($field in $schema.getFields())
-#if(${this.javaType($field.schema())} == "java.lang.Integer")
+#if (${this.javaType($field.schema())} == "java.lang.Integer")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Integer.parseInt(map.get("${this.mangle($field.name())}"));
-#elseif(${this.javaType($field.schema())} == "java.lang.Long")
+#elseif (${this.javaType($field.schema())} == "java.lang.Long")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Long.parseLong(map.get("${this.mangle($field.name())}"));
 #else
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = (${this.javaType($field.schema())}) getConversion("${this.mangle($field.name())}").fromCharSequence(map.get("${this.mangle($field.name())}"), null, null);
+#if (${this.conversionInstance($field.schema())} != "null")
+    ${this.javaType($field.schema())} ${this.mangle($field.name())} = (${this.javaType($field.schema())}) record.getConversion("${this.mangle($field.name())}").fromCharSequence(map.get("${this.mangle($field.name())}"), null, null);
+#else
+    ${this.javaType($field.schema())} ${this.mangle($field.name())} = map.get("${this.mangle($field.name())}");
 #end
 #end
-    return new ${this.mangle($schema.getName())}(#foreach($field in $schema.getFields())${this.mangle($field.name())}#if(!$foreach.last), #end#end);
+    record.${this.generateSetMethod($schema, $field)}(${this.mangle($field.name())});
+#end
+    return record;
   }
 
   public static ${this.mangle($schema.getName())} fromList(List<String> list) {

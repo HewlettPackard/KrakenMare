@@ -443,10 +443,14 @@ static {
   }
 
   public static Agent fromMap(Map<String, String> map) {
+    Agent record = new Agent();
     java.lang.Long id = Long.parseLong(map.get("id"));
-    java.util.UUID uuid = (java.util.UUID) getConversion("uuid").fromCharSequence(map.get("uuid"), null, null);
-    java.lang.CharSequence name = (java.lang.CharSequence) getConversion("name").fromCharSequence(map.get("name"), null, null);
-    return new Agent(id, uuid, name);
+    record.setId(id);
+    java.util.UUID uuid = (java.util.UUID) record.getConversion("uuid").fromCharSequence(map.get("uuid"), null, null);
+    record.setUuid(uuid);
+    java.lang.CharSequence name = map.get("name");
+    record.setName(name);
+    return record;
   }
 
   public static Agent fromList(List<String> list) {
