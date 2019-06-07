@@ -31,8 +31,10 @@ yum install docker-ce -y
 mkdir -p /etc/systemd/system/docker.service.d/
 
 cat << EOF >  /etc/systemd/system/docker.service.d/http-proxy.conf
+# BEGIN ANSIBLE MANAGED BLOCK
 [Service]
 Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080"
+# END ANSIBLE MANAGED BLOCK
 EOF
 ## Restart docker
 systemctl daemon-reload
