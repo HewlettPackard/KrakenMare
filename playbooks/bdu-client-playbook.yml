@@ -2,7 +2,6 @@
 - name: Preparation phase
   hosts: localhost
 
-
 # Edit variables.
   vars_files:
     - vars.yml
@@ -36,7 +35,7 @@
 
 - name: Ansible setup for the scalability analysis
   hosts: all
-
+  gather_facts: no
 
 # Edit variables.
   vars_files:
@@ -179,8 +178,49 @@
 
 
 
-  #---------------------------WARNING---------------------------------------------------------
-  ##Always at the end, ansible run in docker and we restart the docker daemon on the host machine
+# Send instructions on nodes before killing docker services on host machine
+- name: Restart docker on swarm_nodes
+  hosts: swarm_nodes
+  gather_facts: no  
+
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+
+# End of variables
+
+  tasks:
+  - name: Run deamon-reload then restart Docker service
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      enabled : yes
+      name: docker
+
+
+
+- name: Restart docker on swarm_manager
+  hosts: swarm_manager
+  gather_facts: no
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ proxy }}"
+    https_proxy: "{{ proxy }}"
+
+
+# End of variables
+
+  tasks:
   - name: Run deamon-reload then restart Docker service
     systemd:
       state: restarted
