@@ -1,8 +1,15 @@
 package com.hpe.bluedragon.impl;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -74,6 +81,25 @@ public class CollectdTransformStream {
 	}
 
 	public void start() throws InterruptedException {
+		LOG.info("Creating topics...");
+		try (AdminClient adminClient = AdminClient.create(PROPERTIES)) {
+			NewTopic requestTopic = new NewTopic(READ_TOPIC, 1, (short) 1);
+			NewTopic resultTopic = new NewTopic(WRITE_TOPIC, 1, (short) 1);
+
+			List<NewTopic> newTopics = new ArrayList<>();
+			newTopics.add(requestTopic);
+			newTopics.add(resultTopic);
+
+			CreateTopicsResult result = adminClient.createTopics(newTopics);
+			// wait for creation completion
+			for (KafkaFuture<Void> f : result.values().values()) {
+				try {
+					f.get();
+				} catch (ExecutionException e) {
+					LOG.warn("Unable to create topic", e);
+				}
+			}
+		}
 		LOG.info("Starting streams...");
 		streams.start();
 	}
