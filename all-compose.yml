@@ -343,3 +343,36 @@ services:
         constraints:
           - node.labels.injectors == true
 
+  influxdb:
+    # image: influxdb:latest
+    image : influxdb:1.7.5
+    hostname: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+# https://docs.docker.com/samples/library/influxdb/
+      INFLUXDB_DB: datapipes
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true
+
+  datapipes-monitor:
+    image: ${registry_name}:5001/datapipes-monitor
+    build:
+      context: datapipes-monitor
+      dockerfile: Dockerfile
+    hostname: datapipesmonitor
+    ports:
+      - "7575:7575"
+    volumes:
+    - ./datapipes-monitor/log/:/log/
+    - ./datapipes-monitor/persistence/:/persistence/
+    depends_on:
+      - mosquitto
+      - influxdb
+      - grafana
+    deploy:
+      placement:
+        constraints:
+          - node.labels.supervisory_cloud == true

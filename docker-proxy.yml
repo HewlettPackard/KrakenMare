@@ -49,3 +49,9 @@ services:
          http_proxy: http://web-proxy.bbn.hpecorp.net:8080
          https_proxy: http://web-proxy.bbn.hpecorp.net:8080
 
+  datapipes-monitor:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+

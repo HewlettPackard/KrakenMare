@@ -1,0 +1,24 @@
+# Docker Compose
+version: '3'
+services:
+  influxdb:
+    # image: influxdb:latest
+    image : influxdb:1.7.5
+    hostname: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      # https://docs.docker.com/samples/library/influxdb/
+      INFLUXDB_DB: datapipes
+
+  datapipes-monitor:
+    build:
+      context: datapipes-monitor
+      dockerfile: Dockerfile
+    hostname: datapipesmonitor
+    ports:
+      - "7575:7575"
+    depends_on:
+      - mosquitto
+      - influxdb
+      - grafana
