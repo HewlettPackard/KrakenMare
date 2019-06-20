@@ -106,13 +106,11 @@
   - name: Add docker-ce repository to yum
     copy:
       dest: /etc/yum.repos.d/docker-ce.repo
-      backup: yes
       src: /tmp/docker.repo
 
   - name: Copy containerd.rpm from Ansible Control Node
     copy:
       dest: /tmp/containerd.rpm
-      backup: yes
       src: /tmp/containerd.rpm
 
 
@@ -168,7 +166,6 @@
   - name: Copy docker-compose from Ansible Control Node
     copy:
       src: /tmp/docker-compose
-      backup: yes
       dest: /usr/local/bin/docker-compose
 
   - name: Allow execution of /usr/local/bin/docker-compose
