@@ -24,8 +24,6 @@ services:
   broker-1:
     image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-1
-    depends_on:
-      - zookeeper
     ports:
       - "9092:9092"
     environment:
@@ -52,8 +50,6 @@ services:
   broker-2:
     image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-2
-    depends_on:
-      - zookeeper
     ports:
       - "9093:9093"
     environment:
@@ -80,8 +76,6 @@ services:
   broker-3:
     image: confluentinc/cp-enterprise-kafka:5.2.0
     hostname: broker-3
-    depends_on:
-      - zookeeper
     ports:
       - "9094:9094"
     environment:
@@ -135,9 +129,6 @@ services:
       args:
         kafka_prefix: ${registry_name}:5001/
     hostname: test
-    depends_on:
-      - mosquitto
-      - kafka-embedded-client-1
     environment:
       MOSQUITTO_IP: mosquitto
       KAFKA_BROKER_IP: broker-1
@@ -154,10 +145,6 @@ services:
       context: simulator
       dockerfile: Dockerfile
     hostname: simulator
-    depends_on:
-      - framework
-      - connect
-      - mosquitto
     deploy:
       restart_policy:
         condition: none            
@@ -171,8 +158,6 @@ services:
       context: kafka-client
       dockerfile: Dockerfile
     hostname: kafka-emb1
-    depends_on:
-      - broker-1
     environment:
       KAFKA_BROKER_IP: broker-1
     deploy:
@@ -188,8 +173,6 @@ services:
       context: mousttic
       dockerfile: Dockerfile
     hostname: mousttic-1
-    depends_on:
-      - mosquitto
     environment:
       MOSQUITTO_IP: mosquitto
     deploy:
@@ -205,8 +188,6 @@ services:
       context: druid
       dockerfile: Dockerfile
     hostname: druid
-    depends_on:
-      - zookeeper
     ports:
 # - 8081: HTTP (coordinator)
 # - 8082: HTTP (broker)
@@ -232,8 +213,6 @@ services:
   grafana:
     image: grafana/grafana
     hostname: grafana
-    depends_on:
-      - druid
     ports:
       - "3000:3000"
     volumes:
@@ -254,9 +233,6 @@ services:
   schema_registry:
     image: confluentinc/cp-schema-registry:5.2.0
     hostname: schema_registry
-    depends_on:
-      - zookeeper
-      - broker-1
     ports:
       - "8081:8081"
     environment:
@@ -277,14 +253,6 @@ services:
       context: kafka-connect
       dockerfile: Dockerfile
     hostname: connect
-    depends_on:
-      - zookeeper
-      - broker-1
-      - broker-2
-      - broker-3
-      - schema_registry
-      - mosquitto
-      - druid
     ports:
       - "8083:8083"
     environment:
@@ -326,11 +294,6 @@ services:
       context: framework
       dockerfile: Dockerfile
     hostname: framework
-    depends_on:
-      - redis
-      - broker-1
-      - broker-2
-      - broker-3
     ports: 
       - "8080:8080"
     environment:
@@ -364,10 +327,6 @@ services:
     build:
       context: collectd
       dockerfile: Dockerfile
-    depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
     deploy:
       restart_policy:
         condition: none
@@ -399,13 +358,6 @@ services:
     hostname: datapipesmonitor
     ports:
       - "7575:7575"
-    volumes:
-    - ./datapipes-monitor/log/:/log/
-    - ./datapipes-monitor/persistence/:/persistence/
-    depends_on:
-      - mosquitto
-      - influxdb
-      - grafana
     deploy:
       restart_policy:
         condition: none
