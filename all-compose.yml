@@ -22,7 +22,10 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-1:
-    image: confluentinc/cp-enterprise-kafka:5.2.0
+    image: ${registry_name}:5001/kafka-broker
+    build:
+      context: kafka-broker
+      dockerfile: Dockerfile
     hostname: broker-1
     ports:
       - "9092:9092"
@@ -36,6 +39,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_JMX_PORT: 9992
+      KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-1:9092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -48,7 +52,10 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-2:
-    image: confluentinc/cp-enterprise-kafka:5.2.0
+    image: ${registry_name}:5001/kafka-broker
+    build:
+      context: kafka-broker
+      dockerfile: Dockerfile
     hostname: broker-2
     ports:
       - "9093:9093"
@@ -62,6 +69,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_JMX_PORT: 9993
+      KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-2:9093
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -74,7 +82,10 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-3:
-    image: confluentinc/cp-enterprise-kafka:5.2.0
+    image: ${registry_name}:5001/kafka-broker
+    build:
+      context: kafka-broker
+      dockerfile: Dockerfile
     hostname: broker-3
     ports:
       - "9094:9094"
@@ -88,6 +99,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_JMX_PORT: 9994
+      KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-3:9094
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -276,6 +288,7 @@ services:
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/custom-plugins"
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_CUB_KAFKA_TIMEOUT: 240
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
     deploy:
       restart_policy:

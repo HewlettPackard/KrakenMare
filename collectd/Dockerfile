@@ -14,13 +14,17 @@ RUN cd / && wget --no-check-certificate https://api.github.com/repos/collectd/co
 	&& mv /collectd-collectd-* /collectd && cd /collectd && ./build.sh && ./configure --disable-werror && make && make install
 COPY collectd.conf.patch /tmp
 RUN cd /opt/collectd/etc && patch -p0 < /tmp/collectd.conf.patch
+RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -
+RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 # Create container for collect using 18.04 and bring in librdkafka and collectd
 FROM ubuntu:18.04
 #
 RUN apt-get update && apt-get upgrade -y
+RUN apt update && apt install -y netcat
 COPY --from=collectdbuild /usr/local/lib/* /usr/local/lib/
 COPY --from=collectdbuild /opt/collectd /opt/collectd
+COPY --from=collectdbuild /tmp/wait-for /tmp/wait-for
 COPY entrypoint.sh /
 #
 CMD ["/entrypoint.sh"]

@@ -6,6 +6,24 @@ services:
          http_proxy: http://web-proxy.bbn.hpecorp.net:8080
          https_proxy: http://web-proxy.bbn.hpecorp.net:8080
 
+  broker-1:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  broker-2:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
+  broker-3:
+    build:
+      args:
+         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
   simulator:
     build:
       args:

@@ -1,5 +1,8 @@
 FROM maven:3.6.0-jdk-8
 
+# requirement for wait-for
+RUN apt update && apt install -y netcat
+
 RUN mkdir -p /opt/bluedragon
 WORKDIR /opt/bluedragon
 
@@ -13,6 +16,12 @@ COPY src /opt/bluedragon/src
 # tests requires a Redis instance: skip them (they are run in the CI)
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
+RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -
+
+RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
+
+COPY entrypoint.sh /tmp/
+
 EXPOSE 8080
 
-CMD ["java", "-cp", "target/framework-0.0.1-SNAPSHOT-jar-with-dependencies.jar", "com.hpe.bluedragon.Main"]
+ENTRYPOINT /tmp/entrypoint.sh
