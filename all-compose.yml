@@ -22,7 +22,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-1:
-    image: ${registry_name}:5001/kafka-broker
+    image: ${REGISTRY_FULL_PATH}kafka-broker
     build:
       context: kafka-broker
       dockerfile: Dockerfile
@@ -52,7 +52,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-2:
-    image: ${registry_name}:5001/kafka-broker
+    image: ${REGISTRY_FULL_PATH}kafka-broker
     build:
       context: kafka-broker
       dockerfile: Dockerfile
@@ -82,7 +82,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   broker-3:
-    image: ${registry_name}:5001/kafka-broker
+    image: ${REGISTRY_FULL_PATH}kafka-broker
     build:
       context: kafka-broker
       dockerfile: Dockerfile
@@ -134,12 +134,12 @@ services:
           - node.labels.supervisory_cloud == true
 
   test-tools:
-    image: ${registry_name}:5001/test-tools
+    image: ${REGISTRY_FULL_PATH}test-tools
     build:
       context: test-tools
       dockerfile: Dockerfile
       args:
-        kafka_prefix: ${registry_name}:5001/
+        kafka_prefix: ${REGISTRY_FULL_PATH}
     hostname: test
     environment:
       MOSQUITTO_IP: mosquitto
@@ -152,7 +152,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   simulator:
-    image: ${registry_name}:5001/simulator
+    image: ${REGISTRY_FULL_PATH}simulator
     build:
       context: simulator
       dockerfile: Dockerfile
@@ -165,7 +165,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   kafka-embedded-client-1:
-    image: ${registry_name}:5001/kafka-embedded-client-1
+    image: ${REGISTRY_FULL_PATH}kafka-embedded-client-1
     build:
       context: kafka-client
       dockerfile: Dockerfile
@@ -180,7 +180,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   mousttic-1:
-    image: ${registry_name}:5001/mousttic-1
+    image: ${REGISTRY_FULL_PATH}mousttic-1
     build:
       context: mousttic
       dockerfile: Dockerfile
@@ -195,7 +195,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   druid:
-    image: ${registry_name}:5001/druid
+    image: ${REGISTRY_FULL_PATH}druid
     build:
       context: druid
       dockerfile: Dockerfile
@@ -260,7 +260,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   connect:
-    image: ${registry_name}:5001/connect
+    image: ${REGISTRY_FULL_PATH}connect
     build:
       context: kafka-connect
       dockerfile: Dockerfile
@@ -302,7 +302,7 @@ services:
 #  redis
 #
   framework:
-    image: ${registry_name}:5001/framework
+    image: ${REGISTRY_FULL_PATH}framework
     build:
       context: framework
       dockerfile: Dockerfile
@@ -336,7 +336,7 @@ services:
 #
 # No hostname is asserted. We want the docker host's name for this container
   collectd:
-    image: ${registry_name}:5001/collectd
+    image: ${REGISTRY_FULL_PATH}collectd
     build:
       context: collectd
       dockerfile: Dockerfile
@@ -364,7 +364,7 @@ services:
           - node.labels.supervisory_cloud == true
 
   datapipes-monitor:
-    image: ${registry_name}:5001/datapipes-monitor
+    image: ${REGISTRY_FULL_PATH}datapipes-monitor
     build:
       context: datapipes-monitor
       dockerfile: Dockerfile

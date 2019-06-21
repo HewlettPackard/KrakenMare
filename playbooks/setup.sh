@@ -5,7 +5,7 @@ BD_HOME=$(pwd)
 PROXY=http://grewebcachevip.bastion.europe.hp.com:8080
 
 #to be done see #146
-export registry_name=$(hostname) || exit 1
+export REGISTRY_FULL_PATH="$(hostname):5001/" || exit 1
 
 if [ $UID -ne 0 ] ; then
     echo "root access needed for bootstraping" >&2 
