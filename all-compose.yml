@@ -150,6 +150,9 @@ services:
       placement:
         constraints:
           - node.labels.supervisory_cloud == true
+    #depends on at build time only
+    depends_on:
+      - kafka-embedded-client-1
 
   simulator:
     image: ${REGISTRY_FULL_PATH}simulator
