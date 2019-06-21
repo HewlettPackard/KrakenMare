@@ -336,7 +336,7 @@ services:
 
   influxdb:
     # image: influxdb:latest
-    image : influxdb:1.7.5
+    image : influxdb:1.7.6
     hostname: influxdb
     ports:
       - "8086:8086"
