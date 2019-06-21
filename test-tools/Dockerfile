@@ -13,14 +13,19 @@ COPY --from=kafka-client /usr/local/include/librdkafka/* /usr/local/include/libr
 # Build kafkacat
 RUN mkdir -p /usr/src
 RUN cd /usr/src && wget -q --no-check-certificate https://github.com/edenhill/kafkacat/archive/1.3.1.tar.gz -O - | tar xzf - && cd kafkacat-1.3.1 && ./configure && make && make install && mv kafkacat /usr/local/bin/
+RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -
+RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server
 COPY --from=kafka-client /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
 COPY --from=kafka-client /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
 COPY --from=testbuild /usr/local/bin/* /usr/local/bin/
+COPY --from=testbuild /tmp/wait-for /tmp/wait-for
+
+COPY ./check-pipeline.sh /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
