@@ -4,7 +4,15 @@
 #  kafka broker 1-3
 #
 
-version: '3'
+version: '3.4'
+x-deploy: &deploy
+  deploy:
+    restart_policy:
+      condition: none
+    placement:
+      constraints:
+        - node.labels.supervisory_cloud == true
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.0
@@ -14,12 +22,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   broker-1:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -44,12 +47,7 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   broker-2:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -74,12 +72,7 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   broker-3:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -104,12 +97,7 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 #
 # Docker Compose with the following services:
 #  mosquitto
@@ -126,12 +114,7 @@ services:
       - "9001:9001"
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   test-tools:
     image: ${REGISTRY_FULL_PATH}test-tools
@@ -144,12 +127,7 @@ services:
     environment:
       MOSQUITTO_IP: mosquitto
       KAFKA_BROKER_IP: broker-1
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
     #depends on at build time only
     depends_on:
       - kafka-embedded-client-1
@@ -160,12 +138,7 @@ services:
       context: simulator
       dockerfile: Dockerfile
     hostname: simulator
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   kafka-embedded-client-1:
     image: ${REGISTRY_FULL_PATH}kafka-embedded-client-1
@@ -175,12 +148,7 @@ services:
     hostname: kafka-emb1
     environment:
       KAFKA_BROKER_IP: broker-1
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   mousttic-1:
     image: ${REGISTRY_FULL_PATH}mousttic-1
@@ -190,12 +158,7 @@ services:
     hostname: mousttic-1
     environment:
       MOSQUITTO_IP: mosquitto
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   druid:
     image: ${REGISTRY_FULL_PATH}druid
@@ -217,12 +180,7 @@ services:
       - "3306:3306"
       - "9095:9095"
       - "1527:1527"
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
 
   grafana:
@@ -234,12 +192,7 @@ services:
     - ./grafana/provisioning/:/etc/grafana/provisioning
     - ./grafana/dashboards/:/etc/grafana/dashboards
     - ./grafana/plugins/:/var/lib/grafana/plugins/
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 #
 # Docker Compose with the following services:
 #  kafka connect
@@ -255,12 +208,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
       SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   connect:
     image: ${REGISTRY_FULL_PATH}connect
@@ -293,12 +241,7 @@ services:
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
       CONNECT_CUB_KAFKA_TIMEOUT: 240
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 #
 # Docker Compose with the following services:
 #  framework
@@ -315,24 +258,14 @@ services:
     environment:
       REDIS_SERVER: "redis:6379"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   redis:
     image: redis:5.0.3
     hostname: redis
     ports:
       - "6379:6379"
-    deploy:
-      restart_policy:
-        condition: none            
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 #
 # Docker Compose with the following services:
 #  collectd
@@ -359,12 +292,7 @@ services:
     environment:
 # https://docs.docker.com/samples/library/influxdb/
       INFLUXDB_DB: datapipes
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy
 
   datapipes-monitor:
     image: ${REGISTRY_FULL_PATH}datapipes-monitor
@@ -374,9 +302,4 @@ services:
     hostname: datapipesmonitor
     ports:
       - "7575:7575"
-    deploy:
-      restart_policy:
-        condition: none
-      placement:
-        constraints:
-          - node.labels.supervisory_cloud == true
+    <<: *deploy

@@ -1,35 +1,26 @@
-version: '3'
+version: '3.4'
+x-proxy: &proxy
+  build:
+    args:
+      http_proxy: http://web-proxy.bbn.hpecorp.net:8080
+      https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+
 services:
   connect:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   broker-1:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   broker-2:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   broker-3:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
-
+    <<: *proxy
+  
   simulator:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
-
+    <<: *proxy
+ 
   framework:
     build:
       args:
@@ -38,38 +29,19 @@ services:
          MAVEN_OPTS: -Dhttps.proxyHost=web-proxy.bbn.hpecorp.net -Dhttps.proxyPort=8080
 
   druid:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   kafka-embedded-client-1:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   mousttic-1:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   test-tools:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   collectd:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+    <<: *proxy
 
   datapipes-monitor:
-    build:
-      args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
-
+    <<: *proxy
