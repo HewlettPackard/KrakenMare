@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Check if user is root
-if [ $UID -ne 0 ] ; then
-    echo "root access needed for bootstraping" >&2;
-    exit 1;
-fi
 
 # Change directory
 cd $(dirname $0) || exit 1
@@ -20,6 +15,7 @@ unset $push;
 unset $deploy;
 unset $proxy;
 unset $setupRegistry;
+unset $restartDocker;
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
@@ -41,6 +37,7 @@ usage () {
      echo '-b: to Build and Push'
      echo '-d: to Deploy'
      echo "-i: to specify the inventory file (DEFAULT is ${DEFAULT_INVENTORY_FILE})"
+     echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
      echo '-h: to display help'
      echo "return code is 0 if all tasks success"
      echo "            is 1 if a task failed "
@@ -60,7 +57,7 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdri:" Option
+while getopts "hfapbdri:R" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
@@ -68,6 +65,7 @@ do
          p     ) pull=1         ;;
          b     ) build=1        ;;
          d     ) deploy=1       ;;
+	 R     ) restartDocker=1;;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
@@ -128,9 +126,17 @@ if [  "$ansible" == "1"  ]; then
      #Build ansible
      #The last task restarts docker and therefore exits brutally, FIXME
      docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/bdu-client-playbook.yml --forks 100
+     if [ "$restartDocker" == 1 ] ; then
      #need to be root to restart the docker service when proxy and/or registries have been reconfigured
-     systemctl daemon-reload || exit 1
-     systemctl restart-docker || exit 1
+     sudo systemctl daemon-reload || exit 1
+     sudo systemctl restart docker || exit 1
+     else
+	 echo "***"
+	 echo "[warning] daemon-reload and restar-docker skipped" 
+	 echo "[warning] this is harmless if proxy or registries for `hostname` were already configured" 2
+	 echo "[warning] add -r flag to force this step if needed (requires privileges)"
+	 echo "***"
+     fi
      docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --forks 100 
      docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml  --forks 100
 
