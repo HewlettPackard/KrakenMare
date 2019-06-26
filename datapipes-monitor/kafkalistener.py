@@ -181,7 +181,9 @@ if __name__ == '__main__':
             #     print('Pushed %d measures in InfluxDB' % len(metrics_to_insert))
         else :
             print("Nothing from KAFKA monitoring to send to influx")
+
         # ----- t1 is now t0 for next round
+        ts_t0 = ts_t1
         offsets_partitions_t0 = offsets_partitions_t1
         offsets_topics_t0     = offsets_topics_t1
 
