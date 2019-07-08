@@ -161,6 +161,7 @@ fi
 if [ "$deploy" == "1"  ]; then
 
      docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
+     cd ../kafka-security && ./certs-create.sh
      docker stack deploy $compose_args $project_name || exit 1 
 
 fi
