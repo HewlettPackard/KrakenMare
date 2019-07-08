@@ -31,8 +31,8 @@ EOF
 
 run_me kafka-connect  curl -s http://connect:8083/connectors      || exit 1
 run_me broker-1       kafkacat -b broker-1 -L                     || exit 1
-run_me broker-2       kafkacat -b broker-2:9093 -L                || exit 1
-run_me broker-3       kafkacat -b broker-3:9094 -L                || exit 1
+run_me broker-2       kafkacat -b broker-2 -L                     || exit 1
+run_me broker-3       kafkacat -b broker-3 -L                     || exit 1
 run_me redis          redis-cli -h redis ping                     || exit 1
 run_me framework      curl -s framework:8080/agents               || exit 1
 run_me mosquitto      timeout 10 mosquitto_sub -h mosquitto -t '\$'SYS/broker/version -C 1 || exit 1
