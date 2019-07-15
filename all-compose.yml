@@ -27,6 +27,9 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider -DrequireClientAuthScheme=sasl"
+    secrets:
+      - zookeeper_jaas.conf
     <<: *deploy
 
   broker-1:
@@ -39,26 +42,46 @@ services:
       - "9092:9092"
       - "9982:9982"
       - "31757:31757"
+      - "19092:19092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-1:9092'
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-1:9092,SSL://broker-1:19092,SASL_SSL://broker-1:29092,SASL_SSL_HOST://localhost:39092'
+      KAFKA_JMX_PORT: 9992
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_CUB_ZK_TIMEOUT: 240
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-1:9092
-      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'false'
-      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:restproxy;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-1.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-1_keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: broker-1_sslkey_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.broker-1.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: broker-1_truststore_creds
+      # enables 2-way authentication
+      KAFKA_SSL_CLIENT_AUTH: "required"
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+      KAFKA_ZOOKEEPER_SET_ACL: "true"
+      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       # KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.host=broker-1 -Dcom.sun.management.jmxremote.port=9992 -Djava.rmi.server.hostname=broker-1 -Dcom.sun.management.jmxremote.rmi.port=9992 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
+    secrets:
+      - broker_jaas.conf
+      - kafka.broker-1.keystore.jks
+      - broker-1_keystore_creds
+      - broker-1_sslkey_creds
+      - kafka.broker-1.truststore.jks
+      - broker-1_truststore_creds
     deploy:
       restart_policy:
         condition: none
@@ -76,31 +99,52 @@ services:
       - "9093:9093"
       - "9983:9983"
       - "31758:31757"
+      - "19093:19093"
+      - "29093:29093"
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-2:9093'
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-2:9093,SSL://broker-2:19093,SASL_SSL://broker-2:29093,SASL_SSL_HOST://localhost:39093'
+      KAFKA_JMX_PORT: 9993
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_CUB_ZK_TIMEOUT: 240
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-2:9093
-      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'false'
-      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:restproxy;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-2.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-2_keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: broker-2_sslkey_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.broker-2.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: broker-2_truststore_creds
+      # enables 2-way authentication
+      KAFKA_SSL_CLIENT_AUTH: "required"
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+      KAFKA_ZOOKEEPER_SET_ACL: "true"
+      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
+    secrets:
+      - broker_jaas.conf
+      - kafka.broker-2.keystore.jks
+      - broker-2_keystore_creds
+      - broker-2_sslkey_creds
+      - kafka.broker-2.truststore.jks
+      - broker-2_truststore_creds
     deploy:
       restart_policy:
         condition: none
       placement:
         constraints:
           - node.labels.broker-2 == true
+
   broker-3:
     image: ${REGISTRY_FULL_PATH}kafka-broker
     build:
@@ -111,25 +155,46 @@ services:
       - "9094:9094"
       - "9984:9984"
       - "31759:31757"
+      - "19094:19094"
+      - "29094:29094"
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-3:9094'
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-3:9094,SSL://broker-3:19094,SASL_SSL://broker-3:29094,SASL_SSL_HOST://localhost:39094'
+      KAFKA_JMX_PORT: 9994
+      KAFKA_CUB_ZK_TIMEOUT: 240
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_CUB_ZK_TIMEOUT: 240
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-3:9094
-      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'false'
-      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:restproxy;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-3.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-3_keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: broker-3_sslkey_creds
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.broker-3.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: broker-3_truststore_creds
+      # enables 2-way authentication
+      KAFKA_SSL_CLIENT_AUTH: "required"
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+      KAFKA_ZOOKEEPER_SET_ACL: "true"
+      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
+    secrets:
+      - broker_jaas.conf
+      - kafka.broker-3.keystore.jks
+      - broker-3_keystore_creds
+      - broker-3_sslkey_creds
+      - kafka.broker-3.truststore.jks
+      - broker-3_truststore_creds
     deploy:
       restart_policy:
         condition: none
@@ -244,8 +309,29 @@ services:
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SASL_SSL://broker-1:29092,SASL_SSL://broker-2:29093,SASL_SSL://broker-3:29094"
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: "https://0.0.0.0:8081"
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.schemaregistry.truststore.jks
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: bluedragon
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.schemaregistry.keystore.jks
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: bluedragon
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: bluedragon
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.schemaregistry.truststore.jks
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD: bluedragon
+      SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.schemaregistry.keystore.jks
+      SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD: bluedragon
+      SCHEMA_REGISTRY_SSL_KEY_PASSWORD: bluedragon
+      # Disable SR client auth as temporary workaround to software bug
+      SCHEMA_REGISTRY_SSL_CLIENT_AUTH: "false"
+      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "https"
+    secrets:
+      - kafka.schemaregistry.truststore.jks
+      - kafka.schemaregistry.keystore.jks
     <<: *deploy
 
   connect:
@@ -257,9 +343,12 @@ services:
     ports:
       - "8083:8083"
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: 'broker-1:9092'
+      CONNECT_BOOTSTRAP_SERVERS: 'broker-1:9092,broker-2:9093,broker-3:9094'
+# for SASL_SSL      CONNECT_BOOTSTRAP_SERVERS: 'broker-1:29092,broker-2:29093,broker-3:29094'
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
       CONNECT_REST_PORT: 8083
+      CONNECT_LISTENERS: "https://0.0.0.0:8083"
+      CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
       CONNECT_GROUP_ID: compose-connect-group
       CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
@@ -279,6 +368,43 @@ services:
       CONNECT_LOG4J_ROOT_LOGLEVEL: WARN
       CONNECT_CUB_KAFKA_TIMEOUT: 240
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
+      # Connect worker
+#      CONNECT_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
+      CONNECT_SASL_MECHANISM: PLAIN
+      CONNECT_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.jks
+      CONNECT_SSL_TRUSTSTORE_PASSWORD: bluedragon
+      CONNECT_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.jks
+      CONNECT_SSL_KEYSTORE_PASSWORD: bluedragon
+      # Connect producer
+#      CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"client\"  password=\"client-secret\";"
+      CONNECT_PRODUCER_SASL_MECHANISM: PLAIN
+      CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.jks
+      CONNECT_PRODUCER_SSL_TRUSTSTORE_PASSWORD: bluedragon
+      CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.jks
+      CONNECT_PRODUCER_SSL_KEYSTORE_PASSWORD: bluedragon
+      CONNECT_PRODUCER_SSL_KEY_PASSWORD: bluedragon
+      # Connect consumer
+#      CONNECT_CONSUMER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_CONSUMER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
+      CONNECT_CONSUMER_SASL_MECHANISM: PLAIN
+      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.jks
+      CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: bluedragon
+      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.jks
+      CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD: bluedragon
+      CONNECT_CONSUMER_SSL_KEY_PASSWORD: bluedragon
+      # Required for Schema Registry HTTPS
+      KAFKA_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.connect.truststore.jks -Djavax.net.ssl.trustStorePassword=bluedragon -Djavax.net.ssl.keyStore=/run/secrets/kafka.connect.keystore.jks -Djavax.net.ssl.keyStorePassword=bluedragon"
+      SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.jks -Djavax.net.ssl.trustStorePassword=bluedragon -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.jks -Djavax.net.ssl.keyStorePassword=bluedragon"
+    secrets:
+      - kafka.connect.truststore.jks
+      - kafka.connect.keystore.jks
+      - kafka.client.truststore.jks
+      - kafka.client.keystore.jks
+      - connect.certificate.pem
+      - connect.key
+      - bd-ca-1.crt
     <<: *deploy
 #
 # Docker Compose with the following services:

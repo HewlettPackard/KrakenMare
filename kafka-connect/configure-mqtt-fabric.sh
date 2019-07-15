@@ -8,12 +8,12 @@ kafka-topics --zookeeper zookeeper:2181 --topic hello --partitions 3 --replicati
 echo ""
 echo "removing MQTT Sink Connector"
 
-curl -X DELETE "connect:8083/connectors/mqtt-sink-reg-res"
+curl -X DELETE "https://connect:8083/connectors/mqtt-sink-reg-res" --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt
 
 echo ""
 echo "creating MQTT Sink Connector"
 
-curl -X POST "connect:8083/connectors" \
+curl -X POST "https://connect:8083/connectors" \
      -H "Content-Type: application/json" \
      -d $'{
   "name": "mqtt-sink-reg-res",
@@ -34,18 +34,18 @@ curl -X POST "connect:8083/connectors" \
     "connect.mqtt.hosts": "tcp://mosquitto:1883",
     "connect.mqtt.service.quality": "2"
   }
-  }'
+  }' --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt
 
 echo ""
 echo "removing MQTT IBswitch and Registration Source Connector"
 
-curl -X DELETE "connect:8083/connectors/mqtt-source-ibswitch"
-curl -X DELETE "connect:8083/connectors/mqtt-source-reg-req"
+curl -X DELETE "https://connect:8083/connectors/mqtt-source-ibswitch" --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt
+curl -X DELETE "https://connect:8083/connectors/mqtt-source-reg-req" --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt
 
 echo ""
 echo "creating MQTT IBswitch Source Connector"
 
-curl -X POST "connect:8083/connectors" \
+curl -X POST "https://connect:8083/connectors" \
      -H "Content-Type: application/json" \
      -d $'{
   "name": "mqtt-source-ibswitch",
@@ -65,12 +65,12 @@ curl -X POST "connect:8083/connectors" \
     "connect.mqtt.hosts": "tcp://mosquitto:1883",
     "connect.mqtt.service.quality": "0"
   }
-  }'
+  }' --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt
 
 echo ""
 echo "creating MQTT Registration Request Source Connector"
 
-curl -X POST "connect:8083/connectors" \
+curl -X POST "https://connect:8083/connectors" \
      -H "Content-Type: application/json" \
      -d $'{
   "name": "mqtt-source-reg-req",
@@ -90,4 +90,4 @@ curl -X POST "connect:8083/connectors" \
     "connect.mqtt.hosts": "tcp://mosquitto:1883",
     "connect.mqtt.service.quality": "2"
   }
-  }'
+  }' --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/bd-ca-1.crt

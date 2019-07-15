@@ -16,7 +16,7 @@ openssl req -new -x509 -keyout bd-ca-1.key -out bd-ca-1.crt -days 365 -subj '/CN
 docker secret create bd-ca-1.key bd-ca-1.key
 docker secret create bd-ca-1.crt bd-ca-1.crt
 
-for i in broker-1 broker-2 broker-3 schemaregistry connect
+for i in broker-1 broker-2 broker-3 schemaregistry connect client
 do
 	echo "------------------------------- $i -------------------------------"
 
@@ -101,3 +101,7 @@ EOF
 
 done
 docker secret create bd-ca-1.srl bd-ca-1.srl
+docker secret rm broker_jaas.conf
+docker secret rm zookeeper_jaas.conf
+docker secret create broker_jaas.conf broker_jaas.conf
+docker secret create zookeeper_jaas.conf zookeeper_jaas.conf
