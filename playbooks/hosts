@@ -4,6 +4,9 @@ ansible_ssh_pass=PFteam
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 [registry]
 [supervisory_cloud]
+[broker-1]
+[broker-2]
+[broker-3]
 [injectors]
 [swarm_manager]
 [swarm_nodes]

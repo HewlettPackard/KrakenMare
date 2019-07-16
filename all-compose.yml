@@ -5,6 +5,7 @@
 #
 
 version: '3.4'
+
 x-deploy: &deploy
   deploy:
     restart_policy:
@@ -12,6 +13,9 @@ x-deploy: &deploy
     placement:
       constraints:
         - node.labels.supervisory_cloud == true
+# Cannot activate this for now due to the way we propagate ansible vars to docker labels
+#      preferences:
+#        - spread:  node.labels.supervisory_zone
 
 services:
   zookeeper:
@@ -53,7 +57,12 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.broker-1 == true
 
   broker-2:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -83,8 +92,12 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-    <<: *deploy
-
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.broker-2 == true
   broker-3:
     image: ${REGISTRY_FULL_PATH}kafka-broker
     build:
@@ -113,7 +126,12 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.broker-3 == true
 #
 # Docker Compose with the following services:
 #  mosquitto
