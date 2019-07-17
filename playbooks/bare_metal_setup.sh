@@ -26,6 +26,7 @@ yum install yum-utils git wget -y || exit 1
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo || exit 1
 yum install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.5-3.1.el7.x86_64.rpm -y || exit 1
 yum install docker-ce -y || exit 1
+yum install java-1.8.0-openjdk-1.8.0.201.b09-2.el8.x86_64 || exit 1
 
 ## Setup docker for HPE only
 mkdir -p /etc/systemd/system/docker.service.d/ || exit 1
