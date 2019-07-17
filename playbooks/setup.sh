@@ -50,10 +50,12 @@ usage () {
 registry_content () {
      echo $registry will be used as registry node
      
-     echo $registry contains on mirror registry :
-     curl --max-time 3 $registry:5001/v2/_catalog
-     echo $registry contains on private registry :
-     curl --max-time 3 $registry:5000/v2/_catalog
+     echo -n "[info] $registry catalog content on mirror registry (can be void if not running):"
+     curl --max-time 3 $registry:5001/v2/_catalog 2> /dev/null
+     echo ""
+     echo -n "[info] $registry catalog content on private registry (can be void if not running):"
+     curl --max-time 3 $registry:5000/v2/_catalog 2> /dev/null
+     echo ""
 }
 
 #Parse args
@@ -133,8 +135,8 @@ if [  "$ansible" == "1"  ]; then
      else
           echo "***"
           echo "[warning] daemon-reload and restart-docker skipped"
-          echo "[warning] this is harmless if proxy or registries for `hostname` were already configured" 2
-          echo "[warning] add -r flag to force this step if needed (requires privileges)"
+          echo "[warning] this is harmless if proxy or registries for `hostname` were already configured" 
+          echo "[warning] add -R flag to force this step if needed (requires privileges)"
           echo "***"
      fi
      docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --forks 100 
