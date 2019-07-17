@@ -22,6 +22,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: ERROR
     <<: *deploy
 
   broker-1:
@@ -48,6 +49,10 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
+      KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
     <<: *deploy
 
   broker-2:
@@ -74,6 +79,10 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
+      KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
     <<: *deploy
 
   broker-3:
@@ -100,6 +109,10 @@ services:
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
+      KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
+      KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
     <<: *deploy
 #
 # Docker Compose with the following services:
@@ -241,7 +254,7 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/custom-plugins"
-      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_LOG4J_ROOT_LOGLEVEL: WARN
       CONNECT_CUB_KAFKA_TIMEOUT: 240
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
     <<: *deploy
