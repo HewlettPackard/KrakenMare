@@ -23,5 +23,5 @@ sed -i "s/Key \"localhost\"/Key \"$HOSTNAME\"/" collectd.conf
 grep "Key \"" collectd.conf
 export LD_LIBRARY_PATH=/usr/local/lib
 /tmp/wait-for --timeout=240 broker-1:9092 && \
-/tmp/wait-for --timeout=240 broker-2:9092 && \
-/tmp/wait-for --timeout=240 broker-3:9092 -- /opt/collectd/sbin/collectd -f
+/tmp/wait-for --timeout=240 broker-2:9093 && \
+/tmp/wait-for --timeout=240 broker-3:9094 -- /opt/collectd/sbin/collectd -f
