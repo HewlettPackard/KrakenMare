@@ -1,22 +1,23 @@
 #precise, aka Ubuntu12 is the baseline for the SLAPM SDK.
-FROM ubuntu:precise as kafkabuild
+# but we use this build in 18.04 so I'm changing to that
+FROM ubuntu:18.04 as kafkabuild
 
 RUN apt-get update && apt-get upgrade -y
 
 #only required for building
 RUN apt-get update && apt-get install -y --force-yes gcc g++ make \
-&& apt-get install -y autoconf libtool wget \
-&& cd / && wget --no-check-certificate https://api.github.com/repos/akheron/jansson/tarball/f4498d2856fff130366e1dacc74d66d3502e0e5c -O - | tar xzf - \
+&& apt-get install -y autoconf libtool wget libssl-dev \
+&& cd / && wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - \
 && apt-get install -y --force-yes gdb valgrind cppcheck
 
-RUN mv /akheron-jansson* /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
+RUN mv /jansson-2.12 /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
 
 #just a simple jansson compile test to validate all build env is 'go'
 COPY json_simple_write.c /jansson/examples/
 RUN cd /jansson/examples && gcc -Wall -Werror json_simple_write.c -ljansson -o simple_write 
 
-RUN cd / && wget --no-check-certificate https://api.github.com/repos/edenhill/librdkafka/tarball/f460729fda3916485508e63f491bba4bcae3a80d -O - | tar xzf - \
-&& mv /edenhill-librdkafka* /librdkafka && cd /librdkafka && ./configure && make && make install
+RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
+&& mv /librdkafka-1.1.0 /librdkafka && cd /librdkafka && ./configure && make && make install
 RUN cd /librdkafka/examples && make 
 
 COPY simul.c /librdkafka/examples/simul.c
@@ -26,7 +27,7 @@ RUN cd /librdkafka/examples && make
 WORKDIR /
 
 # The demo configuration allows topics to be created. By the act of publishing we create the hello topic
-FROM ubuntu:precise
+FROM ubuntu:18.04
 COPY --from=kafkabuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka
 COPY --from=kafkabuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
