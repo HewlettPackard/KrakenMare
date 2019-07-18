@@ -28,6 +28,8 @@ WORKDIR /
 
 # The demo configuration allows topics to be created. By the act of publishing we create the hello topic
 FROM ubuntu:18.04
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get install -y --force-yes libssl-dev
 COPY --from=kafkabuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka
 COPY --from=kafkabuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
