@@ -234,6 +234,45 @@ services:
     #depends on at build time only
     depends_on:
       - kafka-embedded-client-1
+    secrets:
+      - zookeeper_jaas.conf
+      - broker_jaas.conf
+      - kafka.broker-1.keystore.jks
+      - broker-1_keystore_creds
+      - broker-1_sslkey_creds
+      - kafka.broker-1.truststore.jks
+      - broker-1_truststore_creds
+      - kafka.broker-2.keystore.jks
+      - broker-2_keystore_creds
+      - broker-2_sslkey_creds
+      - kafka.broker-2.truststore.jks
+      - broker-2_truststore_creds
+      - kafka.broker-3.keystore.jks
+      - broker-3_keystore_creds
+      - broker-3_sslkey_creds
+      - kafka.broker-3.truststore.jks
+      - broker-3_truststore_creds
+      - kafka.schemaregistry.truststore.jks
+      - kafka.schemaregistry.keystore.jks
+      - kafka.connect.truststore.jks
+      - kafka.connect.keystore.jks
+      - kafka.client.truststore.jks
+      - kafka.client.keystore.jks
+      - connect.certificate.pem
+      - broker-1.certificate.pem
+      - broker-2.certificate.pem
+      - broker-3.certificate.pem
+      - client.certificate.pem
+      - schemaregistry.certificate.pem
+      - connect.key
+      - broker-1.key
+      - broker-2.key
+      - broker-3.key
+      - client.key
+      - schemaregistry.key
+      - bd-ca-1.crt
+      - bd-ca-1.key
+      - bd-ca-1.srl
 
   simulator:
     image: ${REGISTRY_FULL_PATH}simulator
