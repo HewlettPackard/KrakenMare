@@ -45,6 +45,9 @@ run_me druid_middle   curl -s http://druid:8091/status/health     || exit 1
 run_me druid_perfquery  'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_perfquery.json http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
 run_me druid_collectd   'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_collectd.json   http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
 run_me influxdb       timeout 10 'curl -G "http://influxdb:8086/query?pretty=true" --data-urlencode "db=datapipes" --data-urlencode "q=show diagnostics"' || exit 1
+run_me ssl-broker-1   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-1:19092 || exit 1
+run_me ssl-broker-2   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-1:19093 || exit 1
+run_me ssl-broker-3   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-1:19094 || exit 1
 
 echo ""
 echo "all tests succeeded..."
