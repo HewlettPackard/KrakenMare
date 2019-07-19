@@ -10,8 +10,7 @@ do
     { type $tool &> /dev/null ; } || { echo "$tool needed..." >&2 ; exit 1 ; }
 done
 
-mkdir /tmp/secrets || exit 1
-cd /tmp/secrets || exit 1
+cd /tmp || exit 1
 
 # Cleanup files
 rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 2> /dev/null 
@@ -81,4 +80,3 @@ EOF
 
 done
 chmod +rw *
-chmod +rw ..
