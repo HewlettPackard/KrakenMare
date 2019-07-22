@@ -115,7 +115,7 @@ echo "Checking whether we are on the HPE LAN and needing a proxy..."
 
 wget -q --dns-timeout=2 autocache.hpecorp.net -O /dev/null
 if [ $? -eq 0 ]; then
-     export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
+     export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml:../secrets.yml
      echo "HPE proxies set up"
 fi
 

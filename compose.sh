@@ -7,7 +7,7 @@ nb_services=$#
 
 export COMPOSE_PROJECT_NAME=demo
 
-export COMPOSE_FILE=all-compose.yml
+export COMPOSE_FILE=all-compose.yml:secrets-compose.yml
 
 if [ "$action" == "up" ]; then
 	echo "Checking whether we are on the HPE LAN and needing a proxy..."
