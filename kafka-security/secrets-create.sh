@@ -48,6 +48,5 @@ docker secret rm broker_jaas.conf 2> /dev/null
 docker secret rm zookeeper_jaas.conf 2> /dev/null
 docker secret create broker_jaas.conf broker_jaas.conf || exit 1
 docker secret create zookeeper_jaas.conf zookeeper_jaas.conf || exit 1
-# Cleanup files
-rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 2> /dev/null
+
 

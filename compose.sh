@@ -46,10 +46,9 @@ if [ "$action" == "up" ]; then
 	else
 		echo "Using $dcver"
 	fi
-  cd kafka-security
-  docker run --rm -v $(pwd):/tmp/  -ti openjdk:8-jdk /tmp/certs-create.sh
-  ./secrets-create.sh
-  cd ..
+  cd kafka-security || exit 1
+  docker run --rm -v $(pwd):/tmp/  openjdk:8-jdk /tmp/certs-create.sh || exit 1
+  cd .. || exit 1
 	if [ $nb_services -eq 0 ]; then
 		echo "Starting all services"
 	else

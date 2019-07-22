@@ -163,7 +163,8 @@ if [ "$deploy" == "1"  ]; then
      docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
      cd ../kafka-security 
      docker run --rm -v $(pwd):/tmp/  -ti openjdk:8-jdk /tmp/certs-create.sh
-     ./secrets-create.sh
+     ./secrets-create.sh  || exit 1
+     rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 2> /dev/null     
      cd ../playbooks
      docker stack deploy $compose_args $project_name || exit 1 
 
