@@ -45,3 +45,10 @@ services:
 
   datapipes-monitor:
     <<: *proxy
+
+  zookeeper:
+    <<: *proxy
+
+  schemaregistry:
+    <<: *proxy
+

@@ -1,4 +1,4 @@
-FROM maven:3.6.0-jdk-8
+FROM maven:3.6.0-jdk-11
 
 # requirement for wait-for
 RUN apt update && apt install -y netcat
