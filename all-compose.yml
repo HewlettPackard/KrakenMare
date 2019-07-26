@@ -37,6 +37,7 @@ services:
     hostname: broker-1
     ports:
       - "9092:9092"
+      - "9982:9982"
       - "31757:31757"
     environment:
       KAFKA_BROKER_ID: 1
@@ -47,7 +48,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_JMX_PORT: 9992
       KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-1:9092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -57,6 +57,8 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      # KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.host=broker-1 -Dcom.sun.management.jmxremote.port=9992 -Djava.rmi.server.hostname=broker-1 -Dcom.sun.management.jmxremote.rmi.port=9992 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     deploy:
       restart_policy:
         condition: none
@@ -72,6 +74,7 @@ services:
     hostname: broker-2
     ports:
       - "9093:9093"
+      - "9983:9983"
       - "31758:31757"
     environment:
       KAFKA_BROKER_ID: 2
@@ -82,7 +85,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_JMX_PORT: 9993
       KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-2:9093
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -92,6 +94,7 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
     deploy:
       restart_policy:
         condition: none
@@ -106,6 +109,7 @@ services:
     hostname: broker-3
     ports:
       - "9094:9094"
+      - "9984:9984"
       - "31759:31757"
     environment:
       KAFKA_BROKER_ID: 3
@@ -116,7 +120,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_JMX_PORT: 9994
       KAFKA_CUB_ZK_TIMEOUT: 240
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker-3:9094
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -126,6 +129,7 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
     deploy:
       restart_policy:
         condition: none
@@ -223,9 +227,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-    - ./grafana/provisioning/:/etc/grafana/provisioning
-    - ./grafana/dashboards/:/etc/grafana/dashboards
-    - ./grafana/plugins/:/var/lib/grafana/plugins/
+      - ./grafana/provisioning/:/etc/grafana/provisioning
+      - ./grafana/dashboards/:/etc/grafana/dashboards
+      - ./grafana/plugins/:/var/lib/grafana/plugins/
     <<: *deploy
 #
 # Docker Compose with the following services:
@@ -337,4 +341,13 @@ services:
     hostname: datapipesmonitor
     ports:
       - "7575:7575"
+    <<: *deploy
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     <<: *deploy
