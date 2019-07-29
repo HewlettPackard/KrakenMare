@@ -69,12 +69,11 @@ services:
       KAFKA_SSL_CLIENT_AUTH: "required"
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
       KAFKA_ZOOKEEPER_SET_ACL: "true"
-      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       # KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.host=broker-1 -Dcom.sun.management.jmxremote.port=9992 -Djava.rmi.server.hostname=broker-1 -Dcom.sun.management.jmxremote.rmi.port=9992 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - broker_jaas.conf
       - kafka.broker-1.keystore.jks
@@ -126,11 +125,10 @@ services:
       KAFKA_SSL_CLIENT_AUTH: "required"
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
       KAFKA_ZOOKEEPER_SET_ACL: "true"
-      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - broker_jaas.conf
       - kafka.broker-2.keystore.jks
@@ -183,11 +181,10 @@ services:
       KAFKA_SSL_CLIENT_AUTH: "required"
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
       KAFKA_ZOOKEEPER_SET_ACL: "true"
-      KAFKA_OPTS: -Djava.security.auth.login.config=/run/secrets/broker_jaas.conf
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.controller=ERROR,kafka.request.logger=ERROR,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=ERROR,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-      KAFKA_OPTS: "-javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - broker_jaas.conf
       - kafka.broker-3.keystore.jks
