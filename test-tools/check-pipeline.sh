@@ -48,6 +48,7 @@ run_me influxdb       timeout 10 'curl -G "http://influxdb:8086/query?pretty=tru
 run_me ssl-broker-1   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-1:19092 || exit 1
 run_me ssl-broker-2   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-2:19093 || exit 1
 run_me ssl-broker-3   kafkacat -L -X ssl.ca.location=/run/secrets/bd-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=bluedragon -X security.protocol=ssl -b broker-3:19094 || exit 1
+run_me prometheus     curl -s http://prometheus:9090/api/v1/targets    || exit 1
 
 echo ""
 echo "all tests succeeded..."
