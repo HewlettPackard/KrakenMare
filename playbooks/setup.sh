@@ -109,13 +109,13 @@ registry_content;
 #BODY
 
 #Check proxy
-export COMPOSE_FILE=../all-compose.yml
+export COMPOSE_FILE=../all-compose.yml:../secrets.yml
 echo "Checking whether we are on the HPE LAN and needing a proxy..."
 { type wget &> /dev/null ; } || { echo "Unable to find wget in your env, install it to have automatic HPE proxy detection" ; exit 4 ;}
 
 wget -q --dns-timeout=2 autocache.hpecorp.net -O /dev/null
 if [ $? -eq 0 ]; then
-     export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml:../secrets.yml
+     export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
      echo "HPE proxies set up"
 fi
 
