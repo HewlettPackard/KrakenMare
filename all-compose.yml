@@ -264,7 +264,8 @@ services:
     secrets:
       - zookeeper_jaas.conf
       - broker_jaas.conf
-      - kafka.broker-1.keystore.pfx
+      - client-sasl_ssl.conf
+      - kafka.broker-1.keystore.jks
       - broker-1_keystore_creds
       - broker-1_sslkey_creds
       - kafka.broker-1.truststore.pfx
@@ -501,22 +502,15 @@ services:
       KAFKA_SSL_KEYSTORE_PASSWORD: krakenmare
       KAFKA_ZOOKEEPER_SET_ACL: "true"
     secrets:
-      - source: broker_jaas.conf
-        target: /etc/kafka-connect/secrets/broker_jaas.conf
-      - source: kafka.connect.truststore.pfx
-        target: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
-      - source: kafka.connect.keystore.pfx
-        target: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
-      - source: kafka.client.truststore.pfx
-        target: /etc/kafka-connect/secrets/kafka.client.truststore.pfx
-      - source: kafka.client.keystore.pfx
-        target: /etc/kafka-connect/secrets/kafka.client.keystore.pfx
-      - source: connect.certificate.pem
-        target: /etc/kafka-connect/secrets/connect.certificate.pem
-      - source: connect.key
-        target: /etc/kafka-connect/secrets/connect.key
-      - source: km-ca-1.crt
-        target: /etc/kafka-connect/secrets/km-ca-1.crt
+      - broker_jaas.conf
+      - client-sasl_ssl.conf
+      - kafka.connect.truststore.jks
+      - kafka.connect.keystore.jks
+      - kafka.client.truststore.jks
+      - kafka.client.keystore.jks
+      - connect.certificate.pem
+      - connect.key
+      - bd-ca-1.crt
     <<: *deploy
     networks:
       - zookeeper_kafka
