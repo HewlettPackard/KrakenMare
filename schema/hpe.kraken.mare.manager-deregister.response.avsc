@@ -1,0 +1,17 @@
+{
+"type": "record",
+"name": "deregister.response",
+"namespace": "hpe.kraken.mare.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "deregisterSuccess",
+		"type": "boolean",
+		"doc": "Success/Failure of deregistration"
+	}
+]
+}

@@ -1,0 +1,46 @@
+{
+"type": "record",
+"name": "sensor.list.response",
+"namespace": "hpe.kraken.mare.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "devices",
+		"type": {
+			"type": "record",
+			"name": "device",
+			"fields": [
+				{
+					"name": "deviceUUID",
+					"type": {
+						"type": "map",
+						"values": "string",
+						"doc": "UUIDs of the devices"
+						}
+				},
+				{
+					"name": "sensors",
+					"type": {
+						"type": "record",
+						"name": "sensor",
+						"fields": [
+							{
+								"name": "sensorUUID",
+								"type": {
+									"type": "map",
+									"values": "string",
+									"doc": "UUIDs of the sensors"
+									}
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+]
+}

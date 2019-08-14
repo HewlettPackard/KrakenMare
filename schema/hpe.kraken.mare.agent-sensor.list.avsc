@@ -1,0 +1,106 @@
+{
+"type": "record",
+"name": "sensor.list",
+"namespace": "hpe.kraken.mare.agent",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "devices",
+		"type": {
+			"type": "record",
+			"name": "device",
+			"fields": [
+				{
+					"name": "deviceID",
+					"type": "string",
+					"doc": "Unique id"
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"doc": "Human readable name"
+				},
+				{
+					"name": "type",
+					"type": "string",
+					"doc": "Type of device such as node, chassis manager, ..."
+				},
+				{
+					"name": "location",
+					"type": "string",
+					"doc": "Location of device in the system"
+				},
+				{
+					"name": "sensors",
+					"type": {
+						"type": "record",
+						"name": "sensor",
+						"fields": [
+							{
+								"name": "sensorID",
+								"type": "string",
+								"doc": "Unique id"
+							},
+							{
+								"name": "name",
+								"type": "string",
+								"doc": "Human readable name"
+							},
+							{
+								"name": "collectionFrequency",
+								"type": {
+									"type": "map",
+									"values": "float",
+									"doc": "Collection frequencies min, max, step, default"
+									}
+							},
+							{
+								"name": "measuringAccuracy",
+								"type": "string",
+								"doc": "Description of the accuracy of measurement"
+							},
+							{
+								"name": "unit",
+								"type": "string",
+								"doc": "Unit such as amps, degrees c"
+							},
+							{
+								"name": "type",
+								"type": "string",
+								"doc": "Description of the type of sensor such as temperature, pressure"
+							},
+							{
+								"name": "valueRange",
+								"type": {
+									"type": "map",
+									"values": "float",
+									"doc": "Value range for sensor. Min and max OR list of values"
+									}
+							},
+							{
+								"name": "changeFrequency",
+								"type": "float",
+								"doc": "How frequently a sensor is expect to change the value"
+							},
+							{
+								"name": "currentCollectionFrequency",
+								"type": "float",
+								"doc": "Current collection frequency is HZ"
+							},
+							{
+								"name": "storageTime",
+								"type": "int",
+								"doc": "How many weeks to store this sensor's values. -1 means forever"
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+]
+}

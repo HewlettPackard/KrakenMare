@@ -1,0 +1,20 @@
+{
+"type": "record",
+"name": "activate.sensors",
+"namespace": "hpe.kraken.mare.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "sensorList",
+		"type": {
+			"type": "array",
+			"items": "int"
+			},
+		"doc": "List of sensor UUIDs to activate"
+	}
+]
+}

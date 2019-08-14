@@ -1,0 +1,32 @@
+{
+"type": "record",
+"name": "register.request",
+"namespace": "hpe.kraken.mare.agent",
+"fields": [
+	{
+		"name": "agentID",
+		"type": "int",
+		"doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
+	},
+	{
+		"name": "type",
+		"type": "string",
+		"doc": "Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, BDE (Kraken Mare Embedded )Agent, BDN (Kraken Mare Node) Agent"
+	},
+	{
+		"name": "name",
+		"type": "string",
+		"doc": "human readable agent name"
+	},
+	{
+		"name": "description",
+		"type": "string",
+		"doc": "human readable agent description"
+	},
+	{
+		"name": "useSensorTemplate",
+		"type": "boolean",
+		"doc": "true, framework will provide device/sensor list"
+	}
+]
+}

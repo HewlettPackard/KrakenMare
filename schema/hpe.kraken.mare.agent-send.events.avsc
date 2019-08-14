@@ -1,0 +1,35 @@
+{
+"type": "record",
+"name": "send.events",
+"namespace": "hpe.kraken.mare.agent",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "measurementList",
+		"type": {
+			"type": "record",
+			"name": "sensor",
+			"fields": [
+				{
+					"name": "sensorUUID",
+					"type": "int",
+					"doc": "Unique sensor identifier"
+				},
+				{
+					"name": "values",
+					"type": "map",
+					"values": {
+						"type": "array",
+						"items": "string",
+						"doc": "Events as strings"
+					}
+				}
+			]
+		}
+	}
+]
+}

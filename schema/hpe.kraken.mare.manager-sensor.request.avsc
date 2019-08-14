@@ -1,0 +1,36 @@
+{
+"type": "record",
+"name": "sensor.request",
+"namespace": "hpe.kraken.mare.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "sensorList",
+		"type": {
+				"type": "record",
+				"name": "sensor",
+				"fields": [
+					{
+						"name": "sensorUUID",
+						"type": "int",
+						"doc": "Sensor UUID from Framework manager"
+					},
+					{
+						"name": "startTimestamp",
+						"type": "string",
+						"doc": "Timestamp for starting values"
+					},
+					{
+						"name": "endTimestamp",
+						"type": "string",
+						"doc": "Timestamp for last values"
+					}
+			]
+	}
+}
+]
+}

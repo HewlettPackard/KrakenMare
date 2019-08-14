@@ -1,0 +1,17 @@
+{
+"type": "record",
+"name": "deregister",
+"namespace": "hpe.kraken.mare.agent",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Agent Framework identifier"
+	},
+	{
+		"name": "deregister",
+		"type": "boolean",
+		"doc": "False == do nothing, True == deregister agent"
+	}
+]
+}

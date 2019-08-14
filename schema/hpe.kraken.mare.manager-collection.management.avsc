@@ -1,0 +1,17 @@
+{
+"type": "record",
+"name": "collection.management",
+"namespace": "hpe.kraken.mare.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": "int",
+		"doc": "Unique framework identifier"
+	},
+	{
+		"name": "enableCollection",
+		"type": "boolean",
+		"doc": "Select to enable or disable collection"
+	}
+]
+}
