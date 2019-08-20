@@ -208,7 +208,7 @@ class IBswitchSimulator():
 			client = mqtt.Client("DataClient")
 			client.connect(self.mqtt_broker, self.mqtt_port)
 		elif (pubsubType == "kafka"):
-			self.kafka_check_topic("ibswitch")	
+			self.kafka_check_topic("ibswitch")
 		else:
 			print("Unknown Pub/Sub type selected: " + pubsubType)
 			sys.exit(-1)
