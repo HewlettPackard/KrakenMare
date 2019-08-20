@@ -57,6 +57,7 @@ class FanIn():
 		self.mqtt_port = int(self.config.get('MQTT', 'mqtt_port'))
 		self.mqttTopicList = self.config.get('MQTT', 'mqttTopicList').split(",")
 		self.sleepLoopTime = float(self.config.get('Others', 'sleepLoopTime'))
+		self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 
 		
 		# Register to the framework
@@ -171,30 +172,27 @@ class FanIn():
 	# Kafka agent methods
 	
 	# connect to Kafka broker as consumer (check topic list)
-	def kafka_consumer_connect(self):
-		bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
-		print(bootstrapServerStr)
+	def kafka_check_topic(self, topic):
+		
+		print("Connecting as kafka consumer to check for topic: " + topic)
 		
 		while not self.kafka_consumer:
-			time.sleep(1)
-			print("waiting for consumer to connect")
-		
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_consumer = KafkaConsumer('registration-result', bootstrap_servers=[bootstrapServerStr])
-			except kafka.errors.KafkaUnavailableError:
-				print("waiting for Kafka broker..." + self.kafka_consumer)
+				self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
+			except (kafka.errors.KafkaUnavailableError, kafka.errors.NoBrokersAvailable) as e:
+				print("waiting for Kafka broker...")
 	
-		while not "registration-result" in self.kafka_consumer.topics():
-			print("waiting for registration-result topic...")
+		while not topic in self.kafka_consumer.topics():
+			print("waiting for " + topic + " topic...")
 			time.sleep(1)
 			# TODO: not sure how to refresh topic list, so recreate a client for now...
 			self.kafka_consumer.close();
-			self.kafka_consumer = KafkaConsumer('registration-result', bootstrap_servers=[bootstrapServerStr])
+			self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
 	
 		# TODO: we still need to wait: investigate why
-		time.sleep(60)
-	
+		self.kafka_consumer.close();
+
 
 	# connect to Kafka broker as producer
 	def kafka_producer_connect(self):
@@ -216,19 +214,7 @@ class FanIn():
 	#######################################################################################
 	
 	# send simulated sensor data via MQTT or Kafka, depending on command line flag
-	def send_data(self, pubsubType):
-		
-		if (pubsubType == "mqtt"):	
-			client = mqtt.Client("DataClient")
-			client.connect(self.mqtt_broker, self.mqtt_port)
-			
-		elif (pubsubType == "kafka"):
-			if not "ibswitch" in self.kafka_consumer.topics():
-				print("topic: ibswitch doesn't exist")
-				sys.exit(-1)
-		else:
-			print("Unknown Pub/Sub type selected: " + pubsubType)
-			sys.exit(-1)
+	def send_data_to_kafka(self):
 		
 		# Infinite loop
 		while True:
@@ -298,25 +284,18 @@ class FanIn():
 					# Write the json data to mqtt broker
 					data_out = json.dumps(query_output)
 					
-					if (pubsubType == "mqtt"):	
-						print('Publishing via mqtt')
-						client.publish("ibswitch", data_out)
-					elif (pubsubType == "kafka"):
-						print('Publishing via kafka')
-						self.kafka_producer.send("ibswitch", data_out)
-					else:
-						print("error: shouldn't be here")
-						sys.exit(-1)
+					self.kafka_producer.send("ibswitch", data_out)
 						
 			# Infinite loop
 			time.sleep(self.sleepLoopTime)
 			
 	
-	# main method of IBswitchSimulator
-	def run(self, local, debug):
+	# main method of FanIn
+	def run(self, debug):
 		# local and debug flag are not used from here at the moment
 		
-		#self.kafka_consumer_connect()
+		self.kafka_check_topic("registration-result")
+		self.kafka_check_topic("ibswitch")
 		#self.mqtt_registration()
 		self.kafka_producer_connect()
 		self.mqtt_subscription() # TODO: should be own process via process class (from multiprocessing import Process)
@@ -345,15 +324,15 @@ def main():
 	
 	if (options.local == True):
 		# load development config to run outside of container
-		myIBswitchSimulator = FanIn('FanIn_dev.cfg', 'local')
+		myFanIn = FanIn('FanIn_dev.cfg', 'local')
 	else:
 		# load container config
-		myIBswitchSimulator = FanIn('FanIn.cfg', 'container')
+		myFanIn = FanIn('FanIn.cfg', 'container')
 	
 	if(options.logLevel):
-		FanIn.resetLogLevel(options.logLevel)
+		myFanIn.resetLogLevel(options.logLevel)
 	
-	myIBswitchSimulator.run(local=option_dict['local'], debug=option_dict['debug'])
+	myFanIn.run(debug=option_dict['debug'])
 	
 
 if __name__ == '__main__':
