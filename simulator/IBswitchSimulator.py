@@ -192,7 +192,7 @@ class IBswitchSimulator():
 			
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_producer = KafkaProducer(bootstrap_servers=[self.bootstrapServerStr], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+				self.kafka_producer = KafkaProducer(bootstrap_servers=[self.bootstrapServerStr], value_serializer=lambda x : json.dumps(x).encode('utf-8'))
 			except kafka.errors.KafkaUnavailableError:
 				print("waiting for Kafka broker..." + self.kafka_broker)
 		
@@ -278,14 +278,13 @@ class IBswitchSimulator():
 						json.dump(query_output, g)
 					g.close()
 					
-					# Write the json data to mqtt broker
-					data_out = json.dumps(query_output)
-					if (pubsubType == "mqtt"):	
+					if (pubsubType == "mqtt"):
 						print("Publishing via mqtt")
+						data_out = json.dumps(query_output).encode('utf-8')
 						client.publish("ibswitch", data_out)
 					elif (pubsubType == "kafka"):
 						print("Publishing via kafka")
-						self.kafka_producer.send("ibswitch", data_out)
+						self.kafka_producer.send("ibswitch", query_output)
 					else:
 						print("error: shouldn't be here")
 						sys.exit(-1)
