@@ -54,6 +54,7 @@ class IBswitchSimulator():
 		self.mqtt_port = int(self.config.get('MQTT', 'mqtt_port'))
 		self.sleepLoopTime = float(self.config.get('Others', 'sleepLoopTime'))
 		self.seedOutputDir = self.config.get('Others', 'seedOutputDir')
+		self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 		
 		# Register to the framework
 		self.myAgent_id = -1
@@ -160,45 +161,42 @@ class IBswitchSimulator():
     # Kafka agent methods
 	
 	# connect to Kafka broker as consumer (check topic list)
-	def kafka_consumer_connect(self):
-		bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
-		print(bootstrapServerStr)
+	def kafka_check_topic(self, topic):
+		
+		print("Connecting as kafka consumer to check for topic: " + topic)
 		
 		while not self.kafka_consumer:
-			time.sleep(1)
-			print("waiting for consumer to connect")
-		
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_consumer = KafkaConsumer('registration-result', bootstrap_servers=[bootstrapServerStr])
-			except kafka.errors.KafkaUnavailableError:
-				print("waiting for Kafka broker..." + self.kafka_consumer)
+				self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
+			except (kafka.errors.KafkaUnavailableError, kafka.errors.NoBrokersAvailable) as e:
+				print("waiting for Kafka broker...")
 	
-		while not "registration-result" in self.kafka_consumer.topics():
-			print("waiting for registration-result topic...")
+		while not topic in self.kafka_consumer.topics():
+			print("waiting for " + topic + " topic...")
 			time.sleep(1)
 			# TODO: not sure how to refresh topic list, so recreate a client for now...
 			self.kafka_consumer.close();
-			self.kafka_consumer = KafkaConsumer('registration-result', bootstrap_servers=[bootstrapServerStr])
+			self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
 	
 		# TODO: we still need to wait: investigate why
-		time.sleep(60)
+		self.kafka_consumer.close();
 	
 
 	# connect to Kafka broker as producer
 	def kafka_producer_connect(self):
-		bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 		
 		while not self.kafka_producer:
 			time.sleep(1)
-			print("waiting for producer to connect")
+			print("waiting for kafka producer to connect")
 			
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_producer = KafkaProducer(bootstrap_servers=[bootstrapServerStr], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+				self.kafka_producer = KafkaProducer(bootstrap_servers=[self.bootstrapServerStr], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
 			except kafka.errors.KafkaUnavailableError:
 				print("waiting for Kafka broker..." + self.kafka_broker)
-	
+		
+		print("kafka producer connected")
 
     # END Kafka agent methods
     #######################################################################################
@@ -206,13 +204,11 @@ class IBswitchSimulator():
     # send simulated sensor data via MQTT or Kafka, depending on command line flag
 	def send_data(self, pubsubType):
 		
-		if (pubsubType == "mqtt"):	
+		if (pubsubType == "mqtt"):
 			client = mqtt.Client("DataClient")
 			client.connect(self.mqtt_broker, self.mqtt_port)
 		elif (pubsubType == "kafka"):
-			if not "ibswitch" in self.kafka_consumer.topics():
-				print("topic: ibswitch doesn't exist")
-				sys.exit(-1)
+			self.kafka_check_topic("ibswitch")	
 		else:
 			print("Unknown Pub/Sub type selected: " + pubsubType)
 			sys.exit(-1)
@@ -281,19 +277,19 @@ class IBswitchSimulator():
 					with open(output, 'w') as g:
 						json.dump(query_output, g)
 					g.close()
-		
+					
 					# Write the json data to mqtt broker
 					data_out = json.dumps(query_output)
 					if (pubsubType == "mqtt"):	
-						print('Publishing via mqtt')
+						print("Publishing via mqtt")
 						client.publish("ibswitch", data_out)
 					elif (pubsubType == "kafka"):
-						print('Publishing via kafka')
+						print("Publishing via kafka")
 						self.kafka_producer.send("ibswitch", data_out)
 					else:
 						print("error: shouldn't be here")
 						sys.exit(-1)
-						
+			
 			# Infinite loop
 			time.sleep(self.sleepLoopTime)
     
@@ -305,14 +301,14 @@ class IBswitchSimulator():
 	def run(self, mode, local, debug):
 		# local and debug flag are not used from here at the moment
 		
-		#self.kafka_consumer_connect()		
+		self.kafka_check_topic("registration-result")		
 		
 		if mode == "mqtt":
 			print("mqtt mode")
 			#self.mqtt_registration()
 			self.send_data("mqtt")
 		else:
-			print("Kafak mode")
+			print("Kafka mode")
 			self.kafka_producer_connect()
 			self.send_data("kafka")
 	

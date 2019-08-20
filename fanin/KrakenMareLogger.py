@@ -59,7 +59,7 @@ class RotatingFileHandlerWithCompression(RotatingFileHandler):
 class KrakenMareLogger:
     
     """
-        This class defines PowerDAM logger options. Should be initialized only once.
+        This class defines KrakenMare logger options. Should be initialized only once.
     
         Multiple log files are allowed.
     """
@@ -69,10 +69,10 @@ class KrakenMareLogger:
 
     
     def setLogger(self, name, loggingLevel, loggingDirectory, logFileSize, logFileArchiveCount):
-        '''
+        """
             creates a new logger object
             with given parameters
-        '''
+        """
         logger=logging.getLogger(name)
         
         hdlr = RotatingFileHandlerWithCompression(loggingDirectory+name, maxBytes=logFileSize, backupCount=logFileArchiveCount)
@@ -96,7 +96,9 @@ class KrakenMareLogger:
         return logger
     
     def getLogger(self, name, loggingLevel=None): 
-        
+        """
+            returns a logger object and optionally modifies its log level
+        """
         if loggers.get(name): 
             # reuses the logger
             if(loggingLevel == None):
@@ -135,12 +137,12 @@ class KrakenMareLogger:
             return logger
         else:
             # default
-            print("WARNING: Unknown logging level. Taking INFO as default logging level.")
-            logger.setLevel(logging.INFO)
+            print("WARNING: Unknown logging level. Taking WARNING as default logging level.")
+            logger.setLevel(logging.WARNING)
             return logger
 
 
-class PowerDAMLoggerTest(unittest.TestCase):
+class KrakenMareLoggerTest(unittest.TestCase):
     
     def testLoggerCreation(self):
         '''
@@ -148,7 +150,7 @@ class PowerDAMLoggerTest(unittest.TestCase):
             for logger files
         '''
         
-        loggerName = "PowerdamTestLogger.log"
+        loggerName = "KrakenMareTestLogger.log"
         logDirectory = ""
         logLevel = "Info"
         logSize = 1024
@@ -165,7 +167,7 @@ class PowerDAMLoggerTest(unittest.TestCase):
     
     def testLoggFilePopulation(self):
         
-        loggerName = "PowerdamTestLogger.log"
+        loggerName = "KrakenMareTestLogger.log"
         logDirectory = ""
         logLevel = "Info"
         logSize = 1024
@@ -199,26 +201,9 @@ class PowerDAMLoggerTest(unittest.TestCase):
  
         self.cleanTmpData()
          
-    def cleanTmpData(self):
-        '''
-            removes temporary created logger and associated zip files
-        '''
-        import glob
+    def testLoggerColoring(self):
         
-        for filename in glob.glob("PowerdamTestLogger*"):
-            
-            print("removing {0} file ...").format(filename)
-            
-            try:
-                os.remove(filename)
-            except Exception as e:
-                print("Could not remove {0} file. Reason: {1}").format(filename, e)
-                 
-            print("{0} file removed").format(filename)
-    
-    def testPowerDAMLoggerColoring(self):
-        
-        loggerName = "PowerdamTestColorLogger.log"
+        loggerName = "KrakenMareTestLoggerColor.log"
         logDirectory = ""
         logLevel = "DEBUG"
         logSize = 1024
@@ -237,7 +222,25 @@ class PowerDAMLoggerTest(unittest.TestCase):
         testlogger.info("TestData: {0}".format("info data"))
         testlogger.warning("TestData: {0}".format("warning data"))
         
+        self.cleanTmpData()
+    
+    def cleanTmpData(self):
+        '''
+            removes temporary created logger and associated zip files
+        '''
+        import glob
+        
+        for filename in glob.glob("KrakenMareTestLogger*"):
             
+            print("removing {0} file ...".format(filename))
+            
+            try:
+                os.remove(filename)
+            except Exception as e:
+                print("Could not remove {0} file. Reason: {1}".format(filename, e))
+                 
+            print("{0} file removed".format(filename))
+   
 def mainTest():
     '''
         Main routine for unit tests

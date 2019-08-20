@@ -5,6 +5,7 @@ echo "creating Kafka topics"
 kafka-topics --zookeeper zookeeper:2181 --topic fabric --partitions 3 --replication-factor 3 --create
 kafka-topics --zookeeper zookeeper:2181 --topic hello --partitions 3 --replication-factor 3 --create
 kafka-topics --zookeeper zookeeper:2181 --topic ibswitch --partitions 3 --replication-factor 3 --create
+kafka-topics --zookeeper zookeeper:2181 --topic registration-result --partitions 3 --replication-factor 3 --create
 
 echo ""
 echo "removing MQTT Sink Connector"
