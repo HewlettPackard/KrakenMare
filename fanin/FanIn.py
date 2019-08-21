@@ -18,12 +18,13 @@ import string
 import configparser
 from random import *
 from multiprocessing import Process, Lock
+import socket
+import inspect
 
 # import special classes
 import uuid
-import kafka
-from kafka import KafkaProducer
-from kafka import KafkaConsumer
+from confluent_kafka import Producer as KafkaProducer
+from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 
@@ -116,20 +117,35 @@ class FanIn():
 		print("log: %s" % buf)
 	
 	
+	# The callback for when the client receives a CONNACK response from the server.
+	def mqtt_on_connect(self, client, userdata, flags, rc):
+		print("Connected with result code "+str(rc))
+		
+		# Subscribing in on_connect() means that if we lose the connection and
+		# reconnect then subscriptions will be renewed.
+		self.client.subscribe("#")
+		
+	
+	
 	# connect to MQTT broker and subscribe to receive agent messages
 	def mqtt_subscription(self):
 		self.mqtt_client = mqtt.Client("FanInUUID")
-		self.mqtt_client.on_log = self.mqtt_on_log
+		#self.mqtt_client.on_log = self.mqtt_on_log
+		self.mqtt_client.on_connect = self.mqtt_on_connect
 		self.mqtt_client.on_message = self.mqtt_on_agent_message
 		self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
-		self.mqtt_client.subscribe("ibswitch")
+		self.mqtt_client.subscribe("#") # use '#' to subscribe to all topics
 		self.mqtt_client.loop_start()
+		
+		print(inspect.currentframe().f_code.co_name + ": subscribed to MQTT.")
 		
 	
 	# converts message to AVRO and sends message to Kafka (in batches)
 	# TODO: do we need multiple threads here?
+	# TODO: have processing method per client type OR topic for each sensor type to convert messages?
+	# TODO: or should the MQTT agent convert message into our schema before sending via MQTT?
 	def mqtt_on_agent_message(self, client, userdata, message):
-		#print("message topic: %s" % message.topic)
+		print("message topic: %s" % message.topic)
 		
 		""" Data format from simulator
 		{"name": "PortSelect", "type": "int", "doc": "For switches -a flag gives PortSelect of 255"},
@@ -157,13 +173,88 @@ class FanIn():
 				
 		#process message
 		if message.topic == "ibswitch":
-			#print("message received: %s " % message.payload)
-			myMessage = json.loads(message.payload)
-			for key, value in myMessage.items():
-				print(str(key) + ':' + str(value))
+			kafka_message = {}
 			
+			#print("message received: %s " % message.payload)
+			
+			myMQTTmessage = json.loads(message.payload)
+			
+			for key, value in myMQTTmessage.items():
+				print(str(key) + ':' + str(value))
+				# reassemble message to Kafka avro syntax
+				"""
+				"fields": [
+				    {
+				      "name": "uuid",
+				      "type": "int"
+				    },
+				    {
+				      "name": "measurement-list",
+				      "type": {
+				            "type": "record",
+				            "name": "sensor",
+				            "fields": [
+				              {
+				                 "name": "sensorUUID",
+				                 "type": "int"
+				                },
+				                {
+				                 "name": "values",
+				                 "type": "map",
+				                 "values": "float"
+				                }]
+				       }
+				    }]
+				"""
+				
+			# missing agent uuid
+			agentUUID = myMQTTmessage['Name']
+			timestamp = myMQTTmessage['Timestamp']
+			kafka_message[agentUUID] = {}
+			kafka_message[agentUUID]['measurement-list'] = {}
+			
+			# go through sensors and add measurements for each sensor
+			for key, value in myMQTTmessage.items():
+				
+				# make up sensor uuid
+				sensorUUID = myMQTTmessage['GUID'] + "-" + key
+				
+				if not sensorUUID in kafka_message[agentUUID]['measurement-list']:
+					kafka_message[agentUUID]['measurement-list'][sensorUUID] = {}
+				
+				if not timestamp in kafka_message[agentUUID]['measurement-list'][sensorUUID]:
+					kafka_message[agentUUID]['measurement-list'][sensorUUID][timestamp] = []
+			
+				kafka_message[agentUUID]['measurement-list'][sensorUUID][timestamp] = value
+
+
+			print("Kafka message:")
+			print(kafka_message)
+			"""
+				{'r1ib-simulator': {'measurement-list': {'0x0800690000005E60-PortSelect': {1566582290496: 255}, 
+															'0x0800690000005E60-SymbolErrorCounter': {1566582290496: 2},
+															'0x0800690000005E60-LinkErrorRecoveryCounter': {1566582290496: 0},
+															'0x0800690000005E60-LinkDownedCounter': {1566582290496: 7},
+															'0x0800690000005E60-PortRcvErrors': {1566582290496: 0},
+															'0x0800690000005E60-PortRcvRemotePhysicalErrors': {1566582290496: 0},
+															'0x0800690000005E60-PortRcvSwitchRelayErrors': {1566582290496: 3},
+															'0x0800690000005E60-PortXmitDiscards': {1566582290496: 300},
+															'0x0800690000005E60-PortXmitConstraintErrors': {1566582290496: 0},
+															'0x0800690000005E60-PortRcvConstraintErrors': {1566582290496: 0},
+															'0x0800690000005E60-LocalLinkIntegrityErrors': {1566582290496: 0},
+															'0x0800690000005E60-ExcessiveBufferOverrunErrors': {1566582290496: 0},
+															'0x0800690000005E60-VL15Dropped': {1566582290496: 0},
+															'0x0800690000005E60-PortXmitData': {1566582290496: 18246776},
+															'0x0800690000005E60-PortRcvData': {1566582290496: 18106365},
+															'0x0800690000005E60-PortXmitPkts': {1566582290496: 117447},
+															'0x0800690000005E60-PortRcvPkts': {1566582290496: 113729},
+															'0x0800690000005E60-PortXmitWait': {1566582290496: 822841},
+															'0x0800690000005E60-Timestamp': {1566582290496: 1566582290496},
+															'0x0800690000005E60-GUID': {1566582290496: '0x0800690000005E60'},
+															'0x0800690000005E60-Name': {1566582290496: 'r1ib-simulator'}}}}
+
+			"""
 		
-	
 	# END MQTT agent methods   
 	#######################################################################################
 	
@@ -171,44 +262,54 @@ class FanIn():
 	#######################################################################################
 	# Kafka agent methods
 	
-	# connect to Kafka broker as consumer (check topic list)
-	def kafka_check_topic(self, topic):
+	# Kafka error printer
+	def kafka_producer_error_cb(self, err):
+		print('error_cb', err)
 		
-		print("Connecting as kafka consumer to check for topic: " + topic)
+	# connect to Kafka broker as producer to check topic 'myTopic'
+	def kafka_check_topic(self, myTopic):
 		
-		while not self.kafka_consumer:
+		print("Connecting as kafka consumer to check for topic: " + myTopic)
+		test = False
+		
+		conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		
+		while test == False:
+			time.sleep(1)
+			print("waiting for kafka producer to connect")
+			
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
-			except (kafka.errors.KafkaUnavailableError, kafka.errors.NoBrokersAvailable) as e:
-				print("waiting for Kafka broker...")
-	
-		while not topic in self.kafka_consumer.topics():
-			print("waiting for " + topic + " topic...")
-			time.sleep(1)
-			# TODO: not sure how to refresh topic list, so recreate a client for now...
-			self.kafka_consumer.close();
-			self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
-	
-		# TODO: we still need to wait: investigate why
-		self.kafka_consumer.close();
+				kafka_producer = KafkaProducer(conf)
+				kafka_producer.list_topics(topic=myTopic, timeout=0.2)
+				test = True
+			except KafkaException as e:
+				#print(e.args[0])
+				print("waiting for " + myTopic + " topic...")
 
 
 	# connect to Kafka broker as producer
 	def kafka_producer_connect(self):
-		bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
+		test = False
 		
-		while not self.kafka_producer:
+		conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		
+		while test == False:
 			time.sleep(1)
-			print("waiting for producer to connect")
+			print("waiting for kafka producer to connect")
 			
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_producer = KafkaProducer(bootstrap_servers=[bootstrapServerStr], value_serializer=lambda x: json.dumps(x).encode('utf-8'), linger_ms=20, batch_size=(256*1024*1024) )
-			except kafka.errors.KafkaUnavailableError:
-				print("waiting for Kafka broker..." + self.kafka_broker)
+				self.kafka_producer = KafkaProducer(conf)
+				self.kafka_producer.list_topics(timeout=0.2)
+				test = True
+			except KafkaException as e:
+				print(e.args[0])
+				print("waiting for Kafka brokers..." + self.bootstrapServerStr)
 		
-		print("kafka_producer_connect: success")
+		print(inspect.currentframe().f_code.co_name + ": producer connected")
 		
 	# END Kafka agent methods
 	#######################################################################################
@@ -280,11 +381,10 @@ class FanIn():
 					with open(output, 'w') as g:
 						json.dump(query_output, g)
 					g.close()
-		
-					# Write the json data to mqtt broker
-					data_out = json.dumps(query_output)
 					
-					self.kafka_producer.send("ibswitch", data_out)
+					data_out = json.dumps(query_output).encode('utf-8')
+					
+					self.kafka_producer.send("fabric", data_out)
 						
 			# Infinite loop
 			time.sleep(self.sleepLoopTime)
@@ -293,9 +393,9 @@ class FanIn():
 	# main method of FanIn
 	def run(self, debug):
 		# local and debug flag are not used from here at the moment
-		
-		self.kafka_check_topic("registration-result")
-		self.kafka_check_topic("ibswitch")
+				
+		#self.kafka_check_topic("registration-result")
+		#self.kafka_check_topic("fabric")
 		#self.mqtt_registration()
 		self.kafka_producer_connect()
 		self.mqtt_subscription() # TODO: should be own process via process class (from multiprocessing import Process)

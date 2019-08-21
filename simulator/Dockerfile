@@ -5,7 +5,7 @@ RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 RUN apt update && apt install -y python3 python3-pip
-RUN pip3 install paho-mqtt kafka-python configparser
+RUN pip3 install paho-mqtt confluent-kafka configparser
 
 COPY IBswitchSimulator.py version.py IBswitchSimulator.cfg r1i0c-ibswitch r1i1c-ibswitch entrypoint.sh /simulator/
 COPY seed/* /tmp/

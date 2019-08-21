@@ -17,12 +17,13 @@ import sys
 import string
 import configparser
 from random import *
+import socket
 
 # import special classes
 import uuid
-import kafka
-from kafka import KafkaProducer
-from kafka import KafkaConsumer
+import confluent_kafka
+from confluent_kafka import Producer as KafkaProducer
+from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 
@@ -159,42 +160,52 @@ class IBswitchSimulator():
 	
     #######################################################################################
     # Kafka agent methods
-	
-	# connect to Kafka broker as consumer (check topic list)
-	def kafka_check_topic(self, topic):
-		
-		print("Connecting as kafka consumer to check for topic: " + topic)
-		
-		while not self.kafka_consumer:
-			try:
-				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
-			except (kafka.errors.KafkaUnavailableError, kafka.errors.NoBrokersAvailable) as e:
-				print("waiting for Kafka broker...")
-	
-		while not topic in self.kafka_consumer.topics():
-			print("waiting for " + topic + " topic...")
-			time.sleep(1)
-			# TODO: not sure how to refresh topic list, so recreate a client for now...
-			self.kafka_consumer.close();
-			self.kafka_consumer = KafkaConsumer(bootstrap_servers=[self.bootstrapServerStr], consumer_timeout_ms=10000)
-	
-		# TODO: we still need to wait: investigate why
-		self.kafka_consumer.close();
-	
 
-	# connect to Kafka broker as producer
-	def kafka_producer_connect(self):
+	# Kafka error printer
+	def kafka_producer_error_cb(self, err):
+		print('error_cb', err)
+	
+	# connect to Kafka broker as producer to check topic 'myTopic'
+	def kafka_check_topic(self, myTopic):
 		
-		while not self.kafka_producer:
+		print("Connecting as kafka consumer to check for topic: " + myTopic)
+		test = False
+		
+		conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		
+		while test == False:
 			time.sleep(1)
 			print("waiting for kafka producer to connect")
 			
 			try:
 				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-				self.kafka_producer = KafkaProducer(bootstrap_servers=[self.bootstrapServerStr], value_serializer=lambda x : json.dumps(x).encode('utf-8'))
-			except kafka.errors.KafkaUnavailableError:
-				print("waiting for Kafka broker..." + self.kafka_broker)
+				kafka_producer = KafkaProducer(conf)
+				kafka_producer.list_topics(topic=myTopic, timeout=0.2)
+				test = True
+			except KafkaException as e:
+				#print(e.args[0])
+				print("waiting for " + myTopic + " topic...")
+	
+	# connect to Kafka broker as producer
+	def kafka_producer_connect(self):
+		test = False
+		
+		conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		
+		while test == False:
+			time.sleep(1)
+			print("waiting for kafka producer to connect")
+			
+			try:
+				#shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
+				self.kafka_producer = KafkaProducer(conf)
+				self.kafka_producer.list_topics(timeout=0.2)
+				test = True
+			except KafkaException as e:
+				print(e.args[0])
+				print("waiting for Kafka brokers..." + self.bootstrapServerStr)
 		
 		print("kafka producer connected")
 
@@ -208,7 +219,8 @@ class IBswitchSimulator():
 			client = mqtt.Client("DataClient")
 			client.connect(self.mqtt_broker, self.mqtt_port)
 		elif (pubsubType == "kafka"):
-			self.kafka_check_topic("fabric")
+			# self.kafka_check_topic("fabric")
+			nothing = "to-do"
 		else:
 			print("Unknown Pub/Sub type selected: " + pubsubType)
 			sys.exit(-1)
@@ -278,13 +290,14 @@ class IBswitchSimulator():
 						json.dump(query_output, g)
 					g.close()
 					
+					data_out = json.dumps(query_output).encode('utf-8')
+					
 					if (pubsubType == "mqtt"):
 						print("Publishing via mqtt")
-						data_out = json.dumps(query_output).encode('utf-8')
 						client.publish("ibswitch", data_out)
 					elif (pubsubType == "kafka"):
 						print("Publishing via kafka")
-						self.kafka_producer.send("fabric", query_output)
+						self.kafka_producer.produce("fabric", data_out)
 					else:
 						print("error: shouldn't be here")
 						sys.exit(-1)
