@@ -217,8 +217,6 @@ services:
     build:
       context: test-tools
       dockerfile: Dockerfile
-      args:
-        kafka_prefix: ${REGISTRY_FULL_PATH}
     hostname: test
     environment:
       MOSQUITTO_IP: mosquitto

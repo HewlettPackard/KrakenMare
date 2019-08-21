@@ -1,15 +1,20 @@
-ARG kafka_prefix
-FROM ${kafka_prefix}kafka-embedded-client-1 as kafka-client
-
 FROM ubuntu:18.04 as testbuild
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget libssl-dev
+
 # Build deps
-RUN apt-get update && apt-get install -y gcc make cmake
-COPY --from=kafka-client /usr/local/lib/* /usr/local/lib/
-RUN mkdir -p /usr/local/include/librdkafka/
-COPY --from=kafka-client /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
+RUN apt-get update && apt-get install -y --force-yes gcc g++ make cmake \
+&& apt-get install -y autoconf libtool wget libssl-dev \
+&& cd / && wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - \
+&& apt-get install -y --force-yes gdb valgrind cppcheck
+
+RUN mv /jansson-2.12 /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
+
+RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
+&& mv /librdkafka-1.1.0 /librdkafka && cd /librdkafka && ./configure && make && make install
+RUN cd /librdkafka/examples && make 
+
 RUN cd / && wget --no-check-certificate https://github.com/lloyd/yajl/archive/2.1.0.tar.gz -O - | tar xzf - \
 && mv /yajl-2.1.0 /yajl && cd /yajl && ./configure && make && make install
 
@@ -23,9 +28,9 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server openssl libssl-dev
-COPY --from=kafka-client /usr/local/lib/* /usr/local/lib/
+COPY --from=testbuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
-COPY --from=kafka-client /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
+COPY --from=testbuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
 COPY --from=testbuild /usr/local/bin/* /usr/local/bin/
 COPY --from=testbuild /tmp/wait-for /tmp/wait-for
 RUN mkdir -p /usr/local/include/yajl
