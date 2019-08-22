@@ -11,7 +11,7 @@
 	{
 		"name": "type",
 		"type": "string",
-		"doc": "Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, BDE (Kraken Mare Embedded )Agent, BDN (Kraken Mare Node) Agent"
+		"doc": "Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, KME (Kraken Mare Embedded )Agent, KMN (Kraken Mare Node) Agent"
 	},
 	{
 		"name": "name",

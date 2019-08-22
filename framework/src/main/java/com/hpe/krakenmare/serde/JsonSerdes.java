@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.serde;
+package com.hpe.krakenmare.serde;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.bluedragon.serde;
+package com.hpe.krakenmare.serde;
 
 import java.util.Map;
 
 import org.apache.kafka.common.errors.SerializationException;
-import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class ObjectNodeDeserializer implements Deserializer<ObjectNode> {
+public class ObjectNodeSerializer implements Serializer<ObjectNode> {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	/**
 	 * Default constructor needed by Kafka
 	 */
-	public ObjectNodeDeserializer() {
+	public ObjectNodeSerializer() {
 	}
 
 	@Override
@@ -39,15 +39,15 @@ public class ObjectNodeDeserializer implements Deserializer<ObjectNode> {
 	}
 
 	@Override
-	public ObjectNode deserialize(String topic, byte[] bytes) {
-		if (bytes == null) {
+	public byte[] serialize(String topic, ObjectNode node) {
+		if (node == null) {
 			return null;
 		}
 
 		try {
-			return (ObjectNode) objectMapper.readTree(bytes);
+			return objectMapper.writeValueAsBytes(node);
 		} catch (Exception e) {
-			throw new SerializationException(e);
+			throw new SerializationException("Error serializing JSON message", e);
 		}
 	}
 

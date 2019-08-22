@@ -1,4 +1,4 @@
-package com.hpe.bluedragon;
+package com.hpe.krakenmare;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.hpe.bluedragon.api.Framework;
-import com.hpe.bluedragon.impl.FrameworkImpl;
+import com.hpe.krakenmare.api.Framework;
+import com.hpe.krakenmare.impl.FrameworkImpl;
 
 public class Main {
 

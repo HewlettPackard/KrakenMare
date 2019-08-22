@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.impl;
+package com.hpe.krakenmare.impl;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.hpe.bluedragon.Main;
-import com.hpe.bluedragon.serde.JsonSerdes;
+import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.serde.JsonSerdes;
 
 public class CollectdTransformStream {
 
 	private final static Logger LOG = LoggerFactory.getLogger(CollectdTransformStream.class);
 	private final static Properties PROPERTIES = Main.cloneProperties();
 	static {
-		PROPERTIES.put("application.id", "bd-collectd-druid");
+		PROPERTIES.put("application.id", "km-collectd-druid");
 		PROPERTIES.put("default.deserialization.exception.handler", "org.apache.kafka.streams.errors.LogAndContinueExceptionHandler");
 		PROPERTIES.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10 * 1000);
 		PROPERTIES.put(StreamsConfig.TOPOLOGY_OPTIMIZATION, StreamsConfig.OPTIMIZE);

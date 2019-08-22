@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.repositories;
+package com.hpe.krakenmare.repositories;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.hpe.bluedragon.Main;
-import com.hpe.bluedragon.core.Agent;
+import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.core.Agent;
 
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;

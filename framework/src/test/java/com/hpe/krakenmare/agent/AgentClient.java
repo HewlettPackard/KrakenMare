@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.agent;
+package com.hpe.krakenmare.agent;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -17,8 +17,8 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.Main;
-import com.hpe.bluedragon.core.Agent;
+import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.core.Agent;
 
 public class AgentClient {
 
@@ -41,7 +41,7 @@ public class AgentClient {
 	static void startAgentRegistrationConsumer() {
 		Thread t = new Thread(() -> {
 			try (Consumer<String, Agent> consumer = createConsumer()) {
-				String topic = PROPERTIES.getProperty("bd.registration.result-topic");
+				String topic = PROPERTIES.getProperty("km.registration.result-topic");
 				consumer.subscribe(Collections.singletonList(topic));
 
 				final ConsumerRecords<String, Agent> consumerRecords = consumer.poll(Duration.ofSeconds(30));
@@ -56,7 +56,7 @@ public class AgentClient {
 
 	static void sendAgentRegistrationMessage() throws Exception {
 		try (Producer<String, String> producer = createProducer()) {
-			String topic = PROPERTIES.getProperty("bd.registration.request-topic");
+			String topic = PROPERTIES.getProperty("km.registration.request-topic");
 			final ProducerRecord<String, String> record = new ProducerRecord<>(topic, "myAgentName");
 			/* RecordMetadata metadata = */ producer.send(record).get();
 

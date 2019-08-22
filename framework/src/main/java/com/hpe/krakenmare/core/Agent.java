@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.core;
+package com.hpe.krakenmare.core;
 
 import java.util.HashMap;
 import java.util.Iterator;

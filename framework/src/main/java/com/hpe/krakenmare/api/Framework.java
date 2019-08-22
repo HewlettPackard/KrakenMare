@@ -1,8 +1,8 @@
-package com.hpe.bluedragon.api;
+package com.hpe.krakenmare.api;
 
 import java.util.List;
 
-import com.hpe.bluedragon.core.Agent;
+import com.hpe.krakenmare.core.Agent;
 
 public interface Framework {
 

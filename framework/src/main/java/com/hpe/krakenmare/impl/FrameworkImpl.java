@@ -1,14 +1,14 @@
-package com.hpe.bluedragon.impl;
+package com.hpe.krakenmare.impl;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.Main;
-import com.hpe.bluedragon.api.Framework;
-import com.hpe.bluedragon.core.Agent;
-import com.hpe.bluedragon.repositories.AgentRedisRepository;
+import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.api.Framework;
+import com.hpe.krakenmare.core.Agent;
+import com.hpe.krakenmare.repositories.AgentRedisRepository;
 
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;

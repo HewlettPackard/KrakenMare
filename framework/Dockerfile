@@ -11,21 +11,21 @@ RUN wget https://download-gcdn.ej-technologies.com/jprofiler/jprofiler_linux_8_1
   tar -xzf /tmp/jprofiler_linux_8_1_4.tar.gz -C /opt/ && \
   rm /tmp/jprofiler_linux_8_1_4.tar.gz
 
-RUN mkdir -p /opt/bluedragon
-WORKDIR /opt/bluedragon
+RUN mkdir -p /opt/krakenmare
+WORKDIR /opt/krakenmare
 
-COPY pom.xml /opt/bluedragon/
+COPY pom.xml /opt/krakenmare/
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"
 # run a first assembly to cache maven dependencies in the image
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
-COPY src /opt/bluedragon/src
+COPY src /opt/krakenmare/src
 # tests requires a Redis instance: skip them (they are run in the CI)
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
-COPY entrypoint.sh /opt/bluedragon/entrypoint.sh
+COPY entrypoint.sh /opt/krakenmare/entrypoint.sh
 
 EXPOSE 8080
 
-ENTRYPOINT /opt/bluedragon/entrypoint.sh
+ENTRYPOINT /opt/krakenmare/entrypoint.sh

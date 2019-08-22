@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.api;
+package com.hpe.krakenmare.api;
 
 import java.util.List;
 import java.util.UUID;

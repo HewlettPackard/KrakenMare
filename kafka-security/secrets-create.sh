@@ -6,13 +6,13 @@
 #    -o xtrace
 
 # Cleanup files
-docker secret rm bd-ca-1.key 2> /dev/null 
-docker secret rm bd-ca-1.crt 2> /dev/null 
-docker secret rm bd-ca-1.srl 2> /dev/null 
+docker secret rm km-ca-1.key 2> /dev/null 
+docker secret rm km-ca-1.crt 2> /dev/null 
+docker secret rm km-ca-1.srl 2> /dev/null 
 
 # Generate CA key
-docker secret create bd-ca-1.key bd-ca-1.key || exit 1
-docker secret create bd-ca-1.crt bd-ca-1.crt || exit 1
+docker secret create km-ca-1.key km-ca-1.key || exit 1
+docker secret create km-ca-1.crt km-ca-1.crt || exit 1
 
 for i in broker-1 broker-2 broker-3 schemaregistry connect client
 do
@@ -43,7 +43,7 @@ do
 	docker secret create $i.csr $i.csr || exit 1
 
 done
-docker secret create bd-ca-1.srl bd-ca-1.srl || exit 1
+docker secret create km-ca-1.srl km-ca-1.srl || exit 1
 docker secret rm broker_jaas.conf 2> /dev/null
 docker secret rm zookeeper_jaas.conf 2> /dev/null
 docker secret create broker_jaas.conf broker_jaas.conf || exit 1

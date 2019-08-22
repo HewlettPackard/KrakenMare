@@ -14,23 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hpe.bluedragon.serde;
+package com.hpe.krakenmare.serde;
 
 import java.util.Map;
 
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JsonPOJOSerializer<T> implements Serializer<T> {
+public class JsonNodeSerializer implements Serializer<JsonNode> {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	/**
 	 * Default constructor needed by Kafka
 	 */
-	public JsonPOJOSerializer() {
+	public JsonNodeSerializer() {
 	}
 
 	@Override
@@ -38,13 +39,13 @@ public class JsonPOJOSerializer<T> implements Serializer<T> {
 	}
 
 	@Override
-	public byte[] serialize(String topic, T data) {
-		if (data == null) {
+	public byte[] serialize(String topic, JsonNode node) {
+		if (node == null) {
 			return null;
 		}
 
 		try {
-			return objectMapper.writeValueAsBytes(data);
+			return objectMapper.writeValueAsBytes(node);
 		} catch (Exception e) {
 			throw new SerializationException("Error serializing JSON message", e);
 		}

@@ -12,8 +12,8 @@ iso_source_path: /opt/cmu/repositories
 iso_mount_point : /opt/cmu/repositories
 docker_compose_Version : 1.24.0
 #generated with :
-#password is bdu
-# ansible all -i localhost, -m debug -a "msg={{ 'bdu' | password_hash('sha512', 'SALT') }}"
+#password is kmu
+# ansible all -i localhost, -m debug -a "msg={{ 'kmu' | password_hash('sha512', 'SALT') }}"
 password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
 
 #Chrony configuration

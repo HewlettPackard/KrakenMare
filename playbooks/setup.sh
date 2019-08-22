@@ -3,7 +3,7 @@
 
 # Change directory
 cd $(dirname $0) || exit 1
-BD_HOME=$(pwd)
+KM_HOME=$(pwd)
 
 
 #TEMPLATE
@@ -22,7 +22,7 @@ MIRROR_REGISTRY_PORT=5001;
 
 
 PROXY=http://grewebcachevip.bastion.europe.hp.com:8080
-project_name=bluedragon
+project_name=krakenmare
 
 #Usage function
 usage () {
@@ -127,7 +127,7 @@ if [  "$ansible" == "1"  ]; then
      docker build --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
      #Build ansible
      #The last task restarts docker and therefore exits brutally, FIXME
-     docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/bdu-client-playbook.yml --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
@@ -139,11 +139,11 @@ if [  "$ansible" == "1"  ]; then
           echo "[warning] add -R flag to force this step if needed (requires privileges)"
           echo "***"
      fi
-     docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --forks 100 
-     docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml  --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --forks 100 
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml  --forks 100
 
      if [ "$setupRegistry" == "1"  ]; then
-          docker run --rm --volume $BD_HOME:/playbooks/ --volume $BD_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $BD_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100 
+          docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $KM_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100 
      fi
      
 fi

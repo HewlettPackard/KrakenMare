@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.impl;
+package com.hpe.krakenmare.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,23 +21,23 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.Main;
-import com.hpe.bluedragon.core.Agent;
-import com.hpe.bluedragon.repositories.AgentRedisRepository;
-import com.hpe.bluedragon.serde.JsonSerdes;
+import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.core.Agent;
+import com.hpe.krakenmare.repositories.AgentRedisRepository;
+import com.hpe.krakenmare.serde.JsonSerdes;
 
 public class KafkaRegistrationStream {
 
 	private final static Logger LOG = LoggerFactory.getLogger(KafkaRegistrationStream.class);
 	private final static Properties PROPERTIES = Main.cloneProperties();
 	static {
-		PROPERTIES.put("application.id", "bd-framework");
+		PROPERTIES.put("application.id", "km-framework");
 		PROPERTIES.put("default.deserialization.exception.handler", "org.apache.kafka.streams.errors.LogAndContinueExceptionHandler");
 		PROPERTIES.put(StreamsConfig.TOPOLOGY_OPTIMIZATION, StreamsConfig.OPTIMIZE);
 	}
 
-	public final static String REQUEST_TOPIC = PROPERTIES.getProperty("bd.registration.request-topic");
-	public final static String RESULT_TOPIC = PROPERTIES.getProperty("bd.registration.result-topic");
+	public final static String REQUEST_TOPIC = PROPERTIES.getProperty("km.registration.request-topic");
+	public final static String RESULT_TOPIC = PROPERTIES.getProperty("km.registration.result-topic");
 
 	private final AgentRedisRepository repository;
 	private KafkaStreams streams;

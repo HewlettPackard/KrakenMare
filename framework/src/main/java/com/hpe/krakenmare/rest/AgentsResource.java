@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.rest;
+package com.hpe.krakenmare.rest;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.api.Framework;
-import com.hpe.bluedragon.core.Agent;
+import com.hpe.krakenmare.api.Framework;
+import com.hpe.krakenmare.core.Agent;
 
 @Path("agents")
 @Produces(MediaType.APPLICATION_JSON)

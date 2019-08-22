@@ -55,7 +55,7 @@ Default values in vars.yml:
 * time_server: ntp.hpecorp.net
 
 
-The password for the bdu user is *bdu*
+The password for the kmu user is *kmu*
 
 ## Command line
 

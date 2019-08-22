@@ -1,4 +1,4 @@
-package com.hpe.bluedragon.repositories;
+package com.hpe.krakenmare.repositories;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.bluedragon.api.Repository;
-import com.hpe.bluedragon.core.Agent;
+import com.hpe.krakenmare.api.Repository;
+import com.hpe.krakenmare.core.Agent;
 
 public class AgentRepository implements Repository<Agent> {
 

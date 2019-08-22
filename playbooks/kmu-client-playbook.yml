@@ -154,10 +154,10 @@
           "dns" : ["16.110.135.51", "16.110.135.52"],
           "dns-search" : ["emea.hpqcorp.net"]
         }
-##BDU user
-  - name: Add the user 'bdu'
+##KMU user
+  - name: Add the user 'kmu'
     user:
-      name: bdu
+      name: kmu
       password: "{{password}}"
       groups: docker,wheel
       append: yes
