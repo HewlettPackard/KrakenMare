@@ -225,9 +225,6 @@ services:
       MOSQUITTO_IP: mosquitto
       KAFKA_BROKER_IP: broker-1
     <<: *deploy
-    #depends on at build time only
-    depends_on:
-      - kafka-embedded-client-1
     secrets:
       - zookeeper_jaas.conf
       - broker_jaas.conf
