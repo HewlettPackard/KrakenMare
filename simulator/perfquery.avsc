@@ -1,0 +1,28 @@
+{
+"type": "record",
+"name": "perfquery_metrics",
+"namespace": hpe.kraken.mare.agent",
+"fields": [
+	{"name": "PortSelect", "type": "int", "doc": "Which port is to be used. For switches -a flag gives PortSelect of 255"},
+	{"name": "SymbolErrorCounter", "type": "int", "doc": "The total number of minor link errors detected on one or more physical lanes. This includes 8B/10B coding violations and is typically an indication of a bit error on the line."},
+	{"name": "LinkErrorRecoveryCounter", "type": "int", "doc": "The total number of times the Port Training state machine has successfully completed the link error recovery process."},
+	{"name": "LinkDownedCounter", "type": "int", "doc": "The total number of times the Port Training state machine has failed the link error recovery process and downed the link."},
+	{"name": "PortRcvErrors", "type": "int", "doc": "The total number of packets containing an error that were received on the port."},
+	{"name": "PortRcvRemotePhysicalErrors", "type": "int", "doc": "The total number of packets marked with the EBP (End of Bad Packet) delimiter received on the port."},
+	{"name": "PortRcvSwitchRelayErrors", "type": "int", "doc": "The total number of packets received on the port that were discarded because they could not be forwarded by the switch relay."},
+	{"name": "PortXmitDiscards", "type": "int", "doc": "The total number of packets dropped because the port is down or congested."},
+	{"name": "PortXmitConstraintErrors", "type": "int", "doc": "The total number of packets not transmitted from the switch physical port"},
+	{"name": "PortRcvConstraintErrors", "type": "int", "doc": "The total number of packets received on the switch physical port that were discarded"},
+	{"name": "LocalLinkIntegrityErrors", "type": "int", "doc": "The number of times that the count of local physical errors exceeded the threshold specified by LocalPhyErrors."},
+	{"name": "ExcessiveBufferOverrunErrors", "type": "int", "doc": "The number of times that OverrunErrors consecutive flow control update periods occurred, each having at least one overrun error."},
+	{"name": "VL15Dropped", "type": "int", "doc": "The number of incoming VL15 packets dropped due to resource limitations (for example, lack of buffers) in the port."},
+	{"name": "PortXmitData", "type": "long", "doc": "The total number of data octets, divided by 4, transmitted on all VLs from the port."},
+	{"name": "PortRcvData", "type": "long", "doc": "The total number of data octets, divided by 4, received on all VLs from the port."},
+	{"name": "PortXmitPkts", "type": "long", "doc": "The total number of packets transmitted on all VLs from the port."},
+	{"name": "PortRcvPkts", "type": "long", "doc": "The total number of packets received on all VLs from the port."},
+	{"name": "PortXmitWait", "type": "int", "doc": "The number of ticks during which the port had data to transmit but no data was sent during the entire tick (either because of insufficient credits or because of lack of arbitration)."},
+	{"name": "Timestamp", "type": "long", "logicalType": "timestamp-millis", "doc": "Number of milliseconds since the epoch"},
+	{"name": "GUID", "type": "string", "doc": "Globally Unique Identifier in hex but treated as string"},
+	{"name": "Name", "type": "string", "doc": "Name of agent that is sending data"}
+]
+}
