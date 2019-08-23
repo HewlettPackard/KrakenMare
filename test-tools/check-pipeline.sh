@@ -49,6 +49,7 @@ run_me ssl-broker-1   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X
 run_me ssl-broker-2   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-2:19093 || exit 1
 run_me ssl-broker-3   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-3:19094 || exit 1
 run_me prometheus     curl -s http://prometheus:9090/api/v1/targets    || exit 1
+run_me schemaregistry 'curl -s --cacert /run/secrets/km-ca-1.crt --cert /run/secrets/schemaregistry.certificate.pem --key /run/secrets/schemaregistry.key -X GET https://schemaregistry:8081/subjects/ | jq .'   || exit 1
 
 echo ""
 echo "all tests succeeded..."
