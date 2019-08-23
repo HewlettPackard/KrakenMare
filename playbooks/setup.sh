@@ -88,7 +88,7 @@ fi
 
 #Registry vars
 unset $registry;
-registry=$(cat $DEFAULT_INVENTORY_FILE | sed -n -e '/\[registry\]/,$p' | grep -v "[\[,#,^$]" |sed  '/^$/d'| awk '{$1=$1};1' | head -1)
+registry=$(cat $DEFAULT_INVENTORY_FILE | sed -n -e '/\[registry\]/,$p' | grep -v "[\[,#,^$]" |sed  '/^$/d'| awk '{$1=$1};1' | head -1 | awk '{ print $1}' )
 export no_proxy=$registry
 export REGISTRY_FULL_PATH="$registry:$MIRROR_REGISTRY_PORT/" 
 
