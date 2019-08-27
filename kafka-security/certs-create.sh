@@ -36,8 +36,8 @@ do
 	keytool -keystore kafka.$i.keystore.jks -alias $i -certreq -file $i.csr -storepass krakenmare -keypass krakenmare -ext "SAN=dns:$i,dns:localhost" || exit 1
         #openssl req -in $i.csr -text -noout
 
-        # Sign the host certificate with the certificate authority (CA)
-        openssl x509 -req -CA km-ca-1.crt -CAkey km-ca-1.key -in $i.csr -out $i-ca1-signed.crt -days 9999 -CAcreateserial -passin pass:krakenmare -extensions v3_req -extfile <(cat <<EOF 
+  # Sign the host certificate with the certificate authority (CA)
+  openssl x509 -req -CA km-ca-1.crt -CAkey km-ca-1.key -in $i.csr -out $i-ca1-signed.crt -days 9999 -CAcreateserial -passin pass:krakenmare -extensions v3_req -extfile <(cat <<EOF 
 [req]
 distinguished_name = req_distinguished_name
 x509_extensions = v3_req
@@ -51,7 +51,6 @@ DNS.1 = $i
 DNS.2 = localhost
 EOF
 ) || exit 1
-        #openssl x509 -noout -text -in $i-ca1-signed.crt
 
         # Sign and import the CA cert into the keystore
 	keytool -noprompt -keystore kafka.$i.keystore.jks -alias CARoot -import -file km-ca-1.crt -storepass krakenmare -keypass krakenmare || exit 1
@@ -65,9 +64,9 @@ EOF
 	keytool -noprompt -keystore kafka.$i.truststore.jks -alias CARoot -import -file km-ca-1.crt -storepass krakenmare -keypass krakenmare || exit 1
 
 	# Save creds
-  	echo "krakenmare" > ${i}_sslkey_creds || exit 1
-  	echo "krakenmare" > ${i}_keystore_creds || exit 1
-  	echo "krakenmare" > ${i}_truststore_creds || exit 1
+ 	echo "krakenmare" > ${i}_sslkey_creds || exit 1
+ 	echo "krakenmare" > ${i}_keystore_creds || exit 1
+ 	echo "krakenmare" > ${i}_truststore_creds || exit 1
 
 	# Create pem files and keys used for Schema Registry HTTPS testing
 	#   openssl x509 -noout -modulus -in client.certificate.pem | openssl md5
