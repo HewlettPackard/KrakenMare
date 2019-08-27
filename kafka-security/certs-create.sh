@@ -16,7 +16,7 @@ cd /tmp || exit 1
 rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 2> /dev/null 
 
 # Generate CA key
-openssl req -new -x509 -keyout km-ca-1.key -out km-ca-1.crt -days 365 -subj '/CN=ca1.test.hpe.com/OU=KM/O=HPE/L=SanJose/S=Ca/C=US' -passin pass:krakenmare -passout pass:krakenmare || exit 1
+openssl req -new -x509 -keyout km-ca-1.key -out km-ca-1.crt -days 365 -subj '/CN=ca1.test.hpe.com/OU=KM/O=HPE/L=SanJose/ST=Ca/C=US' -passin pass:krakenmare -passout pass:krakenmare || exit 1
 
 for i in broker-1 broker-2 broker-3 schemaregistry connect client
 do
@@ -25,7 +25,7 @@ do
 	# Create host keystore
 	keytool -genkey -noprompt \
 				 -alias $i \
-				 -dname "CN=$i,OU=KM,O=HPE,L=SanJose,S=Ca,C=US" \
+				 -dname "CN=$i,OU=KM,O=HPE,L=SanJose,ST=Ca,C=US" \
                                  -ext "SAN=dns:$i,dns:localhost" \
 				 -keystore kafka.$i.keystore.jks \
 				 -keyalg RSA \
