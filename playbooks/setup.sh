@@ -164,7 +164,7 @@ if [ "$deploy" == "1"  ]; then
      cd ../kafka-security 
      docker run --rm -v $(pwd):/tmp/  -ti openjdk:11-jdk /tmp/certs-create.sh
      ./secrets-create.sh  || exit 1
-     rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 2> /dev/null     
+     rm -f *.crt *.csr *_creds *.pfx *.srl *.key *.pem *.der *.p12 2> /dev/null
      cd ../playbooks
      docker stack deploy $compose_args $project_name || exit 1 
 

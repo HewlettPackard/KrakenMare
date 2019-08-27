@@ -25,10 +25,10 @@ do
 	docker secret create ${i}_keystore_creds ${i}_keystore_creds || exit 1
 	docker secret rm ${i}_truststore_creds 2> /dev/null
 	docker secret create ${i}_truststore_creds ${i}_truststore_creds || exit 1
-	docker secret rm kafka.$i.keystore.jks 2> /dev/null
-	docker secret create kafka.$i.keystore.jks kafka.$i.keystore.jks || exit 1
-	docker secret rm kafka.$i.truststore.jks 2> /dev/null
-	docker secret create kafka.$i.truststore.jks kafka.$i.truststore.jks || exit 1
+	docker secret rm kafka.$i.keystore.pfx 2> /dev/null
+	docker secret create kafka.$i.keystore.pfx kafka.$i.keystore.pfx || exit 1
+	docker secret rm kafka.$i.truststore.pfx 2> /dev/null
+	docker secret create kafka.$i.truststore.pfx kafka.$i.truststore.pfx || exit 1
 	docker secret rm $i-ca1-signed.crt 2> /dev/null
 	docker secret create $i-ca1-signed.crt $i-ca1-signed.crt || exit 1
 	docker secret rm $i.keystore.p12 2> /dev/null
