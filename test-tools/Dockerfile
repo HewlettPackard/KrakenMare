@@ -37,10 +37,10 @@ RUN mkdir -p /usr/local/include/yajl
 COPY --from=testbuild /usr/local/include/yajl/* /usr/local/include/yajl/
 COPY --from=testbuild /usr/local/lib/* /usr/local/lib/
 RUN wget -qO - https://packages.confluent.io/deb/5.2/archive.key | apt-key add -
-COPY ./check-pipeline.sh /tmp/
-COPY ./client-sasl_ssl.conf /tmp/
 RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.2 stable main"
 RUN apt-get update && apt-get install -y confluent-community-2.12
+
+COPY ./check-pipeline.sh ./client-sasl_ssl.conf ./client-plain.conf /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
