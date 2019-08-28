@@ -27,7 +27,7 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server openssl libssl-dev
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server openssl libssl-dev gnupg software-properties-common openjdk-11-jre-headless
 COPY --from=testbuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
 COPY --from=testbuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
@@ -36,8 +36,11 @@ COPY --from=testbuild /tmp/wait-for /tmp/wait-for
 RUN mkdir -p /usr/local/include/yajl
 COPY --from=testbuild /usr/local/include/yajl/* /usr/local/include/yajl/
 COPY --from=testbuild /usr/local/lib/* /usr/local/lib/
-
+RUN wget -qO - https://packages.confluent.io/deb/5.2/archive.key | apt-key add -
 COPY ./check-pipeline.sh /tmp/
+COPY ./client-sasl_ssl.conf /tmp/
+RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.2 stable main"
+RUN apt-get update && apt-get install -y confluent-community-2.12
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
