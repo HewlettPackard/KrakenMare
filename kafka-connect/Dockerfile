@@ -17,5 +17,4 @@ RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode
 
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
-
 CMD ["/etc/kafka-connect/entrypoint.sh"]

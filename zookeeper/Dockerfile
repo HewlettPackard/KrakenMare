@@ -10,6 +10,5 @@ RUN mkdir /opt/prometheus &&\
     wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-0.12.0.jar -P /opt/prometheus &&\
     wget https://github.com/prometheus/jmx_exporter/raw/master/example_configs/kafka-2_0_0.yml -P /opt/prometheus
 
-COPY entrypoint.sh /etc/confluent/docker/
+CMD ["/etc/confluent/docker/run"]
 
-CMD ["/etc/confluent/docker/entrypoint.sh"]

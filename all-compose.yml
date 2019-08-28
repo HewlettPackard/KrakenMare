@@ -29,9 +29,10 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider -DrequireClientAuthScheme=sasl"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/zookeeper/secrets/zookeeper_jaas.conf -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider -DrequireClientAuthScheme=sasl"
     secrets:
-      - zookeeper_jaas.conf
+      - source: zookeeper_jaas.conf
+        target: /etc/zookeeper/secrets/zookeeper_jaas.conf
     <<: *deploy
 
   broker-1:
@@ -74,14 +75,20 @@ services:
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       # KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.host=broker-1 -Dcom.sun.management.jmxremote.port=9992 -Djava.rmi.server.hostname=broker-1 -Dcom.sun.management.jmxremote.rmi.port=9992 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
-      - broker_jaas.conf
-      - kafka.broker-1.keystore.pfx
-      - broker-1_keystore_creds
-      - broker-1_sslkey_creds
-      - kafka.broker-1.truststore.pfx
-      - broker-1_truststore_creds
+      - source: broker_jaas.conf
+        target: /etc/kafka/secrets/broker_jaas.conf
+      - source: kafka.broker-1.keystore.pfx
+        target: /etc/kafka/secrets/kafka.broker-1.keystore.pfx
+      - source: broker-1_keystore_creds
+        target: /etc/kafka/secrets/broker-1_keystore_creds
+      - source: broker-1_sslkey_creds
+        target: /etc/kafka/secrets/broker-1_sslkey_creds
+      - source: kafka.broker-1.truststore.pfx
+        target: /etc/kafka/secrets/kafka.broker-1.truststore.pfx
+      - source: broker-1_truststore_creds
+        target: /etc/kafka/secrets/broker-1_truststore_creds
     deploy:
       restart_policy:
         condition: none
@@ -128,14 +135,20 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
-      - broker_jaas.conf
-      - kafka.broker-2.keystore.pfx
-      - broker-2_keystore_creds
-      - broker-2_sslkey_creds
-      - kafka.broker-2.truststore.pfx
-      - broker-2_truststore_creds
+      - source: broker_jaas.conf
+        target: /etc/kafka/secrets/broker_jaas.conf
+      - source: kafka.broker-2.keystore.pfx
+        target: /etc/kafka/secrets/kafka.broker-2.keystore.pfx
+      - source: broker-2_keystore_creds
+        target: /etc/kafka/secrets/broker-2_keystore_creds
+      - source: broker-2_sslkey_creds
+        target: /etc/kafka/secrets/broker-2_sslkey_creds
+      - source: kafka.broker-2.truststore.pfx
+        target: /etc/kafka/secrets/kafka.broker-2.truststore.pfx
+      - source: broker-2_truststore_creds
+        target: /etc/kafka/secrets/broker-2_truststore_creds
     deploy:
       restart_policy:
         condition: none
@@ -183,14 +196,20 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
-      - broker_jaas.conf
-      - kafka.broker-3.keystore.pfx
-      - broker-3_keystore_creds
-      - broker-3_sslkey_creds
-      - kafka.broker-3.truststore.pfx
-      - broker-3_truststore_creds
+      - source: broker_jaas.conf
+        target: /etc/kafka/secrets/broker_jaas.conf
+      - source: kafka.broker-3.keystore.pfx
+        target: /etc/kafka/secrets/kafka.broker-3.keystore.pfx
+      - source: broker-3_keystore_creds
+        target: /etc/kafka/secrets/broker-3_keystore_creds
+      - source: broker-3_sslkey_creds
+        target: /etc/kafka/secrets/broker-3_sslkey_creds
+      - source: kafka.broker-3.truststore.pfx
+        target: /etc/kafka/secrets/kafka.broker-3.truststore.pfx
+      - source: broker-3_truststore_creds
+        target: /etc/kafka/secrets/broker-3_truststore_creds
     deploy:
       restart_policy:
         condition: none
@@ -348,23 +367,25 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
-      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.schemaregistry.truststore.pfx
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.schemaregistry.keystore.pfx
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: krakenmare
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: krakenmare
       SCHEMA_REGISTRY_KAFKASTORE_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
-      SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.schemaregistry.truststore.pfx
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
       SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.schemaregistry.keystore.pfx
+      SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
       SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD: krakenmare
       SCHEMA_REGISTRY_SSL_KEY_PASSWORD: krakenmare
       # Disable SR client auth as temporary workaround to software bug
       SCHEMA_REGISTRY_SSL_CLIENT_AUTH: "false"
       SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "https"
     secrets:
-      - kafka.schemaregistry.truststore.pfx
-      - kafka.schemaregistry.keystore.pfx
+      - source: kafka.schemaregistry.truststore.pfx
+        target: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
+      - source: kafka.schemaregistry.keystore.pfx
+        target: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
     <<: *deploy
 
   connect:
@@ -405,48 +426,56 @@ services:
 #      CONNECT_SECURITY_PROTOCOL: SASL_SSL
       CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
       CONNECT_SASL_MECHANISM: PLAIN
-      CONNECT_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.pfx
+      CONNECT_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      CONNECT_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.pfx
+      CONNECT_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
       CONNECT_SSL_KEYSTORE_PASSWORD: krakenmare
       # Connect producer
 #      CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
       CONNECT_PRODUCER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"client\"  password=\"client-secret\";"
       CONNECT_PRODUCER_SASL_MECHANISM: PLAIN
-      CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.pfx
+      CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_PRODUCER_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.pfx
+      CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
       CONNECT_PRODUCER_SSL_KEYSTORE_PASSWORD: krakenmare
       CONNECT_PRODUCER_SSL_KEY_PASSWORD: krakenmare
       # Connect consumer
 #      CONNECT_CONSUMER_SECURITY_PROTOCOL: SASL_SSL
       CONNECT_CONSUMER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
       CONNECT_CONSUMER_SASL_MECHANISM: PLAIN
-      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.connect.truststore.pfx
+      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.connect.keystore.pfx
+      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
       CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD: krakenmare
       CONNECT_CONSUMER_SSL_KEY_PASSWORD: krakenmare
       # Required for Schema Registry HTTPS
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/run/secrets/kafka.connect.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.connect.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
-      SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka-connect/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/etc/kafka-connect/secrets/kafka.connect.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/etc/kafka-connect/secrets/kafka.connect.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
+      SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/etc/kafka-connect/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/etc/kafka-connect/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
       # We create topics in connector so we need Zookeeper and Kafka options
       KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
       KAFKA_SASL_MECHANISM: PLAIN
-      KAFKA_SSL_TRUSTSTORE_LOCATION: /run/secrets/kafka.client.truststore.pfx
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.client.truststore.pfx
       KAFKA_SSL_TRUSTSTORE_PASSWORD: krakenmare
-      KAFKA_SSL_KEYSTORE_LOCATION: /run/secrets/kafka.client.keystore.pfx
+      KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.client.keystore.pfx
       KAFKA_SSL_KEYSTORE_PASSWORD: krakenmare
       KAFKA_ZOOKEEPER_SET_ACL: "true"
     secrets:
-      - broker_jaas.conf
-      - kafka.connect.truststore.pfx
-      - kafka.connect.keystore.pfx
-      - kafka.client.truststore.pfx
-      - kafka.client.keystore.pfx
-      - connect.certificate.pem
-      - connect.key
-      - km-ca-1.crt
+      - source: broker_jaas.conf
+        target: /etc/kafka-connect/secrets/broker_jaas.conf
+      - source: kafka.connect.truststore.pfx
+        target: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
+      - source: kafka.connect.keystore.pfx
+        target: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
+      - source: kafka.client.truststore.pfx
+        target: /etc/kafka-connect/secrets/kafka.client.truststore.pfx
+      - source: kafka.client.keystore.pfx
+        target: /etc/kafka-connect/secrets/kafka.client.keystore.pfx
+      - source: connect.certificate.pem
+        target: /etc/kafka-connect/secrets/connect.certificate.pem
+      - source: connect.key
+        target: /etc/kafka-connect/secrets/connect.key
+      - source: km-ca-1.crt
+        target: /etc/kafka-connect/secrets/km-ca-1.crt
     <<: *deploy
 #
 # Docker Compose with the following services:
