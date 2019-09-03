@@ -44,6 +44,8 @@ services:
     secrets:
       - source: zookeeper_jaas.conf
         target: /etc/zookeeper/secrets/zookeeper_jaas.conf
+    networks:
+      - zk_kb
     <<: *deploy
 
   broker-1:
@@ -106,6 +108,9 @@ services:
       placement:
         constraints:
           - node.labels.broker-1 == true
+    networks:
+      - zk_kb
+      - krakenmare
 
   broker-2:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -166,6 +171,9 @@ services:
       placement:
         constraints:
           - node.labels.broker-2 == true
+    networks:
+      - zk_kb
+      - krakenmare
 
   broker-3:
     image: ${REGISTRY_FULL_PATH}kafka-broker
@@ -227,6 +235,9 @@ services:
       placement:
         constraints:
           - node.labels.broker-3 == true
+    networks:
+      - zk_kb
+      - krakenmare
 
   mosquitto:
     image: eclipse-mosquitto:latest
@@ -237,6 +248,8 @@ services:
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     <<: *deploy
+    networks:
+      - krakenmare
 
   test-tools:
     image: ${REGISTRY_FULL_PATH}test-tools
@@ -287,6 +300,9 @@ services:
       - km-ca-1.crt
       - km-ca-1.key
       - km-ca-1.srl
+    networks:
+      - zk_kb
+      - krakenmare
 
   simulator:
     image: ${REGISTRY_FULL_PATH}simulator
@@ -295,6 +311,8 @@ services:
       dockerfile: Dockerfile
     hostname: simulator
     <<: *deploy
+    networks:
+      - krakenmare
 
   kafka-embedded-client-1:
     image: ${REGISTRY_FULL_PATH}kafka-embedded-client-1
@@ -305,6 +323,8 @@ services:
     environment:
       KAFKA_BROKER_IP: broker-1
     <<: *deploy
+    networks:
+      - krakenmare
 
   mousttic-1:
     image: ${REGISTRY_FULL_PATH}mousttic-1
@@ -315,6 +335,8 @@ services:
     environment:
       MOSQUITTO_IP: mosquitto
     <<: *deploy
+    networks:
+      - krakenmare
 
   druid:
     image: ${REGISTRY_FULL_PATH}druid
@@ -337,6 +359,9 @@ services:
       - "9095:9095"
       - "1527:1527"
     <<: *deploy
+    networks:
+      - zk_kb
+      - krakenmare
 
   grafana:
     image: ${REGISTRY_FULL_PATH}grafana
@@ -350,6 +375,8 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning
       - ./grafana/dashboards/:/etc/grafana/dashboards
     <<: *deploy
+    networks:
+      - krakenmare
 
   schemaregistry:
     image: ${REGISTRY_FULL_PATH}schemaregistry
@@ -388,6 +415,9 @@ services:
       - source: kafka.schemaregistry.keystore.pfx
         target: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
     <<: *deploy
+    networks:
+      - zk_kb
+      - krakenmare
 
   connect:
     image: ${REGISTRY_FULL_PATH}connect
@@ -478,6 +508,9 @@ services:
       - source: km-ca-1.crt
         target: /etc/kafka-connect/secrets/km-ca-1.crt
     <<: *deploy
+    networks:
+      - zk_kb
+      - krakenmare
 
   framework:
     image: ${REGISTRY_FULL_PATH}framework
@@ -492,6 +525,8 @@ services:
       REDIS_SERVER: "redis:6379"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
     <<: *deploy
+    networks:
+      - krakenmare
 
   redis:
     image: redis:5.0.3
@@ -499,6 +534,8 @@ services:
     ports:
       - "6379:6379"
     <<: *deploy
+    networks:
+      - krakenmare
 
 # No hostname is asserted. We want the docker host's name for this container
   collectd:
@@ -512,6 +549,8 @@ services:
       placement:
         constraints:
           - node.labels.injectors == true
+    networks:
+      - krakenmare
 
   influxdb:
     # image: influxdb:latest
@@ -523,6 +562,8 @@ services:
 # https://docs.docker.com/samples/library/influxdb/
       INFLUXDB_DB: datapipes
     <<: *deploy
+    networks:
+      - krakenmare
 
   datapipes-monitor:
     image: ${REGISTRY_FULL_PATH}datapipes-monitor
@@ -533,6 +574,8 @@ services:
     ports:
       - "7575:7575"
     <<: *deploy
+    networks:
+      - krakenmare
 
   prometheus:
     image: prom/prometheus
@@ -542,6 +585,8 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     <<: *deploy
+    networks:
+      - krakenmare
 
   config-zookeeper:
     image: ${REGISTRY_FULL_PATH}config-zookeeper
@@ -553,3 +598,24 @@ services:
     secrets:
       - zookeeper_jaas.conf
       - broker_jaas.conf
+    networks:
+      - zk_kb
+      - krakenmare
+
+networks:
+# zk_kb is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
+# it is not attachable to prevent other containers from connecting
+# it is encrypted because zk does not support TLS natively
+  zk_kb:
+    driver: overlay
+    attachable: false
+    driver_opts:
+      encrypted: "true"
+# krakenmare is the general network for all containers
+# it is attachable to allow other containers to connect
+# it is not encrypted because we are doing that at the application layer
+  krakenmare:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "false"
