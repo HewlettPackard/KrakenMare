@@ -54,9 +54,11 @@ if [ "$action" == "up" ]; then
 	else
 		echo "Starting $nb_services services: $services"
 	fi
+	docker swarm init
 	docker-compose up --build --remove-orphans -d $services
 elif [ "$action" == "down" ]; then
 	docker-compose down --remove-orphans
+	docker swarm leave --force
 else
 	echo "Unknown action"
 	exit 1
