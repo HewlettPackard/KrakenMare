@@ -50,6 +50,9 @@ run_me ssl-broker-2   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X
 run_me ssl-broker-3   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-3:19094 || exit 1
 run_me prometheus     curl -s http://prometheus:9090/api/v1/targets    || exit 1
 run_me schemaregistry 'curl -s --cacert /run/secrets/km-ca-1.crt --cert /run/secrets/schemaregistry.certificate.pem --key /run/secrets/schemaregistry.key -X GET https://schemaregistry:8081/subjects/ | jq .'   || exit 1
+run_me sasl-broker-1  kafkacat -b broker-1:29092 -L -X security.protocol=SASL_SSL -X sasl.mechanisms=SCRAM-SHA-256 -X sasl.username=client -X sasl.password=client-secret -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare || exit 1
+run_me sasl-broker-2  kafkacat -b broker-2:29093 -L -X security.protocol=SASL_SSL -X sasl.mechanisms=SCRAM-SHA-256 -X sasl.username=client -X sasl.password=client-secret -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare || exit 1
+run_me sasl-broker-3  kafkacat -b broker-3:29094 -L -X security.protocol=SASL_SSL -X sasl.mechanisms=SCRAM-SHA-256 -X sasl.username=client -X sasl.password=client-secret -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare || exit 1
 
 echo ""
 echo "all tests succeeded..."
