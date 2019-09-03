@@ -73,8 +73,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
       KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-1.keystore.pfx
       KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-1_keystore_creds
       KAFKA_SSL_KEY_CREDENTIALS: broker-1_sslkey_creds
@@ -137,8 +137,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
       KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-2.keystore.pfx
       KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-2_keystore_creds
       KAFKA_SSL_KEY_CREDENTIALS: broker-2_sslkey_creds
@@ -201,8 +201,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
       KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-3.keystore.pfx
       KAFKA_SSL_KEYSTORE_CREDENTIALS: broker-3_keystore_creds
       KAFKA_SSL_KEY_CREDENTIALS: broker-3_sslkey_creds
@@ -393,8 +393,8 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
       SCHEMA_REGISTRY_LISTENERS: "https://0.0.0.0:8081"
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
-      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
-      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: SCRAM-SHA-256
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: krakenmare
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
@@ -455,16 +455,16 @@ services:
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.2.0.jar
       # Connect worker
 #      CONNECT_SECURITY_PROTOCOL: SASL_SSL
-      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
-      CONNECT_SASL_MECHANISM: PLAIN
+      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"client\" password=\"client-secret\";"
+      CONNECT_SASL_MECHANISM: SCRAM-SHA-256
       CONNECT_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_SSL_TRUSTSTORE_PASSWORD: krakenmare
       CONNECT_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
       CONNECT_SSL_KEYSTORE_PASSWORD: krakenmare
       # Connect producer
 #      CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
-      CONNECT_PRODUCER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required  username=\"client\"  password=\"client-secret\";"
-      CONNECT_PRODUCER_SASL_MECHANISM: PLAIN
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"client\"  password=\"client-secret\";"
+      CONNECT_PRODUCER_SASL_MECHANISM: SCRAM-SHA-256
       CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_PRODUCER_SSL_TRUSTSTORE_PASSWORD: krakenmare
       CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
@@ -472,8 +472,8 @@ services:
       CONNECT_PRODUCER_SSL_KEY_PASSWORD: krakenmare
       # Connect consumer
 #      CONNECT_CONSUMER_SECURITY_PROTOCOL: SASL_SSL
-      CONNECT_CONSUMER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
-      CONNECT_CONSUMER_SASL_MECHANISM: PLAIN
+      CONNECT_CONSUMER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"client\" password=\"client-secret\";"
+      CONNECT_CONSUMER_SASL_MECHANISM: SCRAM-SHA-256
       CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.pfx
       CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: krakenmare
       CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.pfx
@@ -483,8 +483,8 @@ services:
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka-connect/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/etc/kafka-connect/secrets/kafka.connect.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/etc/kafka-connect/secrets/kafka.connect.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
       SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/etc/kafka-connect/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/etc/kafka-connect/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
       # We create topics in connector so we need Zookeeper and Kafka options
-      KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"client\" password=\"client-secret\";"
-      KAFKA_SASL_MECHANISM: PLAIN
+      KAFKA_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"client\" password=\"client-secret\";"
+      KAFKA_SASL_MECHANISM: SCRAM-SHA-256
       KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.client.truststore.pfx
       KAFKA_SSL_TRUSTSTORE_PASSWORD: krakenmare
       KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.client.keystore.pfx
