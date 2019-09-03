@@ -1,11 +1,22 @@
 #
-# Docker Compose with the following services:
+# services:
 #  zookeeper
 #  kafka broker 1-3
+#  mosquitto
+#  simulator
+#  druid
+#  grafana
+#  kafka connect
+#  schema registry
+#  framework
+#  redis
+#  collectd
 #
 
+# Docker compose version
 version: '3.4'
 
+# Deploy via swarm has this included in most services
 x-deploy: &deploy
   deploy:
     restart_policy:
@@ -216,13 +227,6 @@ services:
       placement:
         constraints:
           - node.labels.broker-3 == true
-#
-# Docker Compose with the following services:
-#  mosquitto
-#  simulator
-#  druid
-#  grafana
-#
 
   mosquitto:
     image: eclipse-mosquitto:latest
@@ -334,7 +338,6 @@ services:
       - "1527:1527"
     <<: *deploy
 
-
   grafana:
     image: ${REGISTRY_FULL_PATH}grafana
     build:
@@ -347,11 +350,7 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning
       - ./grafana/dashboards/:/etc/grafana/dashboards
     <<: *deploy
-#
-# Docker Compose with the following services:
-#  kafka connect
-#  schema-registry 
-#
+
   schemaregistry:
     image: ${REGISTRY_FULL_PATH}schemaregistry
     build:
@@ -479,11 +478,7 @@ services:
       - source: km-ca-1.crt
         target: /etc/kafka-connect/secrets/km-ca-1.crt
     <<: *deploy
-#
-# Docker Compose with the following services:
-#  framework
-#  redis
-#
+
   framework:
     image: ${REGISTRY_FULL_PATH}framework
     build:
@@ -504,10 +499,7 @@ services:
     ports:
       - "6379:6379"
     <<: *deploy
-#
-# Docker Compose with the following services:
-#  collectd
-#
+
 # No hostname is asserted. We want the docker host's name for this container
   collectd:
     image: ${REGISTRY_FULL_PATH}collectd
@@ -550,3 +542,14 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     <<: *deploy
+
+  config-zookeeper:
+    image: ${REGISTRY_FULL_PATH}config-zookeeper
+    build:
+      context: config-zookeeper
+      dockerfile: Dockerfile
+    hostname: config-zk
+    <<: *deploy
+    secrets:
+      - zookeeper_jaas.conf
+      - broker_jaas.conf
