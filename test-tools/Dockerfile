@@ -27,7 +27,7 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server openssl libssl-dev gnupg software-properties-common openjdk-11-jre-headless
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget curl nmap netcat iputils-ping jq redis-server openssl libssl-dev gnupg software-properties-common openjdk-11-jre-headless vim emacs less bc
 COPY --from=testbuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka/
 COPY --from=testbuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/
