@@ -54,11 +54,44 @@ if [ "$action" == "up" ]; then
 	else
 		echo "Starting $nb_services services: $services"
 	fi
-	docker swarm init
+  case "$(docker info --format '{{.Swarm.LocalNodeState}}')" in
+  inactive)
+    docker swarm init || exit 1
+    ;;
+  pending)
+    echo "Docker swarm init will fail. Compose is not able to proceed"
+    exit 1
+    ;;
+  active)
+    if [ "$(docker info --format '{{.Swarm.ControlAvailable}}')" == "true" ]; then
+      echo "Use existing swarm. Set /tmp/existing to true"
+      touch /tmp/existing || exit 1
+    else
+      echo "Not on swarm manager. Compose is not able to proceed"
+      exit 1
+    fi
+    ;;
+  locked)
+    echo "Node is in a locked swarm cluster. Compose is not able to proceed"
+    exit 1
+    ;;
+  error)
+    echo "Node is in an error state. Compose is not able to proceed"
+    exit 1
+    ;;
+  *)
+    echo "Unknown state $(docker info --format '{{.Swarm.LocalNodeState}}'). Compose is not able to proceed"
+    exit 1
+  esac
 	docker-compose up --build --remove-orphans -d $services
 elif [ "$action" == "down" ]; then
 	docker-compose down --remove-orphans
-	docker swarm leave --force
+  if [ -e /tmp/existing ]; then
+    echo "Existing swarm found. Do not leave it."
+    rm /tmp/existing || exit 1
+  else
+    docker swarm leave --force
+  fi
 else
 	echo "Unknown action"
 	exit 1
