@@ -40,7 +40,7 @@ RUN wget -qO - https://packages.confluent.io/deb/5.2/archive.key | apt-key add -
 RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.2 stable main"
 RUN apt-get update && apt-get install -y confluent-community-2.12
 
-COPY ./check-pipeline.sh ./client-sasl_ssl.conf ./client-plain.conf ./scaling-test.sh /tmp/
+COPY ./check-pipeline.sh ./client-sasl_ssl.conf ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
