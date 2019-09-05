@@ -55,3 +55,6 @@ services:
   schemaregistry:
     <<: *proxy
 
+  config-zookeeper:
+    <<: *proxy
+
