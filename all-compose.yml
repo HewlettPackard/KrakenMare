@@ -629,6 +629,22 @@ services:
     networks:
       - zookeeper_kafka
       - krakenmare
+      
+  redfish:
+    image: ${REGISTRY_FULL_PATH}redfish
+    build:
+      context: redfish
+      dockerfile: Dockerfile
+      args:
+        REDFISHIP: "$REDFISHIP"
+        REDFISHACC: "$REDFISHACC"
+        REDFISHPWD: "$REDFISHPWD"
+    hostname: redfish
+    ports:
+      - "6464:6464"
+    <<: *deploy
+    networks:
+      - krakenmare
 
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
@@ -647,16 +663,3 @@ networks:
     attachable: true
     driver_opts:
       encrypted: "false"
-      
-  redfish:
-    build:
-      context: redfish
-      dockerfile: Dockerfile
-      args:
-        REDFISHIP: "$REDFISHIP"
-        REDFISHACC: "$REDFISHACC"
-        REDFISHPWD: "$REDFISHPWD"
-    hostname: redfish
-    ports:
-      - "6464:6464"
-    <<: *deploy
