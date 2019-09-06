@@ -336,14 +336,16 @@ services:
 
 
   grafana:
-    image: grafana/grafana
+    image: ${REGISTRY_FULL_PATH}grafana
+    build:
+      context: grafana
+      dockerfile: Dockerfile
     hostname: grafana
     ports:
       - "3000:3000"
     volumes:
       - ./grafana/provisioning/:/etc/grafana/provisioning
       - ./grafana/dashboards/:/etc/grafana/dashboards
-      - ./grafana/plugins/:/var/lib/grafana/plugins/
     <<: *deploy
 #
 # Docker Compose with the following services:
