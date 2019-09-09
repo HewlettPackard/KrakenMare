@@ -1,0 +1,20 @@
+[all:vars]
+ansible_user=root
+ansible_ssh_pass=Cmuteam
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[registry]
+__HOST__
+[supervisory_cloud]
+__HOST__
+[broker-1]
+__HOST__
+[broker-2]
+__HOST__
+[broker-3]
+__HOST__
+[injectors]
+__HOST__
+[swarm_manager]
+__HOST__
+[swarm_nodes]
+__HOST__

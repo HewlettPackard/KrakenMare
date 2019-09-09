@@ -11,5 +11,5 @@
 
     - name: Remove nodes
       docker_swarm:
-        state: absent    
+        state: absent
         force: true

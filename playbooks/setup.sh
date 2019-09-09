@@ -16,6 +16,7 @@ unset $deploy;
 unset $proxy;
 unset $setupRegistry;
 unset $restartDocker;
+unset $stop;
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
@@ -38,6 +39,7 @@ usage () {
      echo "-d: to Deploy"
      echo "-i: to specify the inventory file (DEFAULT is ${DEFAULT_INVENTORY_FILE})"
      echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
+     echo "-s: to stop the stack"
      echo "-h: to display help"
      echo "return code is 0 if all tasks success"
      echo "            is 1 if a task failed "
@@ -70,6 +72,7 @@ do
          R     ) restartDocker=1;;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
+         s     ) stop=1        ;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
 done
@@ -148,24 +151,26 @@ if [  "$ansible" == "1"  ]; then
      
 fi
 
-if [ "$pull" == "1"  ]; then
+if [ "$pull" == "1" ]; then
      # to only pull registry's content
      docker-compose pull || exit 1
 fi
 
-if [ "$build" == "1"  ]; then
+if [ "$build" == "1" ]; then
      docker-compose  build || exit 1
      docker-compose  push || exit 1
 fi
 
-if [ "$deploy" == "1"  ]; then
-
+if [ "$stop" == "1" ] || [ ]"$deploy" == "1" ]; then
      docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
+fi
+
+if [ "$deploy" == "1" ]; then
      cd ../kafka-security 
      docker run --rm -v $(pwd):/tmp/  -ti openjdk:11-jdk /tmp/certs-create.sh
      ./secrets-create.sh  || exit 1
      rm -f *.crt *.csr *_creds *.pfx *.srl *.key *.pem *.der *.p12 2> /dev/null
      cd ../playbooks
      docker stack deploy $compose_args $project_name || exit 1 
-
 fi
+

@@ -43,12 +43,9 @@ deploy-dev: &deploy-dev
     url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
     on_stop: stop-dev
   dependencies: []
-  before_script:
-    - export https_proxy=$https_proxy
-    - export http_proxy=$http_proxy
-    - echo $https_proxy
   script:
-    - ./compose.sh up
+    -  sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
+    - playbooks/setup.sh -arbd
   except:
     - master
 
@@ -61,7 +58,7 @@ stop-dev:
     action: stop
   dependencies: []
   script:
-    - ./compose.sh down
+    - playbooks/setup.sh -s
   when: manual
 
 deploy-master: &deploy-master
@@ -73,6 +70,7 @@ deploy-master: &deploy-master
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   dependencies: []
   script:
-    - ./compose.sh down --remove-orphans && ./compose.sh up
+    - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
+    - playbooks/setup.sh -sarbd
   only:
     - master
