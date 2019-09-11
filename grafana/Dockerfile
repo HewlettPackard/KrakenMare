@@ -3,6 +3,8 @@ FROM grafana/grafana
 USER root
 RUN apt update && apt install -y wget
 
-RUN wget https://github.com/Plonk42/druidplugin/archive/ten-sec-granularity.tar.gz \
-    && tar zxvpf ten-sec-granularity.tar.gz && mv druidplugin-ten-sec-granularity /var/lib/grafana/plugins/druidplugin \
-    && rm ten-sec-granularity.tar.gz
+ARG commit=67400f89786b476635e0e87cf6ac038a83818672
+
+RUN wget https://github.com/Plonk42/druidplugin/archive/$commit.tar.gz \
+    && tar zxvpf $commit.tar.gz && mv druidplugin-$commit /var/lib/grafana/plugins/druidplugin \
+    && rm $commit.tar.gz
