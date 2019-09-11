@@ -1,0 +1,22 @@
+[all:vars]
+ansible_user=root
+ansible_ssh_pass=PFteam
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[registry]
+u176i125 ip_addr=172.16.7.249
+[supervisory_cloud]
+u176i125 ip_addr=172.16.7.249
+[broker-1]
+u176i125 ip_addr=172.16.7.249
+[broker-2]
+u176i126 ip_addr=172.16.7.250
+[broker-3]
+u176i127 ip_addr=172.16.7.251
+[injectors]
+n0001
+[swarm_manager]
+u176i125 ip_addr=172.16.7.249
+[swarm_nodes]
+n0001
+u176i126 ip_addr=172.16.7.250
+u176i127 ip_addr=172.16.7.251
