@@ -45,7 +45,7 @@ services:
       - source: zookeeper_jaas.conf
         target: /etc/zookeeper/secrets/zookeeper_jaas.conf
     networks:
-      - zk_kb
+      - zookeeper_kafka
     <<: *deploy
 
   broker-1:
@@ -109,7 +109,7 @@ services:
         constraints:
           - node.labels.broker-1 == true
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   broker-2:
@@ -172,7 +172,7 @@ services:
         constraints:
           - node.labels.broker-2 == true
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   broker-3:
@@ -236,7 +236,7 @@ services:
         constraints:
           - node.labels.broker-3 == true
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   mosquitto:
@@ -301,7 +301,7 @@ services:
       - km-ca-1.key
       - km-ca-1.srl
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   simulator:
@@ -360,7 +360,7 @@ services:
       - "1527:1527"
     <<: *deploy
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   grafana:
@@ -416,7 +416,7 @@ services:
         target: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
     <<: *deploy
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   connect:
@@ -509,7 +509,7 @@ services:
         target: /etc/kafka-connect/secrets/km-ca-1.crt
     <<: *deploy
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
   framework:
@@ -599,14 +599,14 @@ services:
       - zookeeper_jaas.conf
       - broker_jaas.conf
     networks:
-      - zk_kb
+      - zookeeper_kafka
       - krakenmare
 
 networks:
-# zk_kb is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
+# zookeeper_kafka is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
 # it is not attachable to prevent other containers from connecting
 # it is encrypted because zk does not support TLS natively
-  zk_kb:
+  zookeeper_kafka:
     driver: overlay
     attachable: false
     driver_opts:
