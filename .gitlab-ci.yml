@@ -26,6 +26,9 @@ test-framework:
   script:
   - mvn -f framework/pom.xml -P coverage -DREDIS_SERVER=redis:6379 test jacoco:report
   - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
+  only:
+    changes:
+     - "framework/**/*"
   artifacts:
     paths:
       - coverage/
