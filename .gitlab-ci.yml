@@ -47,8 +47,8 @@ deploy-dev: &deploy-dev
     on_stop: stop-dev
   dependencies: []
   script:
-    -  sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
-    - playbooks/setup.sh -arbd
+    - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
+    - bash -x playbooks/setup.sh -arbd
   except:
     - master
 
@@ -61,7 +61,7 @@ stop-dev:
     action: stop
   dependencies: []
   script:
-    - playbooks/setup.sh -s
+    - bash -x playbooks/setup.sh -s
   when: manual
 
 deploy-master: &deploy-master
@@ -74,6 +74,6 @@ deploy-master: &deploy-master
   dependencies: []
   script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
-    - playbooks/setup.sh -sarbd
+    - bash -x playbooks/setup.sh -sarbd
   only:
     - master
