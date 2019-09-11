@@ -64,8 +64,7 @@ if [ "$action" == "up" ]; then
     ;;
   active)
     if [ "$(docker info --format '{{.Swarm.ControlAvailable}}')" == "true" ]; then
-      echo "Use existing swarm. Set /tmp/existing to true"
-      touch /tmp/existing || exit 1
+      echo "Use existing swarm."
     else
       echo "Not on swarm manager. Compose is not able to proceed"
       exit 1
@@ -86,12 +85,6 @@ if [ "$action" == "up" ]; then
 	docker-compose up --build --remove-orphans -d $services
 elif [ "$action" == "down" ]; then
 	docker-compose down --remove-orphans
-  if [ -e /tmp/existing ]; then
-    echo "Existing swarm found. Do not leave it."
-    rm /tmp/existing || exit 1
-  else
-    docker swarm leave --force
-  fi
 else
 	echo "Unknown action"
 	exit 1
