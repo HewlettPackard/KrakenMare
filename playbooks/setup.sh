@@ -61,7 +61,7 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdri:R" Option
+while getopts "hfapbdri:Rs" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
