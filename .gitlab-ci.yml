@@ -48,7 +48,7 @@ deploy-dev: &deploy-dev
   dependencies: []
   script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
-    - bash -x playbooks/setup.sh -arbd
+    - bash -x playbooks/setup.sh -sarbd
   except:
     - master
 
