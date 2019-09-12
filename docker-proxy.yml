@@ -58,3 +58,6 @@ services:
   config-zookeeper:
     <<: *proxy
 
+  config-schemaregistry:
+    <<: *proxy
+

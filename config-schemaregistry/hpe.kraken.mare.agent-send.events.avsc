@@ -21,10 +21,9 @@
 				},
 				{
 					"name": "values",
-					"type": "map",
-					"values": {
-						"type": "array",
-						"items": "string",
+					"type": {
+						"type": "map",
+						"values": "string",
 						"doc": "Events as strings"
 					}
 				}

@@ -602,6 +602,21 @@ services:
       - zookeeper_kafka
       - krakenmare
 
+  config-schemaregistry:
+    image: ${REGISTRY_FULL_PATH}config-schemaregistry
+    build:
+      context: config-schemaregistry
+      dockerfile: Dockerfile
+    hostname: config-schemaregistry
+    <<: *deploy
+    secrets:
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
+      - km-ca-1.crt
+    networks:
+      - zookeeper_kafka
+      - krakenmare
+
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
 # it is not attachable to prevent other containers from connecting
@@ -619,3 +634,4 @@ networks:
     attachable: true
     driver_opts:
       encrypted: "false"
+      
