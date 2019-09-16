@@ -113,9 +113,24 @@ class FanIn():
 
 	#######################################################################################
 	# MQTT agent methods
+
+	# connect to MQTT broker and subscribe to receive agent messages
+	def mqtt_subscription(self):
+		topic = "ibswitch"
+		
+		self.mqtt_client = mqtt.Client("FanInUUID")
+		#self.mqtt_client.on_log = self.mqtt_on_log
+		self.mqtt_client.on_connect = self.mqtt_on_connect
+		self.mqtt_client.on_message = self.mqtt_on_agent_message
+		self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
+		self.mqtt_client.subscribe(topic) # use '#' to subscribe to all topics
+		self.mqtt_client.loop_start()
+		
+		print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": subscribed to MQTT for topics: " + topic)
+		
+	# The callback for when the client receives LOG response
 	def mqtt_on_log(self, client, userdata, level, buf):
 		print("log: %s" % buf)
-	
 	
 	# The callback for when the client receives a CONNACK response from the server.
 	def mqtt_on_connect(self, client, userdata, flags, rc):
@@ -125,52 +140,13 @@ class FanIn():
 		# reconnect then subscriptions will be renewed.
 		self.client.subscribe("#")
 		
-	
-	
-	# connect to MQTT broker and subscribe to receive agent messages
-	def mqtt_subscription(self):
-		self.mqtt_client = mqtt.Client("FanInUUID")
-		#self.mqtt_client.on_log = self.mqtt_on_log
-		self.mqtt_client.on_connect = self.mqtt_on_connect
-		self.mqtt_client.on_message = self.mqtt_on_agent_message
-		self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
-		self.mqtt_client.subscribe("#") # use '#' to subscribe to all topics
-		self.mqtt_client.loop_start()
-		
-		print(inspect.currentframe().f_code.co_name + ": subscribed to MQTT.")
-		
-	
 	# converts message to AVRO and sends message to Kafka (in batches)
 	# TODO: do we need multiple threads here?
 	# TODO: have processing method per client type OR topic for each sensor type to convert messages?
 	# TODO: or should the MQTT agent convert message into our schema before sending via MQTT?
 	def mqtt_on_agent_message(self, client, userdata, message):
-		print("message topic: %s" % message.topic)
+		print("MQTT message topic: %s" % message.topic)
 		
-		""" Data format from simulator
-		{"name": "PortSelect", "type": "int", "doc": "For switches -a flag gives PortSelect of 255"},
-		{"name": "SymbolErrorCounter", "type": "int"},
-		{"name": "LinkErrorRecoveryCounter", "type": "int"},
-		{"name": "LinkDownedCounter", "type": "int"},
-		{"name": "PortRcvErrors", "type": "int"},
-		{"name": "PortRcvRemotePhysicalErrors", "type": "int"},
-		{"name": "PortRcvSwitchRelayErrors", "type": "int"},
-		{"name": "PortXmitDiscards", "type": "int"},
-		{"name": "PortXmitConstraintErrors", "type": "int"},
-		{"name": "PortRcvConstraintErrors", "type": "int"},
-		{"name": "LocalLinkIntegrityErrors", "type": "int"},
-		{"name": "ExcessiveBufferOverrunErrors", "type": "int"},
-		{"name": "VL15Dropped", "type": "int"},
-		{"name": "PortXmitData", "type": "long"},
-		{"name": "PortRcvData", "type": "long"},
-		{"name": "PortXmitPkts", "type": "long"},
-		{"name": "PortRcvPkts", "type": "long"},
-		{"name": "PortXmitWait", "type": "int"},
-		{"name": "Timestamp", "type": "long", "logicalType": "timestamp-millis", "doc": "Number of milliseconds since the epoch"},
-		{"name": "GUID", "type": "string", "doc": "Globally Unique Identifier in hex but treated as string"},
-		{"name": "Name", "type": "string", "doc": "Name of agent that is sending data"}
-		"""
-				
 		#process message
 		if message.topic == "ibswitch":
 			kafka_message = {}
@@ -183,78 +159,22 @@ class FanIn():
 				print(str(key) + ':' + str(value))
 				# reassemble message to Kafka avro syntax
 				"""
-				"fields": [
-				    {
-				      "name": "uuid",
-				      "type": "int"
-				    },
-				    {
-				      "name": "measurement-list",
-				      "type": {
-				            "type": "record",
-				            "name": "sensor",
-				            "fields": [
-				              {
-				                 "name": "sensorUUID",
-				                 "type": "int"
-				                },
-				                {
-				                 "name": "values",
-				                 "type": "map",
-				                 "values": "float"
-				                }]
-				       }
-				    }]
+					{'timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}
+					timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}}
 				"""
 				
-			# missing agent uuid
-			agentUUID = myMQTTmessage['Name']
-			timestamp = myMQTTmessage['Timestamp']
-			kafka_message[agentUUID] = {}
-			kafka_message[agentUUID]['measurement-list'] = {}
+				timestamp = str(key)
+				kafka_message[timestamp] = {}
+				
+				# go through sensors and add measurements for each sensor
+				for subkey, value in myMQTTmessage[key].items():	
+					kafka_message[timestamp][subkey] = value
+
+			# publish assembled message to kafka
+			print("Publishing to Kafka topic (" + "fabric" + "): " + str(kafka_message))
+			self.kafka_producer.produce("fabric", json.dumps(kafka_message).encode('utf-8'))
+			#self.kafka_producer.flush()
 			
-			# go through sensors and add measurements for each sensor
-			for key, value in myMQTTmessage.items():
-				
-				# make up sensor uuid
-				sensorUUID = myMQTTmessage['GUID'] + "-" + key
-				
-				if not sensorUUID in kafka_message[agentUUID]['measurement-list']:
-					kafka_message[agentUUID]['measurement-list'][sensorUUID] = {}
-				
-				if not timestamp in kafka_message[agentUUID]['measurement-list'][sensorUUID]:
-					kafka_message[agentUUID]['measurement-list'][sensorUUID][timestamp] = []
-			
-				kafka_message[agentUUID]['measurement-list'][sensorUUID][timestamp] = value
-
-
-			print("Kafka message:")
-			print(kafka_message)
-			"""
-				{'r1ib-simulator': {'measurement-list': {'0x0800690000005E60-PortSelect': {1566582290496: 255}, 
-															'0x0800690000005E60-SymbolErrorCounter': {1566582290496: 2},
-															'0x0800690000005E60-LinkErrorRecoveryCounter': {1566582290496: 0},
-															'0x0800690000005E60-LinkDownedCounter': {1566582290496: 7},
-															'0x0800690000005E60-PortRcvErrors': {1566582290496: 0},
-															'0x0800690000005E60-PortRcvRemotePhysicalErrors': {1566582290496: 0},
-															'0x0800690000005E60-PortRcvSwitchRelayErrors': {1566582290496: 3},
-															'0x0800690000005E60-PortXmitDiscards': {1566582290496: 300},
-															'0x0800690000005E60-PortXmitConstraintErrors': {1566582290496: 0},
-															'0x0800690000005E60-PortRcvConstraintErrors': {1566582290496: 0},
-															'0x0800690000005E60-LocalLinkIntegrityErrors': {1566582290496: 0},
-															'0x0800690000005E60-ExcessiveBufferOverrunErrors': {1566582290496: 0},
-															'0x0800690000005E60-VL15Dropped': {1566582290496: 0},
-															'0x0800690000005E60-PortXmitData': {1566582290496: 18246776},
-															'0x0800690000005E60-PortRcvData': {1566582290496: 18106365},
-															'0x0800690000005E60-PortXmitPkts': {1566582290496: 117447},
-															'0x0800690000005E60-PortRcvPkts': {1566582290496: 113729},
-															'0x0800690000005E60-PortXmitWait': {1566582290496: 822841},
-															'0x0800690000005E60-Timestamp': {1566582290496: 1566582290496},
-															'0x0800690000005E60-GUID': {1566582290496: '0x0800690000005E60'},
-															'0x0800690000005E60-Name': {1566582290496: 'r1ib-simulator'}}}}
-
-			"""
-		
 	# END MQTT agent methods   
 	#######################################################################################
 	
@@ -293,7 +213,10 @@ class FanIn():
 	def kafka_producer_connect(self):
 		test = False
 		
-		conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+		#conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
+        #          'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		
+		conf = {'bootstrap.servers': self.bootstrapServerStr, 'socket.timeout.ms': 10,
                   'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
 		
 		while test == False:
@@ -314,82 +237,6 @@ class FanIn():
 	# END Kafka agent methods
 	#######################################################################################
 	
-	# send simulated sensor data via MQTT or Kafka, depending on command line flag
-	def send_data_to_kafka(self):
-		
-		# Infinite loop
-		while True:
-			# Read formatted JSON data that describes the switches in the IRU (c stands for CMC)
-			for cmc in ['r1i0c-ibswitch', 'r1i1c-ibswitch']:
-				with open(cmc, 'r') as f:
-					query_data = json.load (f)
-		
-				# For each switch found in the JSON data generate perfquery with -a to summarize the ports
-				# This simulates a poor quality fabric in heavy use
-				# Using random numbers on 0,1 we update three error counters as down below.
-				# SymbolErrorCounter increments fastest
-				# LinkedDownedCounter increments slower both fewer and less
-				# PortXmitDiscards increments slowest both fewer and less
-				# For data counters add randint[1000,4000]
-				# for packet counters add randint[100,400]
-				# Set time to milliseconds since the epoch for InfluxDB
-				nowint = int(round(time.time() * 1000))
-		
-				for switch in query_data['Switch']:
-					hca = str(switch['HCA'])
-					port = str(switch['Port'])
-					guid = str(switch['Node_GUID'])
-					# Read in the old query outuput
-					output = self.seedOutputDir + "/" + guid + ".perfquery.json"
-					with open(output, 'r') as g:
-						query_output = json.load (g)
-					g.close()
-		
-					query_output['Name'] = self.myAgentName
-					query_output['Timestamp'] = nowint
-					x = random()
-					if x > .98:
-						query_output['SymbolErrorCounter'] += 1000
-					elif x > .88:
-						query_output['SymbolErrorCounter'] += 10
-					elif x > .78:
-						query_output['SymbolErrorCounter'] += 1
-		
-					x = random()
-					if x > .99:
-						query_output['LinkDownedCounter'] += 100
-					elif x > .89:
-						query_output['LinkDownedCounter'] += 5
-					elif x > .79:
-						query_output['LinkDownedCounter'] += 1
-		
-					x = random()
-					if x > .99:
-						query_output['PortXmitDiscards'] += 10
-					elif x > .89:
-						query_output['PortXmitDiscards'] += 5
-					elif x > .79:
-						query_output['PortXmitDiscards'] += 2
-		
-					query_output['PortXmitData'] += randint(1000, 4000)
-					query_output['PortRcvData'] += randint(1000, 4000)
-					query_output['PortXmitPkts'] += randint(100, 400)
-					query_output['PortRcvPkts'] += randint(100, 400)
-					query_output['PortXmitWait'] += randint(100, 200)
-		
-					# Write output to the next input
-					with open(output, 'w') as g:
-						json.dump(query_output, g)
-					g.close()
-					
-					data_out = json.dumps(query_output).encode('utf-8')
-					
-					self.kafka_producer.send("fabric", data_out)
-						
-			# Infinite loop
-			time.sleep(self.sleepLoopTime)
-			
-	
 	# main method of FanIn
 	def run(self, debug):
 		# local and debug flag are not used from here at the moment
@@ -405,12 +252,11 @@ class FanIn():
 	
 ### END IBswitchSimulator class ##################################################	
 
-
 def main():
-	usage = ("usage: %s --mode=kafka|mqtt" % sys.argv[0])
+	usage = ("usage: %s --mode=redfish|mqtt" % sys.argv[0])
 	parser = OptionParser(usage=usage, version=__version__)
 	
-	parser.add_option("--mode", dest="modename", help="specify mode, possible modes are: kafka|mqtt")
+	parser.add_option("--mode", dest="modename", help="specify mode, possible modes are: redfish|mqtt")
 	parser.add_option("--local", action="store_true", default=False, dest="local",
 					  help = "specify this option in order to run in local mode")
 	parser.add_option("--debug", action="store_true", default=False, dest="debug",

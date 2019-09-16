@@ -20,6 +20,9 @@ services:
   
   simulator:
     <<: *proxy
+    
+  fanin:
+    <<: *proxy
  
   framework:
     build:
