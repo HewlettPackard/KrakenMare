@@ -60,7 +60,7 @@ class IBswitchSimulator():
 		# Register to the framework
 		self.myAgent_id = -1
 		self.myAgent_uuid = str(uuid.uuid4())
-		self.myAgentName = "r1ib-simulator"
+		self.myAgentName = "agent-ibswitchSim-1"
 		self.myMQTTregistered = False
 		self.kafka_producer = None
 		self.kafka_consumer = None
@@ -111,7 +111,6 @@ class IBswitchSimulator():
 	def mqtt_on_log(self, client, userdata, level, buf):
 
 		print("log: %s" % buf)
-	
 	
 	# TODO: for now we listen to any response, not only ours
 	# defines self.myMQTTregistered and self.myAgent_id
@@ -227,11 +226,15 @@ class IBswitchSimulator():
 		
 		# Infinite loop
 		while True:
+					
+			# fresh output map
+			query_output_new = {}
+						
 			# Read formatted JSON data that describes the switches in the IRU (c stands for CMC)
 			for cmc in ['r1i0c-ibswitch', 'r1i1c-ibswitch']:
 				with open(cmc, 'r') as f:
 					query_data = json.load (f)
-		
+				
 				# For each switch found in the JSON data generate perfquery with -a to summarize the ports
 				# This simulates a poor quality fabric in heavy use
 				# Using random numbers on 0,1 we update three error counters as down below.
@@ -240,67 +243,102 @@ class IBswitchSimulator():
 				# PortXmitDiscards increments slowest both fewer and less
 				# For data counters add randint[1000,4000]
 				# for packet counters add randint[100,400]
+				
 				# Set time to milliseconds since the epoch for InfluxDB
 				nowint = int(round(time.time() * 1000))
-		
+			
+				# set timestamp
+				timestamp = nowint
+				
+				# create empty map for timestamp to store sensorID:value pairs
+				query_output_new[str(timestamp)] = {}
+				
+				# go through sensors for device
 				for switch in query_data['Switch']:
 					hca = str(switch['HCA'])
 					port = str(switch['Port'])
 					guid = str(switch['Node_GUID'])
-					# Read in the old query outuput
+					# Read in the old query output
 					output = self.seedOutputDir + "/" + guid + ".perfquery.json"
 					with open(output, 'r') as g:
 						query_output = json.load (g)
 					g.close()
 		
+					# set sensor ID prefix
+					# TODO: fix id's after registration works
+					sensorIdPrefix = "tw-" + self.myAgentName + "-" + guid
+					
+					# TODO: remove old query_output
 					query_output['Name'] = self.myAgentName
 					query_output['Timestamp'] = nowint
 					x = random()
 					if x > .98:
 						query_output['SymbolErrorCounter'] += 1000
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-SymbolErrorCounter')] = query_output['SymbolErrorCounter']
 					elif x > .88:
 						query_output['SymbolErrorCounter'] += 10
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-SymbolErrorCounter')] = query_output['SymbolErrorCounter']
 					elif x > .78:
 						query_output['SymbolErrorCounter'] += 1
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-SymbolErrorCounter')] = query_output['SymbolErrorCounter']
+					else:
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-SymbolErrorCounter')] = query_output['SymbolErrorCounter']
 		
 					x = random()
 					if x > .99:
 						query_output['LinkDownedCounter'] += 100
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-LinkDownedCounter')] = query_output['LinkDownedCounter']
 					elif x > .89:
 						query_output['LinkDownedCounter'] += 5
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-LinkDownedCounter')] = query_output['LinkDownedCounter']
 					elif x > .79:
 						query_output['LinkDownedCounter'] += 1
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-LinkDownedCounter')] = query_output['LinkDownedCounter']
+					else:
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-LinkDownedCounter')] = query_output['LinkDownedCounter']
 		
 					x = random()
 					if x > .99:
 						query_output['PortXmitDiscards'] += 10
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitDiscards')] = query_output['PortXmitDiscards']
 					elif x > .89:
 						query_output['PortXmitDiscards'] += 5
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitDiscards')] = query_output['PortXmitDiscards']
 					elif x > .79:
 						query_output['PortXmitDiscards'] += 2
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitDiscards')] = query_output['PortXmitDiscards']
+					else:
+						query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitDiscards')] = query_output['PortXmitDiscards']
 		
 					query_output['PortXmitData'] += randint(1000, 4000)
+					query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitData')] = query_output['PortXmitData']
 					query_output['PortRcvData'] += randint(1000, 4000)
+					query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortRcvData')] = query_output['PortRcvData']
 					query_output['PortXmitPkts'] += randint(100, 400)
+					query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitPkts')] = query_output['PortXmitPkts']
 					query_output['PortRcvPkts'] += randint(100, 400)
+					query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortRcvPkts')] = query_output['PortRcvPkts']
 					query_output['PortXmitWait'] += randint(100, 200)
+					query_output_new[str(timestamp)][str(sensorIdPrefix + '-PortXmitWait')] = query_output['PortXmitWait']
 		
 					# Write output to the next input
 					with open(output, 'w') as g:
 						json.dump(query_output, g)
 					g.close()
 					
-					data_out = json.dumps(query_output).encode('utf-8')
 					
-					if (pubsubType == "mqtt"):
-						print("Publishing via mqtt")
-						client.publish("ibswitch", data_out)
-					elif (pubsubType == "kafka"):
-						print("Publishing via kafka")
-						self.kafka_producer.produce("fabric", data_out)
-					else:
-						print("error: shouldn't be here")
-						sys.exit(-1)
+			data_out_new = json.dumps(query_output_new).encode('utf-8')
+			
+			if (pubsubType == "mqtt"):
+				print("Publishing via mqtt")
+				client.publish("ibswitch", data_out_new)
+			elif (pubsubType == "kafka"):
+				#ToDO: write AVRO
+				print("Publishing via kafka")
+				self.kafka_producer.produce("fabric", data_out_new)
+			else:
+				print("error: shouldn't be here")
+				sys.exit(-1)
 			
 			# Infinite loop
 			time.sleep(self.sleepLoopTime)
