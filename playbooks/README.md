@@ -51,7 +51,7 @@ Default values in vars.yml:
 * iso_server: 172.16.7.253
 * iso_source_path: /opt/cmu/repositories
 * iso_mount_point : /opt/cmu/repositories
-* docker_compose_Version : 1.24.0
+* docker_compose_version : 1.24.0
 * time_server: ntp.hpecorp.net
 
 

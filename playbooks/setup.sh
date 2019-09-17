@@ -136,10 +136,14 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 
 
 if [  "$ansible" == "1"  ]; then
-     docker build --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
-     #Build ansible
-     #The last task restarts docker and therefore exits brutally, FIXME
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
+    #Build ansible
+    docker build --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
+    
+    mkdir -p $KM_HOME/download-cache || exit 1
+    
+    #The last task restarts docker and therefore exits brutally, FIXME
+    
+    docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
