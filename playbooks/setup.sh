@@ -175,11 +175,16 @@ if [ "$stop" == "1" ] || [ ]"$deploy" == "1" ]; then
 fi
 
 if [ "$deploy" == "1" ]; then
-     cd ../kafka-security 
-     docker run --rm -v $(pwd):/tmp/ -i openjdk:11-jdk /tmp/certs-create.sh
-     ./secrets-create.sh  || exit 1
-     rm -f *.crt *.csr *_creds *.pfx *.srl *.key *.pem *.der *.p12 2> /dev/null
-     cd ../playbooks
-     docker stack deploy $compose_args $project_name || exit 1 
+						  
+    cd ../km-security || exit 1
+    #if all necessary secrets already exist in swarm, use them,
+    #if not and they exist as files, push them
+    #if not generate them and push them
+    #delete files after pushing to swarm in all cases
+    ./km-secrets-tool.sh -wcgpd || exit 1
+
+    cd ../playbooks || exit 1
+    docker stack deploy $compose_args $project_name || exit 1 
+
 fi
 
