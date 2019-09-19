@@ -116,11 +116,20 @@ export COMPOSE_FILE=../all-compose.yml:../secrets.yml
 echo "Checking whether we are on the HPE LAN and needing a proxy..."
 { type wget &> /dev/null ; } || { echo "Unable to find wget in your env, install it to have automatic HPE proxy detection" ; exit 4 ;}
 
-wget -q --dns-timeout=2 autocache.hpecorp.net -O /dev/null
-if [ $? -eq 0 ]; then
-     export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
-     echo "HPE proxies set up"
+
+wget --no-proxy -q --dns-timeout=2 --timeout=2 www.google.com ; r=$?
+echo "$r"
+if [ ! $r -eq 0 ]; then
+    wget -q --dns-timeout=5 --timeout=5 autocache.hpecorp.net -O /dev/null
+    if [ $? -eq 0 ]; then
+	export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
+	echo "HPE proxy USED..."
+    else
+	echo "network connectivity issue..."
+	exit 1
+    fi
 fi
+
 
 compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " -c $file "; done;)
 # Example ../all-compose.yml:../docker-proxy.yml  ====> -c ../all-compose.yml -c ../docker-proxy.yml

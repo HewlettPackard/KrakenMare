@@ -15,11 +15,17 @@ if [ "$action" == "up" ]; then
 	    echo "Unable to find wget in your env, install it to have automatic HPE proxy detection"
 	    exit 1
 	else
-		wget -q --dns-timeout=2 autocache.hpecorp.net -O /dev/null
+	    wget --no-proxy -q --dns-timeout=2 --timeout=2 www.google.com -O /dev/null
+	    if [ ! $? -eq 0 ]; then
+		wget -q --dns-timeout=5 --timeout=5 autocache.hpecorp.net -O /dev/null
 		if [ $? -eq 0 ]; then
 			export COMPOSE_FILE=${COMPOSE_FILE}:docker-proxy.yml
-			echo "HPE proxies set up"
+			echo "HPE proxy USED..."
+		else
+		    echo "network connectivity issue..."
+		    exit 1
 		fi
+	    fi
 	fi
 	dever=`docker --version`
 	demaj=`echo $dever | cut -d' ' -f3 | cut -d'.' -f1`
