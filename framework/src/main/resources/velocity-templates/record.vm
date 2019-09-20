@@ -552,7 +552,9 @@ static {
   public static ${this.mangle($schema.getName())} fromMap(Map<String, String> map) {
     ${this.mangle($schema.getName())} record = new ${this.mangle($schema.getName())}();
 #foreach ($field in $schema.getFields())
-#if (${this.javaType($field.schema())} == "java.lang.Integer")
+#if (${this.javaType($field.schema())} == "java.lang.Boolean")
+    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Boolean.parseBoolean(map.get("${this.mangle($field.name())}"));
+#elseif (${this.javaType($field.schema())} == "java.lang.Integer")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Integer.parseInt(map.get("${this.mangle($field.name())}"));
 #elseif (${this.javaType($field.schema())} == "java.lang.Long")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Long.parseLong(map.get("${this.mangle($field.name())}"));
