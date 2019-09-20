@@ -541,12 +541,11 @@ static {
   }
   
   public Map<String, String> toMap() {
-    return ImmutableMap.of(
+    return ImmutableMap.<String, String> builder()
 #foreach ($field in $schema.getFields())
-      "${this.mangle($field.name())}", String.valueOf(${this.mangle($field.name())})#if(!$foreach.last),#end
-
+      .put("${this.mangle($field.name())}", String.valueOf(${this.mangle($field.name())}))
 #end
-    );
+      .build();
   }
 
   public static ${this.mangle($schema.getName())} fromMap(Map<String, String> map) {
@@ -558,6 +557,8 @@ static {
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Integer.parseInt(map.get("${this.mangle($field.name())}"));
 #elseif (${this.javaType($field.schema())} == "java.lang.Long")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = Long.parseLong(map.get("${this.mangle($field.name())}"));
+#elseif (${this.javaType($field.schema())} == "java.lang.Float")
+    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Float.parseFloat(map.get("${this.mangle($field.name())}"));
 #else
 #if (${this.conversionInstance($field.schema())} != "null")
     ${this.javaType($field.schema())} ${this.mangle($field.name())} = (${this.javaType($field.schema())}) record.getConversion("${this.mangle($field.name())}").fromCharSequence(map.get("${this.mangle($field.name())}"), null, null);
