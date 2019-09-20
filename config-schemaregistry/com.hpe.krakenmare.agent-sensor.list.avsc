@@ -10,36 +10,7 @@
 	},
 	{
 		"name": "devices",
-		"type": {
-			"type": "record",
-			"name": "Device",
-			"fields": [
-				{
-					"name": "deviceID",
-					"type": "string",
-					"doc": "Unique id"
-				},
-				{
-					"name": "name",
-					"type": "string",
-					"doc": "Human readable name"
-				},
-				{
-					"name": "type",
-					"type": ["null", "string"],
-					"doc": "Type of device such as node, chassis manager, ..."
-				},
-				{
-					"name": "location",
-					"type": ["null","string"],
-					"doc": "Location of device in the system"
-				},
-				{
-					"name": "sensors",
-					"type": "Sensor"
-				}
-			]
-		}
+		"type": "Device"
 	}
 ]
 }

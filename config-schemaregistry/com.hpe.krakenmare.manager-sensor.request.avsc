@@ -12,7 +12,7 @@
 		"name": "sensorList",
 		"type": {
 				"type": "record",
-				"name": "Sensor",
+				"name": "Request",
 				"fields": [
 					{
 						"name": "sensorUUID",
