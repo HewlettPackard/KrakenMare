@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "sensor.request",
+"name": "SensorRequest",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{
@@ -12,7 +12,7 @@
 		"name": "sensorList",
 		"type": {
 				"type": "record",
-				"name": "sensor",
+				"name": "Sensor",
 				"fields": [
 					{
 						"name": "sensorUUID",

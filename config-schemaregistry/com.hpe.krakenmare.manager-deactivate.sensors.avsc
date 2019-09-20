@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "deactivate.sensors",
+"name": "DeactivateSensors",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{

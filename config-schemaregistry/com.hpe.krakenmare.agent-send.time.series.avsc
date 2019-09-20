@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "send.time.series",
+"name": "SendTimeSeries",
 "namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{
@@ -12,7 +12,7 @@
 		"name": "measurementList",
 		"type": {
 			"type": "record",
-			"name": "sensor",
+			"name": "Sensor",
 			"fields": [
 				{
 					"name": "sensorUUID",

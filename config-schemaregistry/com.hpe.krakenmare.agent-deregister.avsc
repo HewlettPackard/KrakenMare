@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "deregister",
+"name": "Deregister",
 "namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{

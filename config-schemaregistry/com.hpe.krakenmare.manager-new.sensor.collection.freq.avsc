@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "new.sensor.collection.freq",
+"name": "NewSensorCollectionFreq",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{

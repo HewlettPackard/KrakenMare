@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "collection.management",
+"name": "CollectionManagement",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{

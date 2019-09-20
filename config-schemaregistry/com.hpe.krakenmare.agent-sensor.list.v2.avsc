@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "sensor.list",
+"name": "SensorList",
 "namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{
@@ -12,7 +12,7 @@
 		"name": "devices",
 		"type": {
 			"type": "record",
-			"name": "device",
+			"name": "Device",
 			"fields": [
 				{
 					"name": "deviceID",
@@ -38,7 +38,7 @@
 					"name": "sensors",
 					"type": {
 						"type": "record",
-						"name": "sensor",
+						"name": "Sensor",
 						"fields": [
 							{
 								"name": "sensorID",

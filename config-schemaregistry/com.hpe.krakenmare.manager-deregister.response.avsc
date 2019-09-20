@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "deregister.response",
+"name": "DeregisterResponse",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{

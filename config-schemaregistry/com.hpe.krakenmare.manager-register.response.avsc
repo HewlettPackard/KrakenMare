@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "register.response",
+"name": "RegisterResponse",
 "namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{

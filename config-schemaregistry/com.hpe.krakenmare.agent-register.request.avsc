@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "register.request",
+"name": "RegisterRequest",
 "namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{
