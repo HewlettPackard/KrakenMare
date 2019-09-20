@@ -1,7 +1,7 @@
 {
 "type": "record",
 "name": "sensor.list.response",
-"namespace": "hpe.kraken.mare.manager",
+"namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{
 		"name": "uuid",

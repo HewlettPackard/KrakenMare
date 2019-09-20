@@ -1,7 +1,7 @@
 {
 "type": "record",
-"name": "sensor.list",
-"namespace": "hpe.kraken.mare.agent",
+"name": "sensor.list.update",
+"namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{
 		"name": "uuid",
@@ -14,6 +14,11 @@
 			"type": "record",
 			"name": "device",
 			"fields": [
+				{
+					"name": "deviceUUID",
+					"type": "int",
+					"doc": "UUID of the device"
+				},
 				{
 					"name": "deviceID",
 					"type": "string",
@@ -40,6 +45,11 @@
 						"type": "record",
 						"name": "sensor",
 						"fields": [
+							{
+								"name": "sensorUUID",
+								"type": "int",
+								"doc": "Framework generated Unique id"
+							},
 							{
 								"name": "sensorID",
 								"type": "string",

@@ -1,7 +1,7 @@
 {
 "type": "record",
 "name": "send.events",
-"namespace": "hpe.kraken.mare.agent",
+"namespace": "com.hpe.krakenmare.agent",
 "fields": [
 	{
 		"name": "uuid",

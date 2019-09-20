@@ -1,7 +1,7 @@
 {
 "type": "record",
 "name": "perfquery_metrics",
-"namespace": hpe.kraken.mare.agent",
+"namespace": com.hpe.krakenmare.agent",
 "fields": [
 	{"name": "PortSelect", "type": "int", "doc": "Which port is to be used. For switches -a flag gives PortSelect of 255"},
 	{"name": "SymbolErrorCounter", "type": "int", "doc": "The total number of minor link errors detected on one or more physical lanes. This includes 8B/10B coding violations and is typically an indication of a bit error on the line."},

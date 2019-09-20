@@ -1,7 +1,7 @@
 {
 "type": "record",
-"name": "deactivate.sensors",
-"namespace": "hpe.kraken.mare.manager",
+"name": "activate.sensors",
+"namespace": "com.hpe.krakenmare.manager",
 "fields": [
 	{
 		"name": "uuid",
@@ -14,7 +14,7 @@
 			"type": "array",
 			"items": "int"
 			},
-		"doc": "Deactivate list of sensors by uuid"
+		"doc": "List of sensor UUIDs to activate"
 	}
 ]
 }
