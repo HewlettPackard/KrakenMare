@@ -26,12 +26,12 @@
 				},
 				{
 					"name": "type",
-					"type": "string",
+					"type": ["null", "string"],
 					"doc": "Type of device such as node, chassis manager, ..."
 				},
 				{
 					"name": "location",
-					"type": "string",
+					"type": ["null","string"],
 					"doc": "Location of device in the system"
 				},
 				{
@@ -52,15 +52,14 @@
 							},
 							{
 								"name": "collectionFrequency",
-								"type": {
-									"type": "map",
+								"type": ["null", 
+								        {"type": "map",
 									"values": "float",
-									"doc": "Collection frequencies min, max, step, default"
-									}
+									"doc": "Collection frequencies min, max, step, default"}]
 							},
 							{
 								"name": "measuringAccuracy",
-								"type": "string",
+								"type": ["null", "string"],
 								"doc": "Description of the accuracy of measurement"
 							},
 							{
@@ -70,20 +69,19 @@
 							},
 							{
 								"name": "type",
-								"type": "string",
+								"type": ["null", "string"],
 								"doc": "Description of the type of sensor such as temperature, pressure"
 							},
 							{
 								"name": "valueRange",
-								"type": {
-									"type": "map",
+								"type": ["null", 
+								        {"type": "map",
 									"values": "float",
-									"doc": "Value range for sensor. Min and max OR list of values"
-									}
+									"doc": "Value range for sensor. Min and max OR list of values"}]
 							},
 							{
 								"name": "changeFrequency",
-								"type": "float",
+								"type": ["null", "float"],
 								"doc": "How frequently a sensor is expect to change the value"
 							},
 							{
