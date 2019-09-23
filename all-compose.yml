@@ -321,6 +321,8 @@ services:
       dockerfile: Dockerfile
     hostname: fanin
     <<: *deploy
+    networks:
+      - krakenmare
 
   kafka-embedded-client-1:
     image: ${REGISTRY_FULL_PATH}kafka-embedded-client-1
