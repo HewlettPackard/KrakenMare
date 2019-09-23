@@ -29,6 +29,7 @@ test-framework:
   only:
     changes:
      - "framework/**/*"
+     - "config-schemaregistry/*.avsc"
   artifacts:
     paths:
       - coverage/

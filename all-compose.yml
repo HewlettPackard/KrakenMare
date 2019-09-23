@@ -528,8 +528,8 @@ services:
   framework:
     image: ${REGISTRY_FULL_PATH}framework
     build:
-      context: framework
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: framework/Dockerfile
     hostname: framework
     ports: 
       - "8080:8080"

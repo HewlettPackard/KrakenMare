@@ -11,23 +11,26 @@ RUN wget https://download-gcdn.ej-technologies.com/jprofiler/jprofiler_linux_8_1
   tar -xzf /tmp/jprofiler_linux_8_1_4.tar.gz -C /opt/ && \
   rm /tmp/jprofiler_linux_8_1_4.tar.gz
 
-RUN mkdir -p /opt/krakenmare
-WORKDIR /opt/krakenmare
+RUN mkdir -p /opt/krakenmare/framework
+WORKDIR /opt/krakenmare/framework
 
-COPY pom.xml /opt/krakenmare/
+# this is image MUST be built from the upper directory (docker build -f framework/Dockerfile .) to access avro schema
+COPY framework/pom.xml /opt/krakenmare/framework/
+COPY config-schemaregistry/*.avsc /opt/krakenmare/config-schemaregistry/
+
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"
 # run a first assembly to cache maven dependencies in the image
-# /src/main/avro shall exist or avro-maven-plugin will fail
-RUN mkdir -p /opt/krakenmare/src/main/avro
+# src/main/resources/velocity-templates/record.vm shall exist or avro-maven-plugin will fail
+COPY framework/src/main/resources/velocity-templates/ /opt/krakenmare/framework/src/main/resources/velocity-templates/
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
-COPY src /opt/krakenmare/src
+COPY framework/src /opt/krakenmare/framework/src
 # tests requires a Redis instance: skip them (they are run in the CI)
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
-COPY entrypoint.sh /opt/krakenmare/entrypoint.sh
+COPY framework/entrypoint.sh /opt/krakenmare/framework/entrypoint.sh
 
 EXPOSE 8080
 
-ENTRYPOINT /opt/krakenmare/entrypoint.sh
+ENTRYPOINT /opt/krakenmare/framework/entrypoint.sh

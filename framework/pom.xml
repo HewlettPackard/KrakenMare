@@ -128,7 +128,7 @@
 					<fieldVisibility>private</fieldVisibility>
 					<!-- <stringType>Utf8</stringType> -->
 					<customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
-					<templateDirectory>${basedir}/src/main/resources/velocity-templates/</templateDirectory>
+					<templateDirectory>${project.basedir}/src/main/resources/velocity-templates/</templateDirectory>
 				</configuration>
 				<executions>
 					<execution>
