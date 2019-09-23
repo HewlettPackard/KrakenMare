@@ -8,16 +8,12 @@ package com.hpe.krakenmare.core;
 import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
 
 @org.apache.avro.specific.AvroGenerated
 public class Agent extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
@@ -81,8 +77,11 @@ static {
     return DECODER.decode(b);
   }
 
+   @JsonProperty
    private long id;
+   @JsonProperty
    private java.util.UUID uuid;
+   @JsonProperty
    private java.lang.CharSequence name;
 
   /**
@@ -432,34 +431,6 @@ static {
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
-  }
-  
-  public Map<String, String> toMap() {
-    return ImmutableMap.of(
-      "id", String.valueOf(id),
-      "uuid", String.valueOf(uuid),
-      "name", String.valueOf(name)
-    );
-  }
-
-  public static Agent fromMap(Map<String, String> map) {
-    Agent record = new Agent();
-    java.lang.Long id = Long.parseLong(map.get("id"));
-    record.setId(id);
-    java.util.UUID uuid = (java.util.UUID) record.getConversion("uuid").fromCharSequence(map.get("uuid"), null, null);
-    record.setUuid(uuid);
-    java.lang.CharSequence name = map.get("name");
-    record.setName(name);
-    return record;
-  }
-
-  public static Agent fromList(List<String> list) {
-    final Map<String, String> hash = new HashMap<>(list.size() / 2, 1);
-    final Iterator<String> iterator = list.iterator();
-    while (iterator.hasNext()) {
-      hash.put(iterator.next(), iterator.next());
-    }
-    return fromMap(hash);
   }
 
 }

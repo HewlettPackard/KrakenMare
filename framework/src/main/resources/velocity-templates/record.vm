@@ -22,19 +22,15 @@ package $schema.getNamespace();
 import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 #if (!$schema.isError())
 import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 #end
 #if (${this.gettersReturnOptional} || ${this.createOptionalGetters})import java.util.Optional;#end
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
 
 #if ($schema.getDoc())
 /** $schema.getDoc() */
@@ -118,6 +114,7 @@ static {
 #foreach ($annotation in $this.javaAnnotations($field))
   @$annotation
 #end
+   @JsonProperty
   #if (${this.deprecatedFields()})@Deprecated#end #if (${this.publicFields()})public#elseif (${this.privateFields()})private#end ${this.javaUnbox($field.schema())} ${this.mangle($field.name(), $schema.isError())};
 #end
 #if ($schema.isError())
@@ -538,46 +535,6 @@ static {
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
-  }
-  
-  public Map<String, String> toMap() {
-    return ImmutableMap.<String, String> builder()
-#foreach ($field in $schema.getFields())
-      .put("${this.mangle($field.name())}", String.valueOf(${this.mangle($field.name())}))
-#end
-      .build();
-  }
-
-  public static ${this.mangle($schema.getName())} fromMap(Map<String, String> map) {
-    ${this.mangle($schema.getName())} record = new ${this.mangle($schema.getName())}();
-#foreach ($field in $schema.getFields())
-#if (${this.javaType($field.schema())} == "java.lang.Boolean")
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Boolean.parseBoolean(map.get("${this.mangle($field.name())}"));
-#elseif (${this.javaType($field.schema())} == "java.lang.Integer")
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Integer.parseInt(map.get("${this.mangle($field.name())}"));
-#elseif (${this.javaType($field.schema())} == "java.lang.Long")
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Long.parseLong(map.get("${this.mangle($field.name())}"));
-#elseif (${this.javaType($field.schema())} == "java.lang.Float")
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = Float.parseFloat(map.get("${this.mangle($field.name())}"));
-#else
-#if (${this.conversionInstance($field.schema())} != "null")
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = (${this.javaType($field.schema())}) record.getConversion("${this.mangle($field.name())}").fromCharSequence(map.get("${this.mangle($field.name())}"), null, null);
-#else
-    ${this.javaType($field.schema())} ${this.mangle($field.name())} = map.get("${this.mangle($field.name())}");
-#end
-#end
-    record.${this.generateSetMethod($schema, $field)}(${this.mangle($field.name())});
-#end
-    return record;
-  }
-
-  public static ${this.mangle($schema.getName())} fromList(List<String> list) {
-    final Map<String, String> hash = new HashMap<>(list.size() / 2, 1);
-    final Iterator<String> iterator = list.iterator();
-    while (iterator.hasNext()) {
-      hash.put(iterator.next(), iterator.next());
-    }
-    return fromMap(hash);
   }
 
 #if ($this.isCustomCodable($schema))
