@@ -157,23 +157,24 @@ class FanIn():
 			
 			for key, value in myMQTTmessage.items():
 				print(str(key) + ':' + str(value))
+				
 				# reassemble message to Kafka avro syntax
+				#TODO: for now Druid ingest spec only support flattened JSON, easier for POC to write flat JSON than nested (maps)
 				"""
 					{'timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}
 					timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}}
 				"""
 				
-				timestamp = str(key)
-				kafka_message[timestamp] = {}
+				kafka_message['timestamp'] = str(key)
 				
 				# go through sensors and add measurements for each sensor
 				for subkey, value in myMQTTmessage[key].items():	
-					kafka_message[timestamp][subkey] = value
+					kafka_message[subkey] = value
 
-			# publish assembled message to kafka
-			print("Publishing to Kafka topic (" + "fabric" + "): " + str(kafka_message))
-			self.kafka_producer.produce("fabric", json.dumps(kafka_message).encode('utf-8'))
-			#self.kafka_producer.flush()
+				# publish assembled message to kafka
+				print("Publishing to Kafka topic (" + "fabric" + "): " + str(kafka_message))
+				self.kafka_producer.produce("fabric", json.dumps(kafka_message).encode('utf-8'))
+				#self.kafka_producer.flush()
 			
 	# END MQTT agent methods   
 	#######################################################################################
