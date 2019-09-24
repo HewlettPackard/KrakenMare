@@ -1,7 +1,7 @@
 {
 "type": "record",
 "name": "RegisterResponse",
-"namespace": "com.hpe.krakenmare.manager",
+"namespace": "com.hpe.krakenmare.message.manager",
 "fields": [
 	{
 		"name": "agentID",

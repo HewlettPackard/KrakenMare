@@ -1,7 +1,7 @@
 {
 "type": "record",
-"name": "SensorListUpdate",
-"namespace": "com.hpe.krakenmare.agent",
+"name": "SensorList",
+"namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
 	{
 		"name": "uuid",
@@ -10,7 +10,10 @@
 	},
 	{
 		"name": "devices",
-		"type": "Device"
+		"type": {
+			"type": "array",
+			"items": "com.hpe.krakenmare.core.Device"
+		}
 	}
 ]
 }

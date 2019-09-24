@@ -1,7 +1,7 @@
 {
 "type": "record",
 "name": "Deregister",
-"namespace": "com.hpe.krakenmare.agent",
+"namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
 	{
 		"name": "uuid",

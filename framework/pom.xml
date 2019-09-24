@@ -140,8 +140,8 @@
 							<sourceDirectory>${project.basedir}/../config-schemaregistry/</sourceDirectory>
 							<outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
 							<imports>
-								<import>${project.basedir}/../config-schemaregistry/com.hpe.krakenmare.agent-sensor.avsc</import>
-								<import>${project.basedir}/../config-schemaregistry/com.hpe.krakenmare.agent-device.avsc</import>
+								<import>${project.basedir}/../config-schemaregistry/com.hpe.krakenmare.core-sensor.avsc</import>
+								<import>${project.basedir}/../config-schemaregistry/com.hpe.krakenmare.core-device.avsc</import>
 							</imports>
 						</configuration>
 					</execution>

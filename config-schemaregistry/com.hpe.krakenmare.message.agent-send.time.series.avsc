@@ -1,7 +1,7 @@
 {
 "type": "record",
-"name": "SendEvents",
-"namespace": "com.hpe.krakenmare.agent",
+"name": "SendTimeSeries",
+"namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
 	{
 		"name": "uuid",
@@ -12,7 +12,7 @@
 		"name": "measurementList",
 		"type": {
 			"type": "record",
-			"name": "EventMeasurement",
+			"name": "TimeSeriesMeasurement",
 			"fields": [
 				{
 					"name": "sensorUUID",
@@ -23,9 +23,9 @@
 					"name": "values",
 					"type": {
 						"type": "map",
-						"values": "string",
-						"doc": "Events as strings"
-					}
+						"values": "float",
+						"doc": "Time series data as floats. First float is timestamp"
+						}
 				}
 			]
 		}
