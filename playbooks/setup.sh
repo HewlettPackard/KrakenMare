@@ -174,7 +174,7 @@ if [ "$build" == "1" ]; then
      docker-compose  push || exit 1
 fi
 
-if [ "$stop" == "1" ] || [ ]"$deploy" == "1" ]; then
+if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
      docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
 fi
 
