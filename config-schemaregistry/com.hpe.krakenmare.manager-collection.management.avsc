@@ -5,7 +5,7 @@
 "fields": [
 	{
 		"name": "uuid",
-		"type": "int",
+		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "Unique framework identifier"
 	},
 	{

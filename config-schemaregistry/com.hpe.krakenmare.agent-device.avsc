@@ -5,7 +5,7 @@
 "fields": [
 	{
 		"name": "deviceUUID",
-		"type": "int",
+		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "UUID of the device"
 	},
 	{

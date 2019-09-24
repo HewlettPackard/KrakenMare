@@ -5,7 +5,7 @@
 "fields": [
 	{
 		"name": "agentID",
-		"type": "int",
+		"type": "string",
 		"doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
 	},
 	{
@@ -20,7 +20,7 @@
 	},
 	{
 		"name": "uuid",
-		"type": "int",
+		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "Framework unique identifier for all other communication"
 	},
 	{

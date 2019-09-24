@@ -5,7 +5,7 @@
 "fields": [
 	{
 		"name": "uuid",
-		"type": "int",
+		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "Unique framework identifier"
 	},
 	{
@@ -16,7 +16,7 @@
 			"fields": [
 				{
 					"name": "sensorUUID",
-					"type": "int",
+					"type": {"type": "string", "logicalType":"uuid"},
 					"doc": "Unique sensor identifier"
 				},
 				{

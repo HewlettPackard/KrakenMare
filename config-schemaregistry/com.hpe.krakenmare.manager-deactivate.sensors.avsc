@@ -5,14 +5,14 @@
 "fields": [
 	{
 		"name": "uuid",
-		"type": "int",
+		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "Unique framework identifier"
 	},
 	{
 		"name": "sensorList",
 		"type": {
 			"type": "array",
-			"items": "int"
+			"items": {"type": "string", "logicalType":"uuid"}
 			},
 		"doc": "Deactivate list of sensors by uuid"
 	}

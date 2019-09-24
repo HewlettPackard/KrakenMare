@@ -5,7 +5,7 @@
 "fields": [
 	{
 		"name": "agentID",
-		"type": "int",
+		"type": "string",
 		"doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
 	},
 	{
