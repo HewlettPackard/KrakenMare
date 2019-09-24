@@ -12,7 +12,6 @@ echo "removing MQTT Sink Connector"
 
 curl -X DELETE "https://connect:8083/connectors/mqtt-sink-reg-res" --cert /run/secrets/connect.certificate.pem --key /run/secrets/connect.key --tlsv1.2 --cacert /run/secrets/km-ca-1.crt
 
-
 echo ""
 echo "creating MQTT Sink Connector"
 
