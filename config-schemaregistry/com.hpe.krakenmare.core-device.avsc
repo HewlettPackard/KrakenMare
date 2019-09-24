@@ -4,12 +4,12 @@
 "namespace": "com.hpe.krakenmare.core",
 "fields": [
 	{
-		"name": "deviceUUID",
+		"name": "uuid",
 		"type": {"type": "string", "logicalType":"uuid"},
 		"doc": "UUID of the device"
 	},
 	{
-		"name": "deviceID",
+		"name": "id",
 		"type": "string",
 		"doc": "Unique id"
 	},
