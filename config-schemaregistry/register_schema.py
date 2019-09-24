@@ -1,4 +1,5 @@
 # https://gist.github.com/aseigneurin/5730c07b4136a84acb5aeec42310312c
+# modified by jeff.hanson@hpe.com to add security features below
 import os
 import sys
 

@@ -12,12 +12,14 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 # - bash
 # - wait-for (netcat) and wait-for from configbase
 # - python for script that pushes to schemaregistry. Plus os, sys and requests modules.
-#   Installing this deb needs wget to featch the key, gnupg to validate, add-apt-repository (from software-properties-common) to add the repository
-#   The deb file that is installed uses apt-utils to post process it
-#   Java is required by kafka-configs. Use the same version that the kafka containers have
+# - curl to get avro-cli
+# - apt-utils to process deb conf
+# - avro-cli to check the validity of avro schema files
+# - Java 8 is required by avro-cli (java 11 causes issues with Springframework)
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash netcat python3 python3-requests
+RUN apt-get update && apt-get install -y bash netcat python3 python3-requests openjdk-8-jre-headless curl apt-utils
+RUN cd /tmp/ && curl -L -O https://github.com/rkluszczynski/avro-cli/releases/download/avro-cli-0.2.7/avro-cli-0.2.7.jar
 COPY --from=configbase /tmp/wait-for /tmp/wait-for
 
 COPY *.avsc register_schema.py entrypoint.sh /tmp/
