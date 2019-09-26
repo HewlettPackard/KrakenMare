@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import org.apache.kafka.streams.StreamsConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -14,7 +13,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.hpe.krakenmare.api.Framework;
 import com.hpe.krakenmare.impl.FrameworkImpl;
 
@@ -31,25 +29,21 @@ public class Main {
 			LOG.error("Unable to load properties", e);
 		}
 
-		// bootstrap servers can be overridden via ENV or properties
-		String bootstrapServersProp = System.getProperty("BOOTSTRAP_SERVERS");
-		if (!Strings.isNullOrEmpty(bootstrapServersProp)) {
-			PROPERTIES.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersProp);
-		} else {
-			String bootstrapServersEnv = System.getenv("BOOTSTRAP_SERVERS");
-			if (!Strings.isNullOrEmpty(bootstrapServersEnv)) {
-				PROPERTIES.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersEnv);
-			}
-		}
+		// override with env parameters and then with command line (-Dxxxx=yyyy) parameters
+		for (Object key : PROPERTIES.keySet()) {
+			if (key instanceof String) {
+				String keyStr = (String) key;
 
-		// redis server can be overridden via ENV or properties
-		String redisServerProp = System.getProperty("REDIS_SERVER");
-		if (!Strings.isNullOrEmpty(redisServerProp)) {
-			PROPERTIES.put("redis.server", redisServerProp);
-		} else {
-			String redisServerEnv = System.getenv("REDIS_SERVER");
-			if (!Strings.isNullOrEmpty(redisServerEnv)) {
-				PROPERTIES.put("redis.server", redisServerEnv);
+				String envKey = keyStr.replace(".", "_").toUpperCase();
+				String value = System.getenv(envKey);
+				if (value != null) {
+					PROPERTIES.put(keyStr, value);
+				}
+
+				value = System.getProperty(keyStr);
+				if (value != null) {
+					PROPERTIES.put(keyStr, value);
+				}
 			}
 		}
 	}
