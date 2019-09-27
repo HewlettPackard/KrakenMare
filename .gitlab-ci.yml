@@ -11,6 +11,7 @@ test-framework:
   image: maven:3.6.0-jdk-8
   services:
   - redis:5.0.3
+  - eclipse-mosquitto:latest
   before_script:
     # proxy settings
     - "host=`echo $https_proxy | cut -d: -f2 | cut -d/ -f3`"
@@ -24,7 +25,7 @@ test-framework:
     paths:
       - .mvnrepo
   script:
-  - mvn -f framework/pom.xml -P coverage -Dredis.server=redis:6379 test jacoco:report
+  - mvn -f framework/pom.xml -P coverage -Dredis.server=redis:6379 -Dmqtt.server=eclipse-mosquitto:1883 test jacoco:report
   - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
   only:
     changes:

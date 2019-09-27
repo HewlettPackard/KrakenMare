@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
-import com.hpe.krakenmare.repositories.AgentRedisRepository;
 import com.hpe.krakenmare.serde.JsonSerdes;
 
 public class KafkaRegistrationStream {
@@ -39,10 +39,10 @@ public class KafkaRegistrationStream {
 	public final static String REQUEST_TOPIC = PROPERTIES.getProperty("km.registration.request-topic");
 	public final static String RESULT_TOPIC = PROPERTIES.getProperty("km.registration.result-topic");
 
-	private final AgentRedisRepository repository;
+	private final Repository<Agent> repository;
 	private KafkaStreams streams;
 
-	public KafkaRegistrationStream(AgentRedisRepository repository) {
+	public KafkaRegistrationStream(Repository<Agent> repository) {
 		this.repository = repository;
 
 		final Serde<String> stringSerde = Serdes.String();
