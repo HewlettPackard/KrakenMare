@@ -1,18 +1,12 @@
 package com.hpe.krakenmare.api;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface Repository<T> {
 
 	void reset();
 
-	default T create(String id) {
-		UUID uuid = UUID.randomUUID();
-		return create(id, uuid);
-	}
-
-	T create(CharSequence id, UUID uuid);
+	T create(T payload);
 
 	boolean save(T entity);
 

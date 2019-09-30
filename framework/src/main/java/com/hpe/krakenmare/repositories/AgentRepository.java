@@ -25,10 +25,11 @@ public class AgentRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent create(CharSequence name, UUID uuid) {
+	public Agent create(Agent payload) {
 		long id = index.getAndIncrement();
-		LOG.info("Creating new agent: id='{}', name='{}', uuid='{}'", id, name, uuid);
-		return new Agent(id, uuid, name);
+		UUID uuid = UUID.randomUUID();
+		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
+		return new Agent(id, payload.getUid(), uuid, payload.getName());
 	}
 
 	@Override

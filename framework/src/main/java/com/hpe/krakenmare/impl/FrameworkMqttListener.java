@@ -19,7 +19,6 @@ public class FrameworkMqttListener {
 	final static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
 	final static String clientId = FrameworkMqttListener.class.getSimpleName();
 	final static String registrationRequestTopic = Main.getProperty("km.registration.mqtt.topic");
-	final static int qos = Integer.parseInt(Main.getProperty("km.registration.mqtt.qos"));
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
@@ -27,6 +26,7 @@ public class FrameworkMqttListener {
 	IMqttClient client;
 
 	public FrameworkMqttListener() {
+		// properly release MQTT connection on shutdown
 		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 	}
 
@@ -34,11 +34,11 @@ public class FrameworkMqttListener {
 		return client;
 	}
 
-	public void addSubscriber(String topicFilter, int qos, IMqttMessageListener messageListener) throws MqttException {
+	public void addSubscriber(String topicFilter, IMqttMessageListener messageListener) throws MqttException {
 		if (client == null) {
 			throw new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED);
 		}
-		client.subscribe(topicFilter, qos, messageListener);
+		client.subscribe(topicFilter, messageListener);
 		LOG.info("New subscriber for topic '" + topicFilter + "': " + messageListener);
 	}
 
@@ -74,7 +74,6 @@ public class FrameworkMqttListener {
 				LOG.info("Disconnected");
 			} catch (MqttException me) {
 				LOG.error("Unable to disconnect from MQTT", me);
-
 			}
 		}
 	}

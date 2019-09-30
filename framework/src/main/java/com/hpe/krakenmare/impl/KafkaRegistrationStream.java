@@ -66,7 +66,7 @@ public class KafkaRegistrationStream {
 	}
 
 	private Agent registerNewAgent(Agent payload) {
-		Agent agent = repository.create(payload.getName(), payload.getUuid());
+		Agent agent = repository.create(payload);
 		repository.save(agent);
 		return agent;
 	}
