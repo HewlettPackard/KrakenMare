@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -73,7 +74,7 @@ public class Main {
 
 	}
 
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException, MqttException {
 		LOG.info("Starting framework...");
 		final FrameworkImpl framework = new FrameworkImpl();
 		framework.startFramework();

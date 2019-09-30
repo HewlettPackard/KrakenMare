@@ -15,13 +15,12 @@ import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
-import com.hpe.krakenmare.repositories.AgentRepository;
 
 public class MqttRegistrationListener implements IMqttMessageListener {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttRegistrationListener.class);
 
-	public static void registerNew(FrameworkMqttListener listener, AgentRepository agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttListener listener, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getRegistrationRequestTopic(), new MqttRegistrationListener(agentRepo, listener.getClient()));
 	}
 
