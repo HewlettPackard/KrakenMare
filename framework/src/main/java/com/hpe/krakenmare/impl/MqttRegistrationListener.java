@@ -33,23 +33,27 @@ public class MqttRegistrationListener implements IMqttMessageListener {
 	}
 
 	@Override
-	public void messageArrived(String topic, MqttMessage message) throws Exception {
+	public void messageArrived(String topic, MqttMessage message) {
 		LOG.info("Message received on topic '" + topic + "': " + message);
-		RegisterRequest request = RegisterRequest.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
+		try {
+			RegisterRequest request = RegisterRequest.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
 
-		String name = request.getName().toString();
-		String uid = request.getAgentID().toString();
-		Agent agent = new Agent(-1l, uid, null, name);
-		agent = registerNewAgent(agent);
-		UUID uuid = agent.getUuid();
+			String name = request.getName().toString();
+			String uid = request.getAgentID().toString();
+			Agent agent = new Agent(-1l, uid, null, name);
+			agent = registerNewAgent(agent);
+			UUID uuid = agent.getUuid();
 
-		RegisterResponse resp = new RegisterResponse(uid, true, "Registration succeed", uuid, Collections.emptyMap());
-		byte[] payload = resp.toByteBuffer().array();
+			RegisterResponse resp = new RegisterResponse(uid, true, "Registration succeed", uuid, Collections.emptyMap());
+			byte[] payload = resp.toByteBuffer().array();
 
-		String respTopic = MqttUtils.getRegistrationResponseTopic(agent);
-		MqttMessage mqttResponse = new MqttMessage(payload);
-		LOG.info("Sending message to topic '" + respTopic + "': " + mqttResponse);
-		mqtt.publish(respTopic, mqttResponse);
+			String respTopic = MqttUtils.getRegistrationResponseTopic(agent);
+			MqttMessage mqttResponse = new MqttMessage(payload);
+			LOG.info("Sending message to topic '" + respTopic + "': " + mqttResponse);
+			mqtt.publish(respTopic, mqttResponse);
+		} catch (Exception e) {
+			LOG.error("Exception occured during message handling", e);
+		}
 	}
 
 	private Agent registerNewAgent(Agent agent) {
