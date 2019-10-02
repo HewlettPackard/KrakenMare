@@ -26,8 +26,8 @@ import org.apache.avro.util.Utf8;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 #if (!$schema.isError())
-import org.apache.avro.message.BinaryMessageEncoder;
-import org.apache.avro.message.BinaryMessageDecoder;
+import org.apache.avro.message.RawMessageEncoder;
+import org.apache.avro.message.RawMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 #end
 #if (${this.gettersReturnOptional} || ${this.createOptionalGetters})import java.util.Optional;#end
@@ -55,35 +55,26 @@ static {
 #end
 
 #if (!$schema.isError())
-  private static final BinaryMessageEncoder<${this.mangle($schema.getName())}> ENCODER =
-      new BinaryMessageEncoder<${this.mangle($schema.getName())}>(MODEL$, SCHEMA$);
+  private static final RawMessageEncoder<${this.mangle($schema.getName())}> ENCODER =
+      new RawMessageEncoder<${this.mangle($schema.getName())}>(MODEL$, SCHEMA$);
 
-  private static final BinaryMessageDecoder<${this.mangle($schema.getName())}> DECODER =
-      new BinaryMessageDecoder<${this.mangle($schema.getName())}>(MODEL$, SCHEMA$);
+  private static final RawMessageDecoder<${this.mangle($schema.getName())}> DECODER =
+      new RawMessageDecoder<${this.mangle($schema.getName())}>(MODEL$, SCHEMA$);
 
   /**
-   * Return the BinaryMessageEncoder instance used by this class.
+   * Return the RawMessageEncoder instance used by this class.
    * @return the message encoder used by this class
    */
-  public static BinaryMessageEncoder<${this.mangle($schema.getName())}> getEncoder() {
+  public static RawMessageEncoder<${this.mangle($schema.getName())}> getEncoder() {
     return ENCODER;
   }
 
   /**
-   * Return the BinaryMessageDecoder instance used by this class.
+   * Return the RawMessageDecoder instance used by this class.
    * @return the message decoder used by this class
    */
-  public static BinaryMessageDecoder<${this.mangle($schema.getName())}> getDecoder() {
+  public static RawMessageDecoder<${this.mangle($schema.getName())}> getDecoder() {
     return DECODER;
-  }
-
-  /**
-   * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
-   * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
-   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
-   */
-  public static BinaryMessageDecoder<${this.mangle($schema.getName())}> createDecoder(SchemaStore resolver) {
-    return new BinaryMessageDecoder<${this.mangle($schema.getName())}>(MODEL$, SCHEMA$, resolver);
   }
 
   /**
