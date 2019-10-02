@@ -6,14 +6,14 @@ from kafka.errors import KafkaUnavailableError
 import subprocess
 
 # Time to wait between requests
-SLEEP = 120
-kafka_broker = "broker-1"
+SLEEP = 60
+kafka_broker = "broker-1:9092"
 
 # wait for Kafka broker to answer
 producer = None
 
 while not producer:
-    time.sleep(1)
+    time.sleep(5)
     try:
         producer = KafkaProducer(bootstrap_servers=[kafka_broker],value_serializer=lambda m: json.dumps(m).encode('utf8'))
     except KafkaUnavailableError:
@@ -35,5 +35,5 @@ while True:
     print('Publishing via Kafka')
     producer.send('ilo', rfdict)
 
-    # Infinite loop - Redfish is slow so wait 2'
+    # Infinite loop - Redfish is slow so wait 1 min'
     time.sleep(SLEEP)
