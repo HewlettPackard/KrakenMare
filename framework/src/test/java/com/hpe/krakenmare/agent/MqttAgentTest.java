@@ -33,7 +33,6 @@ public class MqttAgentTest {
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgentTest.class);
 
 	static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
-	static String registrationRequestTopic = Main.getProperty("km.registration.mqtt.topic");
 
 	private final String myName = MqttAgentTest.class.getSimpleName();
 	private final String myId = myName + "-" + System.currentTimeMillis();
@@ -59,14 +58,14 @@ public class MqttAgentTest {
 			mqtt.connect(connOpts);
 			LOG.info("Connected");
 
-			CountDownLatch registrationLacth = new CountDownLatch(1);
+			CountDownLatch registrationLatch = new CountDownLatch(1);
 			mqtt.subscribe(myManagerTopic, (topic, message) -> {
 				LOG.info("Message received on topic '" + topic + "': " + message);
 				RegisterResponse response = RegisterResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
 				UUID uuid = response.getUuid();
 				agent.setUuid(uuid);
 				LOG.info("UUID received from manager: " + uuid);
-				registrationLacth.countDown();
+				registrationLatch.countDown();
 			});
 
 			RegisterRequest req = new RegisterRequest(agent.getUid(), "test-agent", agent.getName(), "A Java based test agent", false);
@@ -79,7 +78,7 @@ public class MqttAgentTest {
 
 			try {
 				// await registration response
-				if (!registrationLacth.await(5, TimeUnit.SECONDS)) {
+				if (!registrationLatch.await(5, TimeUnit.SECONDS)) {
 					fail("No registration response received");
 				}
 			} finally {
@@ -90,6 +89,10 @@ public class MqttAgentTest {
 			// at the end of registration process, agent UUID must be set
 			assertNotNull(agent.getUuid());
 		}
+	}
+
+	public static void main(String[] args) throws IOException, InterruptedException, MqttException {
+		new MqttAgentTest().register();
 	}
 
 }

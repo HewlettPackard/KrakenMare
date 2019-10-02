@@ -18,7 +18,6 @@ public class FrameworkMqttListener {
 
 	final static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
 	final static String clientId = FrameworkMqttListener.class.getSimpleName();
-	final static String registrationRequestTopic = Main.getProperty("km.registration.mqtt.topic");
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
