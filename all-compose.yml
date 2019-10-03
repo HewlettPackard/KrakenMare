@@ -536,6 +536,7 @@ services:
       - "31760:31757"
     environment:
       REDIS_SERVER: "redis:6379"
+      MQTT_SERVER: "mosquitto:1883"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
     <<: *deploy
     networks:
