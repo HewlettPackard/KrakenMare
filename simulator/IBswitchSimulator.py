@@ -18,6 +18,7 @@ import string
 import configparser
 from random import *
 import socket
+import platform
 
 # import special classes
 import confluent_kafka
@@ -26,9 +27,17 @@ from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaExceptio
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 
+# avro imports
+import avro.schema    # pip3 install avro-python3
+import avro.io        # pip3 install avro-python3
+import avro.datafile  # pip3 install avro-python3
+import pathlib
+import io
+
 # project imports
 from version import __version__
-
+from schema_registry.client import SchemaRegistryClient, schema
+from schema_registry.serializers import MessageSerializer
 
 ### START IBswitchSimulator class ##################################################
 class IBswitchSimulator():
@@ -52,14 +61,35 @@ class IBswitchSimulator():
                 self.seedOutputDir = self.config.get('Others', 'seedOutputDir')
                 self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
                 
-                # Register to the framework
+                # id comes from the framework manager as a convenience incremental id
                 self.myAgent_id = -1
-                self.myAgent_uuid = str(uuid.uuid4())
-                self.myAgentName = "agent-ibswitchSim-1"
+                # uuid comes from the central framework manager
+                self.myAgent_uuid = -1
+                self.myAgentName = "IBSwitchSimulator"
+                self.data_topic = "ibswitch"
                 self.myMQTTregistered = False
-                self.kafka_producer = None
-                self.kafka_consumer = None
+                # Agent uid as provided by the discovery mecanism.
+                # for now use the hostname, should be the output of the discovery mecanism
+                self.myAgent_uid = platform.node()
 
+                conf = { 'url': "https://schemaregistry:8081", 'ssl.ca.location': "/run/secrets/km-ca-1.crt", 'ssl.certificate.location': "/run/secrets/schemaregistry.certificate.pem", 'ssl.key.location': "/run/secrets/schemaregistry.key"}
+
+                client = SchemaRegistryClient(conf)
+                subject = "com-hpe-krakenmare-message-agent-register-request"
+                register_request_schema = client.get_schema(subject).schema
+
+                #two ugly things, replace ' by '' and True  by true to have proper avro-parsable JSON
+                #tbd fix me
+                mystring = str(register_request_schema)
+                buffer = mystring.replace("'",'"')
+                self.schema_register_request = avro.schema.Parse(buffer.replace("True","true"))
+                
+                subject  ="com-hpe-krakenmare-message-manager-register-response"
+                register_response_schema = client.get_schema(subject).schema
+                mystring = str(register_response_schema)
+                buffer = mystring.replace("'",'"')
+                self.schema_register_response = avro.schema.Parse(buffer.replace("True","true"))
+                
         def resetLogLevel(self, logLevel):
                 """
                         Resets the log level 
@@ -112,41 +142,46 @@ class IBswitchSimulator():
                 
                 print("message received: %s " % message.payload)
                 print("message topic: %s" % message.topic)
-                data = json.loads(message.payload)
-                data_uuid = data.get("uuid")
-                if data_uuid == self.myAgent_uuid:
-                        print("got registration-result with matching UUID: %s" % data_uuid)
-                        self.myMQTTregistered = True
-                        self.myAgent_id = data.get("id")
-                else:
-                        print("ignoring registration-result with foreign UUID: %s" % data_uuid)
-                
+                reader = avro.io.DatumReader(self.schema_register_response)
+                bytes_reader = io.BytesIO(message.payload)
+                decoder = avro.io.BinaryDecoder(bytes_reader)
+                data = reader.read(decoder)
+                print("registration-result with km UUID: %s" % data['uuid'])
+                self.myMQTTregistered = True
+                self.myAgent_uuid = data['uuid']
         
         def mqtt_registration(self):
                 registration_client = mqtt.Client("RegistrationClient")
                 registration_client.on_log = self.mqtt_on_log
                 registration_client.on_message = self.mqtt_on_registration_result
+                print ("connecting to mqtt broker:"+self.mqtt_broker)
                 registration_client.connect(self.mqtt_broker)
                 registration_client.loop_start()
         
-                registration_client.subscribe("registration-result")
-                
-                # Generate a uuid to send over as the name
-                registration_payload = {}
-                registration_payload["name"] = self.myAgentName
-                registration_payload["uuid"] = self.myAgent_uuid
-                data_out = json.dumps(registration_payload)
+                registration_client.subscribe("registration/"+self.myAgent_uid+"/response")
+
+                writer = avro.io.DatumWriter(self.schema_register_request)                 
+                RegistrationData = { "agentID" : self.myAgent_uid,
+                             "type" : "simulatorAgent",
+                             "name" : "IBswitchSimulator",
+                             "description": "This is a fine description",
+                             "useSensorTemplate": False }
+
+                bytes_writer = io.BytesIO()
+                encoder = avro.io.BinaryEncoder(bytes_writer)
+                writer.write(RegistrationData, encoder)
+                raw_bytes = bytes_writer.getvalue()
                 
                 # use highest QoS for now
-                print("sending registration payload: %s" % data_out)
-                registration_client.publish("registration-request/r1ib", data_out, 2, True)
+                print("sending registration payload: --%s--" % raw_bytes)
+                registration_client.publish("registration/"+self.myAgent_uid+"/request", raw_bytes, 2, True)
                 
                 while not self.myMQTTregistered:
                     time.sleep(1)
                     print("waiting for registration result...")
                 
                 registration_client.loop_stop()
-                print("registered with name '%s' and id '%d'" % (self.myAgentName, self.myAgent_id))
+                print("registered with uid '%s' and km-uuid '%s'" % (self.myAgent_uid, self.myAgent_uuid))
         # END MQTT agent methods   
         #######################################################################################
         
@@ -155,6 +190,7 @@ class IBswitchSimulator():
                 
                 if (pubsubType == "mqtt"):
                         client = mqtt.Client("DataClient")
+                        print ("connecting to mqtt broker")
                         client.connect(self.mqtt_broker, self.mqtt_port)
                 elif (pubsubType == "kafka"):
                         # self.kafka_check_topic("fabric")
@@ -269,8 +305,8 @@ class IBswitchSimulator():
                         data_out_new = json.dumps(query_output_new).encode('utf-8')
                         
                         if (pubsubType == "mqtt"):
-                                print("Publishing via mqtt")
-                                client.publish("ibswitch", data_out_new)
+                                print("Publishing via mqtt (topic:%s)" % self.data_topic)
+                                client.publish(self.data_topic, data_out_new)
                         elif (pubsubType == "kafka"):
                                 #ToDO: write AVRO
                                 print("Publishing via kafka")
@@ -290,11 +326,9 @@ class IBswitchSimulator():
         def run(self, mode, local, debug):
                 # local and debug flag are not used from here at the moment
                 
-                self.kafka_check_topic("registration-result")           
-                
                 if mode == "mqtt":
                         print("mqtt mode")
-                        #self.mqtt_registration()
+                        self.mqtt_registration()
                         self.send_data("mqtt")
                 else:
                         print("Kafka mode")
