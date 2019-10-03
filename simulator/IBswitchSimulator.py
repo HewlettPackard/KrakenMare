@@ -20,7 +20,6 @@ from random import *
 import socket
 
 # import special classes
-import uuid
 import confluent_kafka
 from confluent_kafka import Producer as KafkaProducer
 from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
@@ -41,13 +40,9 @@ class IBswitchSimulator():
                         Class init
                 '''
                 
-                self.sensors = []
-                
                 self.loggerName = "simulator.agent."+__version__+".log"
                    
                 self.config = self.checkConfigurationFile(configFile, ['Daemon', 'Logger', 'Kafka', 'MQTT'])
-                
-                #self.logger = self.helperFunctions.setLogger(self.config, self.loggerName)
                 
                 self.kafka_broker = self.config.get('Kafka', 'kafka_broker')
                 self.kafka_port = int(self.config.get('Kafka', 'kafka_port'))
@@ -105,7 +100,6 @@ class IBswitchSimulator():
                 
                 return config
         
-
         #######################################################################################
         # MQTT agent methods
         def mqtt_on_log(self, client, userdata, level, buf):
@@ -156,61 +150,6 @@ class IBswitchSimulator():
         # END MQTT agent methods   
         #######################################################################################
         
-        
-    #######################################################################################
-    # Kafka agent methods
-
-        # Kafka error printer
-        def kafka_producer_error_cb(self, err):
-                print('error_cb', err)
-        
-        # connect to Kafka broker as producer to check topic 'myTopic'
-        def kafka_check_topic(self, myTopic):
-                
-                print("Connecting as kafka consumer to check for topic: " + myTopic)
-                test = False
-                
-                conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
-                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
-                
-                while test == False:
-                        time.sleep(1)
-                        print("waiting for kafka producer to connect")
-                        
-                        try:
-                                #shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-                                kafka_producer = KafkaProducer(conf)
-                                kafka_producer.list_topics(topic=myTopic, timeout=0.2)
-                                test = True
-                        except KafkaException as e:
-                                #print(e.args[0])
-                                print("waiting for " + myTopic + " topic...")
-        
-        # connect to Kafka broker as producer
-        def kafka_producer_connect(self):
-                test = False
-                
-                conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
-                  'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
-                
-                while test == False:
-                        time.sleep(1)
-                        print("waiting for kafka producer to connect")
-                        
-                        try:
-                                #shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
-                                self.kafka_producer = KafkaProducer(conf)
-                                self.kafka_producer.list_topics(timeout=0.2)
-                                test = True
-                        except KafkaException as e:
-                                print(e.args[0])
-                                print("waiting for Kafka brokers..." + self.bootstrapServerStr)
-                
-                print("kafka producer connected")
-
-    # END Kafka agent methods
-    #######################################################################################
-    
     # send simulated sensor data via MQTT or Kafka, depending on command line flag
         def send_data(self, pubsubType):
                 
@@ -393,9 +332,6 @@ def main():
                 # load container config
                 myIBswitchSimulator = IBswitchSimulator('IBswitchSimulator.cfg', 'container')
         
-        if(options.logLevel):
-                myIBswitchSimulator.resetLogLevel(options.logLevel)
-
         if(options.modename == 'kafka'):
                 myIBswitchSimulator.run("kafka", local=option_dict['local'], debug=option_dict['debug'])
                                         
