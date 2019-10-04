@@ -2,22 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-@license: This Source Code Form is subject to the terms of the 
+@license: This Source Code Form is subject to the terms of the
 @organization: Hewlett-Packard Enterprise (HPE)
 @author: Torsten Wilde
 """
 
 # import from OS
-import subprocess
 import json
 import time
 import os
-import re
 import sys
-import string
 import configparser
-from random import *
-import socket
+import random
 import platform
 
 # import special classes
@@ -28,15 +24,15 @@ from optparse import OptionParser
 import avro.schema  # pip3 install avro-python3
 import avro.io  # pip3 install avro-python3
 import avro.datafile  # pip3 install avro-python3
-import pathlib
 import io
 
 # project imports
 from version import __version__
-from schema_registry.client import SchemaRegistryClient, schema
-from schema_registry.serializers import MessageSerializer
+from schema_registry.client import SchemaRegistryClient
 
-### START IBswitchSimulator class ##################################################
+# START IBswitchSimulator class
+
+
 class IBswitchSimulator:
     registered = False
     loggerName = None
@@ -65,35 +61,38 @@ class IBswitchSimulator:
         self.data_topic = "ibswitch"
         self.myMQTTregistered = False
         # Agent uid as provided by the discovery mecanism.
-        # for now use the hostname, should be the output of the discovery mecanism
+        # for now use the hostname, should be the output of the disc mecanism
         self.myAgent_uid = platform.node()
 
         conf = {
             "url": "https://schemaregistry:8081",
             "ssl.ca.location": "/run/secrets/km-ca-1.crt",
-            "ssl.certificate.location": "/run/secrets/schemaregistry.certificate.pem",
+            "ssl.certificate.location":
+            "/run/secrets/schemaregistry.certificate.pem",
             "ssl.key.location": "/run/secrets/schemaregistry.key",
         }
 
         client = SchemaRegistryClient(conf)
         subject = "com-hpe-krakenmare-message-agent-register-request"
         cg = None
-        while cg == None:
+        while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
             time.sleep(1)
 
         register_request_schema = cg.schema
 
-        # two ugly things, replace ' by '' and True  by true to have proper avro-parsable JSON
+        # two ugly things
+        # ' --> '' and True --> true to have proper avro-parsable JSON
         # tbd fix me
         mystring = str(register_request_schema)
         buffer = mystring.replace("'", '"')
-        self.schema_register_request = avro.schema.Parse(buffer.replace("True", "true"))
+        self.schema_register_request = avro.schema.Parse(
+            buffer.replace("True", "true"))
 
         subject = "com-hpe-krakenmare-message-manager-register-response"
         cg = None
-        while cg == None:
+        while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
             time.sleep(1)
@@ -105,26 +104,21 @@ class IBswitchSimulator:
             buffer.replace("True", "true")
         )
 
-    def resetLogLevel(self, logLevel):
-        """
-                        Resets the log level 
-                """
-        self.logger = KrakenMareLogger().getLogger(self.loggerName, logLevel)
-
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
     ):
         """
-                        Checks if the submitted.cfg configuration file is found 
-                        and contains required sections
-                        
-                        configurationFileFullPath        - full path to the configuration file (e.g. /home/agent/myConf.cfg)
-                        sectionsToCheck                    - list of sections in the configuration file that should be checked for existence 
-                """
+        Checks if the submitted.cfg configuration file is found
+        and contains required sections
+        configurationFileFullPath:
+        full path to the configuration file (e.g. /home/agent/myConf.cfg)
+        sectionsToCheck:
+        list of sections in the configuration to be checked for existence
+        """
 
         config = configparser.SafeConfigParser()
 
-        if os.path.isfile(configurationFileFullPath) == False:
+        if os.path.isfile(configurationFileFullPath) is False:
             print(
                 "ERROR: the configuration file "
                 + configurationFileFullPath
@@ -144,11 +138,12 @@ class IBswitchSimulator:
             print("Terminating ...")
             sys.exit(2)
 
-        if sectionsToCheck != None:
+        if sectionsToCheck is not None:
             for section in sectionsToCheck:
                 if not config.has_section(section):
                     print(
-                        "ERROR: the configuration file is not correctly set - it does not contain required section: "
+                        "ERROR: the configuration file is not correctly set \
+                        - it does not contain required section: "
                         + section
                     )
                     print("Terminating ...")
@@ -156,7 +151,6 @@ class IBswitchSimulator:
 
         return config
 
-    #######################################################################################
     # MQTT agent methods
     def mqtt_on_log(self, client, userdata, level, buf):
 
@@ -184,7 +178,8 @@ class IBswitchSimulator:
         registration_client.connect(self.mqtt_broker)
         registration_client.loop_start()
 
-        registration_client.subscribe("registration/" + self.myAgent_uid + "/response")
+        registration_client.subscribe(
+            "registration/" + self.myAgent_uid + "/response")
 
         writer = avro.io.DatumWriter(self.schema_register_request)
         RegistrationData = {
@@ -217,7 +212,6 @@ class IBswitchSimulator:
         )
 
     # END MQTT agent methods
-    #######################################################################################
 
     # send simulated sensor data via MQTT
     def send_data(self, pubsubType):
@@ -236,14 +230,15 @@ class IBswitchSimulator:
             # fresh output map
             query_output_new = {}
 
-            # Read formatted JSON data that describes the switches in the IRU (c stands for CMC)
+            # read JSON data describing switches in the IRU (c stands for CMC)
             for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
                 with open(cmc, "r") as f:
                     query_data = json.load(f)
 
-                # For each switch found in the JSON data generate perfquery with -a to summarize the ports
+                # For each switch found in the JSON data ,
+                # generate perfquery with -a to summarize the ports
                 # This simulates a poor quality fabric in heavy use
-                # Using random numbers on 0,1 we update three error counters as down below.
+                # Using random numbers on 0,1 we update 3 error counters as
                 # SymbolErrorCounter increments fastest
                 # LinkedDownedCounter increments slower both fewer and less
                 # PortXmitDiscards increments slowest both fewer and less
@@ -261,11 +256,10 @@ class IBswitchSimulator:
 
                 # go through sensors for device
                 for switch in query_data["Switch"]:
-                    hca = str(switch["HCA"])
-                    port = str(switch["Port"])
                     guid = str(switch["Node_GUID"])
                     # Read in the old query output
-                    output = self.seedOutputDir + "/" + guid + ".perfquery.json"
+                    output = self.seedOutputDir + \
+                        "/" + guid + ".perfquery.json"
                     with open(output, "r") as g:
                         query_output = json.load(g)
                     g.close()
@@ -277,7 +271,7 @@ class IBswitchSimulator:
                     # TODO: remove old query_output
                     query_output["Name"] = self.myAgentName
                     query_output["Timestamp"] = nowint
-                    x = random()
+                    x = random.random()
                     if x > 0.98:
                         query_output["SymbolErrorCounter"] += 1000
                         query_output_new[str(timestamp)][
@@ -298,7 +292,7 @@ class IBswitchSimulator:
                             str(sensorIdPrefix + "-SymbolErrorCounter")
                         ] = query_output["SymbolErrorCounter"]
 
-                    x = random()
+                    x = random.random()
                     if x > 0.99:
                         query_output["LinkDownedCounter"] += 100
                         query_output_new[str(timestamp)][
@@ -319,7 +313,7 @@ class IBswitchSimulator:
                             str(sensorIdPrefix + "-LinkDownedCounter")
                         ] = query_output["LinkDownedCounter"]
 
-                    x = random()
+                    x = random.random()
                     if x > 0.99:
                         query_output["PortXmitDiscards"] += 10
                         query_output_new[str(timestamp)][
@@ -340,23 +334,23 @@ class IBswitchSimulator:
                             str(sensorIdPrefix + "-PortXmitDiscards")
                         ] = query_output["PortXmitDiscards"]
 
-                    query_output["PortXmitData"] += randint(1000, 4000)
+                    query_output["PortXmitData"] += random.randint(1000, 4000)
                     query_output_new[str(timestamp)][
                         str(sensorIdPrefix + "-PortXmitData")
                     ] = query_output["PortXmitData"]
-                    query_output["PortRcvData"] += randint(1000, 4000)
+                    query_output["PortRcvData"] += random.randint(1000, 4000)
                     query_output_new[str(timestamp)][
                         str(sensorIdPrefix + "-PortRcvData")
                     ] = query_output["PortRcvData"]
-                    query_output["PortXmitPkts"] += randint(100, 400)
+                    query_output["PortXmitPkts"] += random.randint(100, 400)
                     query_output_new[str(timestamp)][
                         str(sensorIdPrefix + "-PortXmitPkts")
                     ] = query_output["PortXmitPkts"]
-                    query_output["PortRcvPkts"] += randint(100, 400)
+                    query_output["PortRcvPkts"] += random.randint(100, 400)
                     query_output_new[str(timestamp)][
                         str(sensorIdPrefix + "-PortRcvPkts")
                     ] = query_output["PortRcvPkts"]
-                    query_output["PortXmitWait"] += randint(100, 200)
+                    query_output["PortXmitWait"] += random.randint(100, 200)
                     query_output_new[str(timestamp)][
                         str(sensorIdPrefix + "-PortXmitWait")
                     ] = query_output["PortXmitWait"]
@@ -388,16 +382,14 @@ class IBswitchSimulator:
             self.send_data("mqtt")
 
 
-### END IBswitchSimulator class ##################################################
+# END IBswitchSimulator class
 
 
 def main():
     usage = "usage: %s --mode=mqtt" % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
-    parser.add_option(
-        "--mode", dest="modename", help="specify mode, possible modes are: mqtt"
-    )
+    parser.add_option("--mode", dest="modename", help="specify mode: mqtt")
     parser.add_option(
         "--local",
         action="store_true",
@@ -415,24 +407,26 @@ def main():
     parser.add_option(
         "--logLevel",
         dest="logLevel",
-        help="specify the logger level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+        help="logger level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
     )
 
     (options, _) = parser.parse_args()
 
     option_dict = vars(options)
 
-    if option_dict["modename"] == None:
+    if option_dict["modename"] is None:
         print("Incorrect usage")
         parser.print_help()
         sys.exit(0)
 
-    if options.local == True:
+    if options.local is True:
         # load development config to run outside of container
-        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator_dev.cfg", "local")
+        myIBswitchSimulator = IBswitchSimulator(
+            "IBswitchSimulator_dev.cfg", "local")
     else:
         # load container config
-        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", "container")
+        myIBswitchSimulator = IBswitchSimulator(
+            "IBswitchSimulator.cfg", "container")
 
     if options.modename == "mqtt":
         myIBswitchSimulator.run(
