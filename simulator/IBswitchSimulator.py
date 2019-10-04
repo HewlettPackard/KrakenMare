@@ -70,7 +70,13 @@ class IBswitchSimulator():
 
                 client = SchemaRegistryClient(conf)
                 subject = "com-hpe-krakenmare-message-agent-register-request"
-                register_request_schema = client.get_schema(subject).schema
+                cg = None 
+                while cg == None:
+                    cg = client.get_schema(subject)
+                    print("getting schema %s from schemaregistry" % subject)
+                    time.sleep(1)
+
+                register_request_schema = cg.schema
 
                 #two ugly things, replace ' by '' and True  by true to have proper avro-parsable JSON
                 #tbd fix me
@@ -79,6 +85,12 @@ class IBswitchSimulator():
                 self.schema_register_request = avro.schema.Parse(buffer.replace("True","true"))
                 
                 subject  ="com-hpe-krakenmare-message-manager-register-response"
+                cg = None
+                while cg == None:
+                    cg = client.get_schema(subject)
+                    print("getting schema %s from schemaregistry" % subject)
+                    time.sleep(1)
+                    
                 register_response_schema = client.get_schema(subject).schema
                 mystring = str(register_response_schema)
                 buffer = mystring.replace("'",'"')
