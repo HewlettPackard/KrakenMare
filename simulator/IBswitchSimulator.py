@@ -21,9 +21,6 @@ import socket
 import platform
 
 # import special classes
-import confluent_kafka
-from confluent_kafka import Producer as KafkaProducer
-from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 
@@ -51,15 +48,12 @@ class IBswitchSimulator():
                 
                 self.loggerName = "simulator.agent."+__version__+".log"
                    
-                self.config = self.checkConfigurationFile(configFile, ['Daemon', 'Logger', 'Kafka', 'MQTT'])
+                self.config = self.checkConfigurationFile(configFile, ['Daemon', 'Logger', 'MQTT'])
                 
-                self.kafka_broker = self.config.get('Kafka', 'kafka_broker')
-                self.kafka_port = int(self.config.get('Kafka', 'kafka_port'))
                 self.mqtt_broker = self.config.get('MQTT', 'mqtt_broker')
                 self.mqtt_port = int(self.config.get('MQTT', 'mqtt_port'))
                 self.sleepLoopTime = float(self.config.get('Others', 'sleepLoopTime'))
                 self.seedOutputDir = self.config.get('Others', 'seedOutputDir')
-                self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
                 
                 # id comes from the framework manager as a convenience incremental id
                 self.myAgent_id = -1
@@ -185,16 +179,13 @@ class IBswitchSimulator():
         # END MQTT agent methods   
         #######################################################################################
         
-    # send simulated sensor data via MQTT or Kafka, depending on command line flag
+    # send simulated sensor data via MQTT 
         def send_data(self, pubsubType):
                 
                 if (pubsubType == "mqtt"):
                         client = mqtt.Client("DataClient")
                         print ("connecting to mqtt broker")
                         client.connect(self.mqtt_broker, self.mqtt_port)
-                elif (pubsubType == "kafka"):
-                        # self.kafka_check_topic("fabric")
-                        nothing = "to-do"
                 else:
                         print("Unknown Pub/Sub type selected: " + pubsubType)
                         sys.exit(-1)
@@ -307,20 +298,12 @@ class IBswitchSimulator():
                         if (pubsubType == "mqtt"):
                                 print("Publishing via mqtt (topic:%s)" % self.data_topic)
                                 client.publish(self.data_topic, data_out_new)
-                        elif (pubsubType == "kafka"):
-                                #ToDO: write AVRO
-                                print("Publishing via kafka")
-                                self.kafka_producer.produce("fabric", data_out_new)
                         else:
                                 print("error: shouldn't be here")
                                 sys.exit(-1)
                         
                         # Infinite loop
                         time.sleep(self.sleepLoopTime)
-    
-    # END Kafka agent methods
-    #######################################################################################
-    
     
         # main method of IBswitchSimulator
         def run(self, mode, local, debug):
@@ -330,19 +313,15 @@ class IBswitchSimulator():
                         print("mqtt mode")
                         self.mqtt_registration()
                         self.send_data("mqtt")
-                else:
-                        print("Kafka mode")
-                        self.kafka_producer_connect()
-                        self.send_data("kafka")
         
 ### END IBswitchSimulator class ##################################################      
 
 
 def main():
-        usage = ("usage: %s --mode=kafka|mqtt" % sys.argv[0])
+        usage = ("usage: %s --mode=mqtt" % sys.argv[0])
         parser = OptionParser(usage=usage, version=__version__)
         
-        parser.add_option("--mode", dest="modename", help="specify mode, possible modes are: kafka|mqtt")
+        parser.add_option("--mode", dest="modename", help="specify mode, possible modes are: mqtt")
         parser.add_option("--local", action="store_true", default=False, dest="local",
                                           help = "specify this option in order to run in local mode")
         parser.add_option("--debug", action="store_true", default=False, dest="debug",
@@ -366,10 +345,7 @@ def main():
                 # load container config
                 myIBswitchSimulator = IBswitchSimulator('IBswitchSimulator.cfg', 'container')
         
-        if(options.modename == 'kafka'):
-                myIBswitchSimulator.run("kafka", local=option_dict['local'], debug=option_dict['debug'])
-                                        
-        elif(options.modename == 'mqtt'):
+        if(options.modename == 'mqtt'):
                 myIBswitchSimulator.run("mqtt", local=option_dict['local'], debug=option_dict['debug'])
                         
         else:
