@@ -314,7 +314,11 @@ services:
     <<: *deploy
     networks:
       - krakenmare
-
+    secrets:
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
+      - km-ca-1.crt
+      
   fanin:
     image: ${REGISTRY_FULL_PATH}fanin
     build:
