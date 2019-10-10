@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ import com.hpe.krakenmare.impl.MqttRegistrationListener;
 import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
-import com.hpe.krakenmare.repositories.AgentRepository;
+import com.hpe.krakenmare.repositories.AgentMemoryRepository;
 
 public class MqttAgentTest {
 
@@ -42,13 +43,13 @@ public class MqttAgentTest {
 		FrameworkMqttListener listener = new FrameworkMqttListener();
 		listener.start();
 
-		AgentRepository agents = new AgentRepository();
+		AgentMemoryRepository agents = new AgentMemoryRepository();
 		MqttRegistrationListener.registerNew(listener, agents);
 	}
 
 	@Test
 	public void register() throws IOException, InterruptedException, MqttException {
-		Agent agent = new Agent(-1l, myId, null, myName);
+		Agent agent = new Agent(-1l, myId, null, myName, Collections.emptyList());
 		String myAgentTopic = MqttUtils.getRegistrationRequestTopic(agent);
 		String myManagerTopic = MqttUtils.getRegistrationResponseTopic(agent);
 

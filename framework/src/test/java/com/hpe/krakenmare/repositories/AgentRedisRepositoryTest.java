@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -23,7 +24,7 @@ public class AgentRedisRepositoryTest {
 
 	static Agent newAgent(String name) {
 		String uid = name + "-" + System.currentTimeMillis();
-		return new Agent(-1l, uid, UUID.randomUUID(), name);
+		return new Agent(-1l, uid, UUID.randomUUID(), name, Collections.emptyList());
 	}
 
 	@BeforeEach

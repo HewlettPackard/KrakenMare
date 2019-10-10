@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.UUID;
 
 import org.apache.avro.Conversions.UUIDConversion;
@@ -27,8 +28,8 @@ import com.hpe.krakenmare.core.Agent;
 public class AgentAvroTest {
 
 	static final UUID THE_UUID = UUID.fromString("12345678-abcd-dcba-1234-000000000000");
-	static final Agent THE_AGENT = new Agent(42l, "agent-42", THE_UUID, "myAgent");
-	static final String THE_JSON = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":\"12345678-abcd-dcba-1234-000000000000\",\"name\":\"myAgent\"}";
+	static final Agent THE_AGENT = new Agent(42l, "agent-42", THE_UUID, "myAgent", Collections.emptyList());
+	static final String THE_JSON = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":\"12345678-abcd-dcba-1234-000000000000\",\"name\":\"myAgent\",\"devices\":[]}";
 
 	@Test
 	void testJSonSer() throws IOException {

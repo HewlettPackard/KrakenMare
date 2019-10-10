@@ -1,6 +1,7 @@
 package com.hpe.krakenmare.repositories;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 		long id = jedis.incr(counterKey);
 		UUID uuid = UUID.randomUUID();
 		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
-		return new Agent(id, payload.getUid(), uuid, payload.getName());
+		return new Agent(id, payload.getUid(), uuid, payload.getName(), Collections.emptyList());
 	}
 
 	@Override

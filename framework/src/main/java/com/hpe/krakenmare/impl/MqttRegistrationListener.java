@@ -40,7 +40,7 @@ public class MqttRegistrationListener implements IMqttMessageListener {
 
 			String name = request.getName().toString();
 			String uid = request.getAgentID().toString();
-			Agent agent = new Agent(-1l, uid, null, name);
+			Agent agent = new Agent(-1l, uid, null, name, Collections.emptyList());
 			agent = registerNewAgent(agent);
 			UUID uuid = agent.getUuid();
 
