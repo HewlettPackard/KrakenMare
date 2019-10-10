@@ -11,23 +11,29 @@
 	{
 		"name": "measurementList",
 		"type": {
-			"type": "record",
-			"name": "EventMeasurement",
-			"fields": [
-				{
+			"type": "array",
+			"items": {
+				"type": "record",
+				"name": "EventMeasurement",
+				"fields": [
+					{
 					"name": "sensorUUID",
 					"type": {"type": "string", "logicalType":"uuid"},
 					"doc": "Unique sensor identifier"
-				},
-				{
-					"name": "values",
-					"type": {
-						"type": "map",
-						"values": "string",
-						"doc": "Events as strings"
+					},
+					{
+					"name": "timestamp",
+					"type": {"type": "long", "logicalType":"timestamp-millis"},
+					"doc": "Timestamp of sensor value, milliseconds since the epoch"
+					},
+					{
+					"name": "event",
+					"type": "string",
+					"doc": "Event"
 					}
-				}
-			]
+				]
+			}
+
 		}
 	}
 ]
