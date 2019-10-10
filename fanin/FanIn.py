@@ -116,17 +116,19 @@ class FanIn():
 
 	# connect to MQTT broker and subscribe to receive agent messages
 	def mqtt_subscription(self):
-		topic = "ibswitch"
+		self.myMQTTtopic = "ibswitch"
+		#self.myMQTTtopic = "#"
 		
 		self.mqtt_client = mqtt.Client("FanInUUID")
 		#self.mqtt_client.on_log = self.mqtt_on_log
 		self.mqtt_client.on_connect = self.mqtt_on_connect
+		self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
 		self.mqtt_client.on_message = self.mqtt_on_agent_message
 		self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
-		self.mqtt_client.subscribe(topic) # use '#' to subscribe to all topics
-		self.mqtt_client.loop_start()
+		self.mqtt_client.subscribe(self.myMQTTtopic) # use '#' to subscribe to all topics
+		self.mqtt_client.loop_forever(timeout=0, retry_first_connection=True)
 		
-		print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": subscribed to MQTT for topics: " + topic)
+		print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": subscribed to MQTT for topics: " + self.myMQTTtopic)
 		
 	# The callback for when the client receives LOG response
 	def mqtt_on_log(self, client, userdata, level, buf):
@@ -138,17 +140,21 @@ class FanIn():
 		
 		# Subscribing in on_connect() means that if we lose the connection and
 		# reconnect then subscriptions will be renewed.
-		self.client.subscribe("#")
-		
+		self.client.subscribe(self.myMQTTtopic)
+	
+	def mqtt_on_disconnect(self, client, userdata,rc=0):
+		print("DisConnected result code "+str(rc))
+	
 	# converts message to AVRO and sends message to Kafka (in batches)
 	# TODO: do we need multiple threads here?
 	# TODO: have processing method per client type OR topic for each sensor type to convert messages?
 	# TODO: or should the MQTT agent convert message into our schema before sending via MQTT?
 	def mqtt_on_agent_message(self, client, userdata, message):
-		print("MQTT message topic: %s" % message.topic)
 		
 		#process message
 		if message.topic == "ibswitch":
+			print(str(message))
+			
 			kafka_message = {}
 			
 			#print("message received: %s " % message.payload)
@@ -175,7 +181,8 @@ class FanIn():
 				print("Publishing to Kafka topic (" + "fabric" + "): " + str(kafka_message))
 				self.kafka_producer.produce("fabric", json.dumps(kafka_message).encode('utf-8'))
 				#self.kafka_producer.flush()
-			
+		else:
+			print("Not ibswitch topic")
 	# END MQTT agent methods   
 	#######################################################################################
 	
@@ -215,7 +222,7 @@ class FanIn():
 		test = False
 		
 		#conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
-        #          'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
+		#          'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
 		
 		conf = {'bootstrap.servers': self.bootstrapServerStr, 'socket.timeout.ms': 10,
                   'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
@@ -247,9 +254,10 @@ class FanIn():
 		#self.mqtt_registration()
 		self.kafka_producer_connect()
 		self.mqtt_subscription() # TODO: should be own process via process class (from multiprocessing import Process)
-		while True:
-			pass
+		#while True:
+		#	pass
 		#self.send_data("kafka")
+		print("FanIn terminated")
 	
 ### END IBswitchSimulator class ##################################################	
 

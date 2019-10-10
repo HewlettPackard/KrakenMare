@@ -59,7 +59,7 @@ class IBswitchSimulator:
         self.myMQTTregistered = False
         # Agent uid as provided by the discovery mecanism.
         # for now use the hostname, should be the output of the disc mecanism
-        self.myAgent_uid = platform.node()
+        self.myAgent_uid = platform.node() + str(random.randint(1,100001))
 
         conf = {
             "url": "https://schemaregistry:8081",
@@ -198,23 +198,26 @@ class IBswitchSimulator:
 
     # send simulated sensor data via MQTT
     def send_data(self, pubsubType):
-
+        i = 0
+        
         if pubsubType == "mqtt":
-            client = mqtt.Client("DataClient")
+            client = mqtt.Client(self.myAgent_uid)
             print("connecting to mqtt broker")
             client.connect(self.mqtt_broker, self.mqtt_port)
         else:
             print("Unknown Pub/Sub type selected: " + pubsubType)
             sys.exit(-1)
-
+            
         # Infinite loop
         while True:
-
+            i = i + 1
+            
             # fresh output map
             query_output_new = {}
 
             # read JSON data describing switches in the IRU (c stands for CMC)
             for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
+                
                 with open(cmc, "r") as f:
                     query_data = json.load(f)
 
@@ -248,8 +251,7 @@ class IBswitchSimulator:
                     g.close()
 
                     # set sensor ID prefix
-                    # TODO: fix id's after registration works
-                    sensorIdPrefix = "tw-" + self.myAgentName + "-" + guid
+                    sensorIdPrefix = str(self.myAgent_uuid)
 
                     # TODO: remove old query_output
                     query_output["Name"] = self.myAgentName
@@ -257,86 +259,52 @@ class IBswitchSimulator:
                     x = random.random()
                     if x > 0.98:
                         query_output["SymbolErrorCounter"] += 1000
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-SymbolErrorCounter")
-                        ] = query_output["SymbolErrorCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
                     elif x > 0.88:
                         query_output["SymbolErrorCounter"] += 10
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-SymbolErrorCounter")
-                        ] = query_output["SymbolErrorCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
                     elif x > 0.78:
                         query_output["SymbolErrorCounter"] += 1
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-SymbolErrorCounter")
-                        ] = query_output["SymbolErrorCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
                     else:
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-SymbolErrorCounter")
-                        ] = query_output["SymbolErrorCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
 
                     x = random.random()
                     if x > 0.99:
                         query_output["LinkDownedCounter"] += 100
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-LinkDownedCounter")
-                        ] = query_output["LinkDownedCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
                     elif x > 0.89:
                         query_output["LinkDownedCounter"] += 5
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-LinkDownedCounter")
-                        ] = query_output["LinkDownedCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
                     elif x > 0.79:
                         query_output["LinkDownedCounter"] += 1
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-LinkDownedCounter")
-                        ] = query_output["LinkDownedCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
                     else:
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-LinkDownedCounter")
-                        ] = query_output["LinkDownedCounter"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
 
                     x = random.random()
                     if x > 0.99:
                         query_output["PortXmitDiscards"] += 10
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-PortXmitDiscards")
-                        ] = query_output["PortXmitDiscards"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
                     elif x > 0.89:
                         query_output["PortXmitDiscards"] += 5
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-PortXmitDiscards")
-                        ] = query_output["PortXmitDiscards"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
                     elif x > 0.79:
                         query_output["PortXmitDiscards"] += 2
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-PortXmitDiscards")
-                        ] = query_output["PortXmitDiscards"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
                     else:
-                        query_output_new[str(timestamp)][
-                            str(sensorIdPrefix + "-PortXmitDiscards")
-                        ] = query_output["PortXmitDiscards"]
+                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
 
                     query_output["PortXmitData"] += random.randint(1000, 4000)
-                    query_output_new[str(timestamp)][
-                        str(sensorIdPrefix + "-PortXmitData")
-                    ] = query_output["PortXmitData"]
+                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitData")] = query_output["PortXmitData"]
                     query_output["PortRcvData"] += random.randint(1000, 4000)
-                    query_output_new[str(timestamp)][
-                        str(sensorIdPrefix + "-PortRcvData")
-                    ] = query_output["PortRcvData"]
+                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvData")] = query_output["PortRcvData"]
                     query_output["PortXmitPkts"] += random.randint(100, 400)
-                    query_output_new[str(timestamp)][
-                        str(sensorIdPrefix + "-PortXmitPkts")
-                    ] = query_output["PortXmitPkts"]
+                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitPkts")] = query_output["PortXmitPkts"]
                     query_output["PortRcvPkts"] += random.randint(100, 400)
-                    query_output_new[str(timestamp)][
-                        str(sensorIdPrefix + "-PortRcvPkts")
-                    ] = query_output["PortRcvPkts"]
+                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvPkts")] = query_output["PortRcvPkts"]
                     query_output["PortXmitWait"] += random.randint(100, 200)
-                    query_output_new[str(timestamp)][
-                        str(sensorIdPrefix + "-PortXmitWait")
-                    ] = query_output["PortXmitWait"]
+                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitWait")] = query_output["PortXmitWait"]
 
                     # Write output to the next input
                     with open(output, "w") as g:
@@ -346,7 +314,7 @@ class IBswitchSimulator:
             data_out_new = json.dumps(query_output_new).encode("utf-8")
 
             if pubsubType == "mqtt":
-                print("Publishing via mqtt (topic:%s)" % self.data_topic)
+                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
                 client.publish(self.data_topic, data_out_new)
             else:
                 print("error: shouldn't be here")
