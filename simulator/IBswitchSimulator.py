@@ -19,11 +19,8 @@ import platform
 # import special classes
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
+from fastavro import writer, parse_schema, schemaless_writer, schemaless_reader
 
-# avro imports
-import avro.schema  # pip3 install avro-python3
-import avro.io  # pip3 install avro-python3
-import avro.datafile  # pip3 install avro-python3
 import io
 
 # project imports
@@ -80,15 +77,7 @@ class IBswitchSimulator:
             print("getting schema %s from schemaregistry" % subject)
             time.sleep(1)
 
-        register_request_schema = cg.schema
-
-        # two ugly things
-        # ' --> '' and True --> true to have proper avro-parsable JSON
-        # tbd fix me
-        mystring = str(register_request_schema)
-        buffer = mystring.replace("'", '"')
-        self.schema_register_request = avro.schema.Parse(
-            buffer.replace("True", "true"))
+        self.register_request_schema = cg.schema.schema
 
         subject = "com-hpe-krakenmare-message-manager-register-response"
         cg = None
@@ -97,12 +86,7 @@ class IBswitchSimulator:
             print("getting schema %s from schemaregistry" % subject)
             time.sleep(1)
 
-        register_response_schema = client.get_schema(subject).schema
-        mystring = str(register_response_schema)
-        buffer = mystring.replace("'", '"')
-        self.schema_register_response = avro.schema.Parse(
-            buffer.replace("True", "true")
-        )
+        self.register_response_schema = cg.schema.schema
 
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
@@ -162,10 +146,8 @@ class IBswitchSimulator:
 
         print("message received: %s " % message.payload)
         print("message topic: %s" % message.topic)
-        reader = avro.io.DatumReader(self.schema_register_response)
-        bytes_reader = io.BytesIO(message.payload)
-        decoder = avro.io.BinaryDecoder(bytes_reader)
-        data = reader.read(decoder)
+        r_bytes = io.BytesIO(message.payload)
+        data = schemaless_reader(r_bytes, self.register_response_schema)
         print("registration-result with km UUID: %s" % data["uuid"])
         self.myMQTTregistered = True
         self.myAgent_uuid = data["uuid"]
@@ -181,7 +163,6 @@ class IBswitchSimulator:
         registration_client.subscribe(
             "registration/" + self.myAgent_uid + "/response")
 
-        writer = avro.io.DatumWriter(self.schema_register_request)
         RegistrationData = {
             "agentID": self.myAgent_uid,
             "type": "simulatorAgent",
@@ -190,10 +171,12 @@ class IBswitchSimulator:
             "useSensorTemplate": False,
         }
 
-        bytes_writer = io.BytesIO()
-        encoder = avro.io.BinaryEncoder(bytes_writer)
-        writer.write(RegistrationData, encoder)
-        raw_bytes = bytes_writer.getvalue()
+        w_bytes = io.BytesIO()
+
+        schemaless_writer(
+            w_bytes, self.register_request_schema, RegistrationData)
+
+        raw_bytes = w_bytes.getvalue()
 
         # use highest QoS for now
         print("sending registration payload: --%s--" % raw_bytes)
