@@ -1,5 +1,90 @@
 {
 "type": "record",
+"name": "Sensor",
+"namespace": "com.hpe.krakenmare.core",
+"fields": [
+	{"name": "uuid",
+	"type": {"type": "string", "logicalType":"uuid"},
+	"doc": "UUID of the sensor"},
+	{"name": "id",
+	"type": "string",
+	"doc": "Unique id as created by the Agent for the Sensor"},
+	{"name": "name",
+	"type": "string",
+	"doc": "Human readable name"	},
+	{"name": "collectionFrequencyMin",
+	"type": ["null", "float"],
+	"doc": "Collection frequenciy minimum"},
+	{"name": "collectionFrequencyMax",
+	"type": ["null", "float"],
+	"doc": "Collection frequenciy maximum"},
+	{"name": "collectionFrequencyDefault",
+	"type": ["null", "float"],
+	"doc": "Collection frequenciy default"},
+	{"name": "measuringAccuracy",
+	"type": ["null", "string"],
+	"doc": "Description of the accuracy of measurement"},
+	{"name": "unit",
+	"type": ["null", "string"],
+	"doc": "Unit such as amps, degrees c"},
+	{"name": "type",
+	"type": ["null", "string"],
+	"doc": "Description of the type of sensor such as temperature, pressure"},
+	{"name": "valueRangeMin",
+	"type": ["null", "float"],
+	"doc": "Value range for sensor. Minimum"},
+	{"name": "valueRangeMax",
+	"type": ["null", "float"],
+	"doc": "Value range for sensor. Maximum"},
+	{"name": "changeFrequency",
+	"type": ["null", "float"],
+	"doc": "How frequently a sensor is expect to change the value"},
+	{"name": "currentCollectionFrequency",
+	"type": "float",
+	"doc": "Current collection frequency is HZ"},
+	{"name": "storageTime",
+	"type": "int",
+	"doc": "How many weeks to store this sensor's values. -1 means forever"}
+]
+}
+{
+"type": "record",
+"name": "Device",
+"namespace": "com.hpe.krakenmare.core",
+"fields": [
+	{
+		"name": "uuid",
+		"type": {"type": "string", "logicalType":"uuid"},
+		"doc": "UUID of the device"
+	},
+	{
+		"name": "id",
+		"type": "string",
+		"doc": "Unique id created by the Agent for the Device"
+	},
+	{
+		"name": "name",
+		"type": "string",
+		"doc": "Human readable name"
+	},
+	{
+		"name": "type",
+		"type": "string",
+		"doc": "Type of device such as node, chassis manager, ..."
+	},
+	{
+		"name": "location",
+		"type": "string",
+		"doc": "Location of device in the system"
+	},
+	{
+		"name": "sensors",
+		"type": "Sensor"
+	}
+]
+}
+{
+"type": "record",
 "name": "SensorList",
 "namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
