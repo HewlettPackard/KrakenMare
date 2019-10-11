@@ -12,19 +12,19 @@ import org.slf4j.LoggerFactory;
 
 import com.hpe.krakenmare.Main;
 
-public class FrameworkMqttListener {
+public class FrameworkMqttClient {
 
-	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttListener.class);
+	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
 	final static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
-	final static String clientId = FrameworkMqttListener.class.getSimpleName();
+	final static String clientId = FrameworkMqttClient.class.getSimpleName();
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
 	// TODO: make client async
 	IMqttClient client;
 
-	public FrameworkMqttListener() {
+	public FrameworkMqttClient() {
 		// properly release MQTT connection on shutdown
 		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 	}

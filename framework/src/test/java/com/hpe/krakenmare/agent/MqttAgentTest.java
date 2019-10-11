@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hpe.krakenmare.Main;
 import com.hpe.krakenmare.core.Agent;
-import com.hpe.krakenmare.impl.FrameworkMqttListener;
+import com.hpe.krakenmare.impl.FrameworkMqttClient;
 import com.hpe.krakenmare.impl.MqttRegistrationListener;
 import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
@@ -40,7 +40,7 @@ public class MqttAgentTest {
 
 	@BeforeEach
 	public void setup() throws MqttException {
-		FrameworkMqttListener listener = new FrameworkMqttListener();
+		FrameworkMqttClient listener = new FrameworkMqttClient();
 		listener.start();
 
 		AgentMemoryRepository agents = new AgentMemoryRepository();

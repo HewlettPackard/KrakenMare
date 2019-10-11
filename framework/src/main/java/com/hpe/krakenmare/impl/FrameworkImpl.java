@@ -20,7 +20,7 @@ public class FrameworkImpl implements Framework {
 
 	private final Jedis jedis = new Jedis(HostAndPort.parseString(Main.getProperty("redis.server")));
 	private final AgentRedisRepository agents = new AgentRedisRepository(jedis);
-	private final FrameworkMqttListener mqttListener = new FrameworkMqttListener();
+	private final FrameworkMqttClient mqttListener = new FrameworkMqttClient();
 
 	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
 

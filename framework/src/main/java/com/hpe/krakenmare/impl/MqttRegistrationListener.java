@@ -20,7 +20,7 @@ public class MqttRegistrationListener implements IMqttMessageListener {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttRegistrationListener.class);
 
-	public static void registerNew(FrameworkMqttListener listener, Repository<Agent> agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttClient listener, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getRegistrationRequestTopic(), new MqttRegistrationListener(agentRepo, listener.getClient()));
 	}
 

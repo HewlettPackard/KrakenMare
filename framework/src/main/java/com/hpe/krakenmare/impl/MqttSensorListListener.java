@@ -24,7 +24,7 @@ public class MqttSensorListListener implements IMqttMessageListener {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttSensorListListener.class);
 
-	public static void registerNew(FrameworkMqttListener listener, Repository<Agent> agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttClient listener, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttSensorListListener(agentRepo, listener.getClient()));
 	}
 
