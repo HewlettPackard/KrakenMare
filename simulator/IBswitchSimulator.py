@@ -88,6 +88,15 @@ class IBswitchSimulator:
 
         self.register_response_schema = cg.schema.schema
 
+        subject = "com-hpe-krakenmare-message-agent-send-time-series"
+        cg = None
+        while cg is None:
+            cg = client.get_schema(subject)
+            print("getting schema %s from schemaregistry" % subject)
+            time.sleep(1)
+
+        self.send_time_series_schema = cg.schema.schema
+
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
     ):
@@ -346,11 +355,13 @@ class IBswitchSimulator:
                         json.dump(query_output, g)
                     g.close()
 
-            data_out_new = json.dumps(record).encode("utf-8")
+            w_bytes = io.BytesIO()
+            schemaless_writer(w_bytes, self.send_time_series_schema, record)
+            raw_bytes = w_bytes.getvalue()
 
             if pubsubType == "mqtt":
                 print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
-                client.publish(self.data_topic, data_out_new)
+                client.publish(self.data_topic, raw_bytes)
             else:
                 print("error: shouldn't be here")
                 sys.exit(-1)
