@@ -208,198 +208,51 @@ class IBswitchSimulator:
             print("Unknown Pub/Sub type selected: " + pubsubType)
             sys.exit(-1)
 
-# Create JSON structure for data. This is a hack because I know how many CMC (2) and switches per CMC (4).  Sorry.
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d1 are PortSelect (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d2 are SymbolErrorCounters (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d3 are LinkErrorRecoveryCounter (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d4 are LinkDownedCounter (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d5 are PortRcvErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d6 are PortRcvSwitchRelayErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d7 are PortXmitDiscards (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d8 are PortXmitConstraintErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6d9 are PortRcvConstraintErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e0 are LocalLinkIntegrityErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e1 are ExcessiveBufferOverrunErrors (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e2 are VL15Dropped (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e3 are PortXmitData (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e4 are PortRcvData (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e5 are PortXmitPkts (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e6 are PortRcvPkts (8 of them for the switches)
-# sensorUUID [a-h]fbfa80d-cd9d-487a-841c-6da12b10c6e7 are PortXmitWait (8 of them for the switches)
+# Create JSON structure for data.
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d1 PortSelect
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d2 SymbolErrorCounters
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d3 LinkErrorRecoveryCounter
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d4 LinkDownedCounter
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d5 PortRcvErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d6 PortRcvSwitchRelayErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d7 PortXmitDiscards
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d8 PortXmitConstraintErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d9 PortRcvConstraintErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e0 LocalLinkIntegrityErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e1 ExcessiveBufferOverrunErrors
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e2 VL15Dropped
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e3 PortXmitData
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e4 PortRcvData
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e5 PortXmitPkts
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e6 PortRcvPkts
+# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e7 PortXmitWait
 
-        records = [
-           {"uuid": str(self.myAgent_uuid),
-            "measurementList": [
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "bfbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "cfbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "dfbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "efbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "ffbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "gfbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "hfbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-           ],
-        }
-        ]
-
-# Lets do this is a simpler way.  Each loop fill in a single record which we'll send
         record = {
-           "uuid": str(self.myAgent_uuid),
+           "uuid": str(self.myAgent_uuid), "timestamp": 1570135369000,
             "measurementList": [
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6", "timestamp": 1570135369000, "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "timestamp": 1570135369000, "sensorValue": 0.0 }
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6", "sensorValue": 0.0 },
+              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "sensorValue": 0.0 }
            ]
         }
             
         # Infinite loop
         while True:
             i = i + 1
-            
-            # fresh output map
-            query_output_new = {}
 
             # read JSON data describing switches in the IRU (c stands for CMC)
             for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
@@ -418,13 +271,9 @@ class IBswitchSimulator:
                 # for packet counters add randint[100,400]
 
                 # Set time to milliseconds since the epoch for InfluxDB
-                nowint = int(round(time.time() * 1000))
+                timestamp = int(round(time.time() * 1000))
 
-                # set timestamp
-                timestamp = nowint
-
-                # create empty map for timestamp to store sensorID:value pairs
-                query_output_new[str(timestamp)] = {}
+                record['timestamp'] = timestamp
 
                 # go through sensors for device
                 for switch in query_data["Switch"]:
@@ -436,102 +285,60 @@ class IBswitchSimulator:
                         query_output = json.load(g)
                     g.close()
 
-                    # set sensor ID prefix
-                    sensorIdPrefix = str(self.myAgent_uuid)
-
-                    # TODO: remove old query_output
                     query_output["Name"] = self.myAgentName
-                    query_output["Timestamp"] = nowint
-                    record['measurementList'][0]['timestamp'] = nowint
+                    query_output["Timestamp"] = timestamp
                     record['measurementList'][0]['sensorValue'] = query_output["PortSelect"]
-                    record['measurementList'][1]['timestamp'] = nowint
+
                     x = random.random()
                     if x > 0.98:
                         query_output["SymbolErrorCounter"] += 1000
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
                     elif x > 0.88:
                         query_output["SymbolErrorCounter"] += 10
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
                     elif x > 0.78:
                         query_output["SymbolErrorCounter"] += 1
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
-                    else:
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-SymbolErrorCounter")] = query_output["SymbolErrorCounter"]
 
                     record['measurementList'][1]['sensorValue'] = query_output["SymbolErrorCounter"]
-
-                    record['measurementList'][2]['timestamp'] = nowint
                     record['measurementList'][2]['sensorValue'] = query_output["LinkErrorRecoveryCounter"]
 
-                    record['measurementList'][3]['timestamp'] = nowint
                     x = random.random()
                     if x > 0.99:
                         query_output["LinkDownedCounter"] += 100
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
                     elif x > 0.89:
                         query_output["LinkDownedCounter"] += 5
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
                     elif x > 0.79:
                         query_output["LinkDownedCounter"] += 1
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
-                    else:
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-LinkDownedCounter")] = query_output["LinkDownedCounter"]
 
                     record['measurementList'][3]['sensorValue'] = query_output["LinkDownedCounter"]
 
-                    record['measurementList'][4]['timestamp'] = nowint
                     record['measurementList'][4]['sensorValue'] = query_output["PortRcvErrors"]
-                    record['measurementList'][5]['timestamp'] = nowint
                     record['measurementList'][5]['sensorValue'] = query_output["PortRcvRemotePhysicalErrors"]
-                    record['measurementList'][6]['timestamp'] = nowint
                     record['measurementList'][6]['sensorValue'] = query_output["PortRcvSwitchRelayErrors"]
 
-                    record['measurementList'][7]['timestamp'] = nowint
                     x = random.random()
                     if x > 0.99:
                         query_output["PortXmitDiscards"] += 10
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
                     elif x > 0.89:
                         query_output["PortXmitDiscards"] += 5
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
                     elif x > 0.79:
                         query_output["PortXmitDiscards"] += 2
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
-                    else:
-                        query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
 
                     record['measurementList'][7]['sensorValue'] = query_output["PortXmitDiscards"]
 
-                    record['measurementList'][8]['timestamp'] = nowint
                     record['measurementList'][8]['sensorValue'] = query_output["PortXmitConstraintErrors"]
-                    record['measurementList'][9]['timestamp'] = nowint
                     record['measurementList'][9]['sensorValue'] = query_output["PortRcvConstraintErrors"]
-                    record['measurementList'][10]['timestamp'] = nowint
                     record['measurementList'][10]['sensorValue'] = query_output["LocalLinkIntegrityErrors"]
-                    record['measurementList'][10]['timestamp'] = nowint
                     record['measurementList'][10]['sensorValue'] = query_output["ExcessiveBufferOverrunErrors"]
-                    record['measurementList'][10]['timestamp'] = nowint
                     record['measurementList'][10]['sensorValue'] = query_output["VL15Dropped"]
 
                     query_output["PortXmitData"] += random.randint(1000, 4000)
-                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitData")] = query_output["PortXmitData"]
-                    record['measurementList'][11]['timestamp'] = nowint
                     record['measurementList'][11]['sensorValue'] = query_output["PortXmitData"]
                     query_output["PortRcvData"] += random.randint(1000, 4000)
-                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvData")] = query_output["PortRcvData"]
-                    record['measurementList'][12]['timestamp'] = nowint
                     record['measurementList'][12]['sensorValue'] = query_output["PortRcvData"]
                     query_output["PortXmitPkts"] += random.randint(100, 400)
-                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitPkts")] = query_output["PortXmitPkts"]
-                    record['measurementList'][13]['timestamp'] = nowint
                     record['measurementList'][13]['sensorValue'] = query_output["PortXmitPkts"]
                     query_output["PortRcvPkts"] += random.randint(100, 400)
-                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvPkts")] = query_output["PortRcvPkts"]
-                    record['measurementList'][14]['timestamp'] = nowint
                     record['measurementList'][14]['sensorValue'] = query_output["PortRcvPkts"]
                     query_output["PortXmitWait"] += random.randint(100, 200)
-                    query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitWait")] = query_output["PortXmitWait"]
-                    record['measurementList'][15]['timestamp'] = nowint
                     record['measurementList'][15]['sensorValue'] = query_output["PortXmitWait"]
 
                     # Write output to the next input
