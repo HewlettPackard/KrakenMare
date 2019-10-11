@@ -6,40 +6,31 @@
 	{
 		"name": "uuid",
 		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Unique framework identifier"
+		"doc": "Agent unique framework identifier"
 	},
 	{
-		"name": "devices",
+		"name": "deviceUuids",
 		"type": {
-			"type": "record",
-			"name": "DeviceUUID",
-			"fields": [
-				{
-					"name": "deviceUUID",
-					"type": {
-						"type": "map",
-						"values": "string",
-						"doc": "UUIDs of the devices"
+			"type": "map",
+			"values": {
+				"type": "record",
+				"name": "SensorUuids",
+				"fields": [
+					{
+						"name": "uuid",
+						"type": {"type": "string", "logicalType":"uuid"},
+						"doc": "Device unique framework identifier"
+					},
+					{
+						"name": "sensorUuids",
+						"type": {
+							"type": "map",
+							"values": {"type": "string", "logicalType":"uuid"},
+							"doc": "Sensors unique framework identifiers"
 						}
-				},
-				{
-					"name": "sensors",
-					"type": {
-						"type": "record",
-						"name": "SensorUUID",
-						"fields": [
-							{
-								"name": "sensorUUID",
-								"type": {
-									"type": "map",
-									"values": "string",
-									"doc": "UUIDs of the sensors"
-									}
-							}
-						]
 					}
-				}
-			]
+				]
+			}
 		}
 	}
 ]

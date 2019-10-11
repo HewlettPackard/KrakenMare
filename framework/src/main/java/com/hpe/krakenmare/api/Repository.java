@@ -1,6 +1,7 @@
 package com.hpe.krakenmare.api;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface Repository<T> {
 
@@ -14,7 +15,7 @@ public interface Repository<T> {
 
 	boolean delete(T entity);
 
-	T get(long id);
+	T get(UUID uuid);
 
 	List<T> getAll();
 

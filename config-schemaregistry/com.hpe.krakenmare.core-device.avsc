@@ -79,7 +79,7 @@
 	},
 	{
 		"name": "sensors",
-		"type": "Sensor"
+		"type": {"type": "array", "items": "com.hpe.krakenmare.core.Sensor"}
 	}
 ]
 }

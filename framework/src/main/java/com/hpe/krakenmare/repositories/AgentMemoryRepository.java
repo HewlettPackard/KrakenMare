@@ -55,8 +55,8 @@ public class AgentMemoryRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent get(long id) {
-		return agents.stream().filter(a -> a.getId() == id).findFirst().get();
+	public Agent get(UUID uuid) {
+		return agents.stream().filter(a -> a.getUuid().equals(uuid)).findFirst().get();
 	}
 
 }

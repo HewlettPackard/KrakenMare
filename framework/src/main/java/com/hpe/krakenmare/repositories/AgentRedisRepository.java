@@ -71,7 +71,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public boolean save(Agent agent) {
-		String agentKey = agentDataKey + ":" + agent.getId();
+		String agentKey = agentDataKey + ":" + agent.getUuid();
 		return jedis.hset(agentsKey, agentKey, toJson(agent)) == 1;
 	}
 
@@ -83,13 +83,13 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public boolean delete(Agent agent) {
-		String agentKey = agentDataKey + ":" + agent.getId();
+		String agentKey = agentDataKey + ":" + agent.getUuid();
 		return jedis.hdel(agentsKey, agentKey) == 1;
 	}
 
 	@Override
-	public Agent get(long id) {
-		String agentKey = agentDataKey + ":" + id;
+	public Agent get(UUID uuid) {
+		String agentKey = agentDataKey + ":" + uuid;
 		String json = jedis.hget(agentsKey, agentKey);
 		return fromJson(json);
 	}
