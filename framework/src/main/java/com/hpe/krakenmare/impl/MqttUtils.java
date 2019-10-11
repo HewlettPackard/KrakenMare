@@ -23,7 +23,13 @@ public class MqttUtils {
 
 	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
 	public static String getRegistrationResponseTopic(Agent agent) {
-		return REGISTRATION_TOPIC + "/" + agent.getUid() + "/response";
+		return getRegistrationResponseTopic(agent.getUid());
+	}
+
+	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
+	public static String getRegistrationResponseTopic(CharSequence uid) {
+		return REGISTRATION_TOPIC + "/" + uid + "/response";
+
 	}
 
 	/* Sensor List */
