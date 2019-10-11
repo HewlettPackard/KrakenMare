@@ -500,25 +500,46 @@ class IBswitchSimulator:
                     else:
                         query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitDiscards")] = query_output["PortXmitDiscards"]
 
-                    record['measurementList'][7]['sensorValue'] = query_output["PortRcvSwitchRelayErrors"]
+                    record['measurementList'][7]['sensorValue'] = query_output["PortXmitDiscards"]
+
+                    record['measurementList'][8]['timestamp'] = nowint
+                    record['measurementList'][8]['sensorValue'] = query_output["PortXmitConstraintErrors"]
+                    record['measurementList'][9]['timestamp'] = nowint
+                    record['measurementList'][9]['sensorValue'] = query_output["PortRcvConstraintErrors"]
+                    record['measurementList'][10]['timestamp'] = nowint
+                    record['measurementList'][10]['sensorValue'] = query_output["LocalLinkIntegrityErrors"]
+                    record['measurementList'][10]['timestamp'] = nowint
+                    record['measurementList'][10]['sensorValue'] = query_output["ExcessiveBufferOverrunErrors"]
+                    record['measurementList'][10]['timestamp'] = nowint
+                    record['measurementList'][10]['sensorValue'] = query_output["VL15Dropped"]
 
                     query_output["PortXmitData"] += random.randint(1000, 4000)
                     query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitData")] = query_output["PortXmitData"]
+                    record['measurementList'][11]['timestamp'] = nowint
+                    record['measurementList'][11]['sensorValue'] = query_output["PortXmitData"]
                     query_output["PortRcvData"] += random.randint(1000, 4000)
                     query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvData")] = query_output["PortRcvData"]
+                    record['measurementList'][12]['timestamp'] = nowint
+                    record['measurementList'][12]['sensorValue'] = query_output["PortRcvData"]
                     query_output["PortXmitPkts"] += random.randint(100, 400)
                     query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitPkts")] = query_output["PortXmitPkts"]
+                    record['measurementList'][13]['timestamp'] = nowint
+                    record['measurementList'][13]['sensorValue'] = query_output["PortXmitPkts"]
                     query_output["PortRcvPkts"] += random.randint(100, 400)
                     query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortRcvPkts")] = query_output["PortRcvPkts"]
+                    record['measurementList'][14]['timestamp'] = nowint
+                    record['measurementList'][14]['sensorValue'] = query_output["PortRcvPkts"]
                     query_output["PortXmitWait"] += random.randint(100, 200)
                     query_output_new[str(timestamp)][str(sensorIdPrefix + "-PortXmitWait")] = query_output["PortXmitWait"]
+                    record['measurementList'][15]['timestamp'] = nowint
+                    record['measurementList'][15]['sensorValue'] = query_output["PortXmitWait"]
 
                     # Write output to the next input
                     with open(output, "w") as g:
                         json.dump(query_output, g)
                     g.close()
 
-            data_out_new = json.dumps(query_output_new).encode("utf-8")
+            data_out_new = json.dumps(record).encode("utf-8")
 
             if pubsubType == "mqtt":
                 print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
