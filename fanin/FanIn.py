@@ -117,10 +117,8 @@ class FanIn():
 	# connect to MQTT broker and subscribe to receive agent messages
 	def mqtt_subscription(self):
 		self.myMQTTtopic = "ibswitch"
-		#self.myMQTTtopic = "#"
 		
 		self.mqtt_client = mqtt.Client("FanInUUID")
-		#self.mqtt_client.on_log = self.mqtt_on_log
 		self.mqtt_client.on_connect = self.mqtt_on_connect
 		self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
 		self.mqtt_client.on_message = self.mqtt_on_agent_message
@@ -151,36 +149,9 @@ class FanIn():
 	# TODO: or should the MQTT agent convert message into our schema before sending via MQTT?
 	def mqtt_on_agent_message(self, client, userdata, message):
 		
-		#process message
 		if message.topic == "ibswitch":
 			print(str(message))
-			
-			kafka_message = {}
-			
-			#print("message received: %s " % message.payload)
-			
-#			myMQTTmessage = json.loads(message.payload)
-			
-#			for key, value in myMQTTmessage.items():
-#				print(str(key) + ':' + str(value))
-				
-				# reassemble message to Kafka avro syntax
-				#TODO: for now Druid ingest spec only support flattened JSON, easier for POC to write flat JSON than nested (maps)
-				#"""
-				#	{'timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}
-				#	timestamp': { 'tw-0x0800690000005E60-PortSelect': 255}, 'tw-0x0800690000005E60-SymbolErrorCounter': 2} ...}}
-				#"""
-				
-#				kafka_message['timestamp'] = str(key)
-				
-				# go through sensors and add measurements for each sensor
-#				for subkey, value in myMQTTmessage[key].items():	
-#					kafka_message[subkey] = value
-
-				# publish assembled message to kafka
-#			print("Publishing to Kafka topic (" + "fabric" + "): " + str(kafka_message))
 			self.kafka_producer.produce("fabric", message.payload)
-				#self.kafka_producer.flush()
 		else:
 			print("Not ibswitch topic")
 	# END MQTT agent methods   
