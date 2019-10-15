@@ -19,13 +19,16 @@ import platform
 # import special classes
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
-from fastavro import writer, parse_schema, schemaless_writer, schemaless_reader
+from fastavro import schemaless_writer, schemaless_reader
+from fastavro.schema import parse_schema
 
 import io
 
 # project imports
 from version import __version__
+
 from schema_registry.client import SchemaRegistryClient
+from schema_registry.serializers import MessageSerializer
 
 # START IBswitchSimulator class
 
@@ -59,7 +62,7 @@ class IBswitchSimulator:
         self.myMQTTregistered = False
         # Agent uid as provided by the discovery mecanism.
         # for now use the hostname, should be the output of the disc mecanism
-        self.myAgent_uid = platform.node() + str(random.randint(1,100001))
+        self.myAgent_uid = platform.node() + str(random.randint(1, 100001))
 
         conf = {
             "url": "https://schemaregistry:8081",
@@ -96,6 +99,8 @@ class IBswitchSimulator:
             time.sleep(1)
 
         self.send_time_series_schema = cg.schema.schema
+        self.send_time_series_schema_id = cg.schema_id
+        self.send_time_series_serializer = MessageSerializer(client)
 
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
@@ -208,7 +213,7 @@ class IBswitchSimulator:
     # send simulated sensor data via MQTT
     def send_data(self, pubsubType):
         i = 0
-        
+
         if pubsubType == "mqtt":
             client = mqtt.Client(self.myAgent_uid)
             print("connecting to mqtt broker")
@@ -237,35 +242,51 @@ class IBswitchSimulator:
 # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e7 PortXmitWait
 
         record = {
-           "uuid": str(self.myAgent_uuid), "timestamp": 1570135369000,
+            "uuid": str(self.myAgent_uuid), "timestamp": 1570135369000,
             "measurementList": [
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6", "sensorValue": 0.0 },
-              { "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "sensorValue": 0.0 }
-           ]
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6",
+                    "sensorValue": 0.0},
+                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "sensorValue": 0.0}
+            ]
         }
-            
+
         # Infinite loop
         while True:
             i = i + 1
 
             # read JSON data describing switches in the IRU (c stands for CMC)
             for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
-                
+
                 with open(cmc, "r") as f:
                     query_data = json.load(f)
 
@@ -355,12 +376,16 @@ class IBswitchSimulator:
                         json.dump(query_output, g)
                     g.close()
 
-            w_bytes = io.BytesIO()
-            schemaless_writer(w_bytes, self.send_time_series_schema, record)
-            raw_bytes = w_bytes.getvalue()
+            #w_bytes = io.BytesIO()
+            #schemaless_writer(w_bytes, self.send_time_series_schema, record)
+            #raw_bytes = w_bytes.getvalue()
+
+            raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
+                self.send_time_series_schema_id, record)
 
             if pubsubType == "mqtt":
-                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                print(str(i) + ":Publishing via mqtt (topic:%s)" %
+                      self.data_topic)
                 client.publish(self.data_topic, raw_bytes)
             else:
                 print("error: shouldn't be here")
