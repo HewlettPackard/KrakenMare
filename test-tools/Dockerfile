@@ -1,10 +1,10 @@
 FROM ubuntu:18.04
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget libssl-dev
+RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget libssl-dev curl
 
 # Build deps
-RUN apt-get update && apt-get install -y gcc g++ make cmake autoconf libtool wget libssl-dev libavro-dev libcurl4-gnutls-dev git gdb valgrind cppcheck
+RUN apt-get update && apt-get install -y gcc g++ make cmake autoconf libtool wget libavro-dev libcurl4-gnutls-dev git gdb valgrind cppcheck
 
 # Jansson json library
 RUN wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - 
@@ -31,7 +31,7 @@ RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 # Add other tools not needed for build
-RUN apt-get update && apt-get install -y nmap netcat iputils-ping jq redis-server openssl libssl-dev gnupg software-properties-common openjdk-11-jre-headless vim emacs less bc iperf
+RUN apt-get update && apt-get install -y nmap netcat iputils-ping jq redis-server openssl gnupg software-properties-common openjdk-11-jre-headless vim emacs less bc iperf
 
 # Confluent kafka tools
 RUN wget -qO - https://packages.confluent.io/deb/5.2/archive.key | apt-key add -
