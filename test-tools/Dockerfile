@@ -44,7 +44,7 @@ RUN pip3 install colorama
 RUN cd /usr/src && git clone https://github.com/simonwahlgren/avrocat.git && cd avrocat && pip3 install -e .
 
 # Bring in the environment of the simulator so we can play with it
-RUN pip3 install avro-python3==1.8.2
+RUN pip3 install avro-python3
 RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro confluent-kafka
 
 COPY ./check-pipeline.sh ./client-sasl_ssl.conf ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh /tmp/
