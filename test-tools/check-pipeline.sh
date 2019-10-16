@@ -37,6 +37,7 @@ run_me redis          redis-cli -h redis ping                     || exit 1
 run_me framework      curl -s framework:8080/agents               || exit 1
 run_me mosquitto      timeout 10 mosquitto_sub -h mosquitto -t '\$'SYS/broker/version -C 1 || exit 1
 run_me influx         curl -s influxdb:8086/ping                  || exit 1
+run_me kafka-avro-console kafka-avro-console-consumer --bootstrap-server broker-1:29092 --topic fabric --property schema.registry.url=https://schemaregistry:8081 --consumer.config /run/secrets/client-sasl_ssl.conf --max-messages=1 || exit 1
 run_me druid_coord    curl -s http://druid:8081/status/health     || exit 1
 run_me druid_broker   curl -s http://druid:8082/status/health     || exit 1
 run_me druid_histo    curl -s http://druid:8083/status/health     || exit 1
