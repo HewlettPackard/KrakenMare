@@ -563,7 +563,14 @@ services:
         REDFISHPWD: "$REDFISHPWD"
     hostname: redfish
     <<: *deploy
+    secrets:
+      - km-ca-1.crt
+      - km-ca-1.key
+      - km-ca-1.srl
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
     networks:
+      - zookeeper_kafka
       - krakenmare
 
   config-druid:
