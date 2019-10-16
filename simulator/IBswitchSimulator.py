@@ -376,12 +376,8 @@ class IBswitchSimulator:
                         json.dump(query_output, g)
                     g.close()
 
-            #w_bytes = io.BytesIO()
-            #schemaless_writer(w_bytes, self.send_time_series_schema, record)
-            #raw_bytes = w_bytes.getvalue()
-
-            raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
-                self.send_time_series_schema_id, record)
+                    raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
+                        self.send_time_series_schema_id, record)
 
             if pubsubType == "mqtt":
                 print(str(i) + ":Publishing via mqtt (topic:%s)" %
