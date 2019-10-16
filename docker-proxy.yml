@@ -59,6 +59,9 @@ services:
   schemaregistry:
     <<: *proxy
 
+  srd:
+    <<: *proxy
+
   config-zookeeper:
     <<: *proxy
 

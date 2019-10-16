@@ -435,6 +435,24 @@ services:
       - zookeeper_kafka
       - krakenmare
 
+  srd:
+    image: ${REGISTRY_FULL_PATH}schemaregistry
+    build:
+      context: schemaregistry
+      dockerfile: Dockerfile
+    hostname: srd
+    ports:
+      - "8085:8085"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: srd
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://broker-1:9092,PLAINTEXT://broker-2:9093,PLAINTEXT://broker-3:9094"
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8085"
+    <<: *deploy
+    networks:
+      - zookeeper_kafka
+      - krakenmare
+
   connect:
     image: ${REGISTRY_FULL_PATH}connect
     build:
