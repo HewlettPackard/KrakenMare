@@ -67,8 +67,7 @@ class IBswitchSimulator:
         conf = {
             "url": "https://schemaregistry:8081",
             "ssl.ca.location": "/run/secrets/km-ca-1.crt",
-            "ssl.certificate.location":
-            "/run/secrets/schemaregistry.certificate.pem",
+            "ssl.certificate.location": "/run/secrets/schemaregistry.certificate.pem",
             "ssl.key.location": "/run/secrets/schemaregistry.key",
         }
 
@@ -174,8 +173,7 @@ class IBswitchSimulator:
         registration_client.connect(self.mqtt_broker)
         registration_client.loop_start()
 
-        registration_client.subscribe(
-            "registration/" + self.myAgent_uid + "/response")
+        registration_client.subscribe("registration/" + self.myAgent_uid + "/response")
 
         RegistrationData = {
             "agentID": self.myAgent_uid,
@@ -187,8 +185,7 @@ class IBswitchSimulator:
 
         w_bytes = io.BytesIO()
 
-        schemaless_writer(
-            w_bytes, self.register_request_schema, RegistrationData)
+        schemaless_writer(w_bytes, self.register_request_schema, RegistrationData)
 
         raw_bytes = w_bytes.getvalue()
 
@@ -222,62 +219,98 @@ class IBswitchSimulator:
             print("Unknown Pub/Sub type selected: " + pubsubType)
             sys.exit(-1)
 
-# Create JSON structure for data.
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d1 PortSelect
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d2 SymbolErrorCounters
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d3 LinkErrorRecoveryCounter
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d4 LinkDownedCounter
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d5 PortRcvErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d6 PortRcvSwitchRelayErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d7 PortXmitDiscards
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d8 PortXmitConstraintErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d9 PortRcvConstraintErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e0 LocalLinkIntegrityErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e1 ExcessiveBufferOverrunErrors
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e2 VL15Dropped
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e3 PortXmitData
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e4 PortRcvData
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e5 PortXmitPkts
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e6 PortRcvPkts
-# sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e7 PortXmitWait
+        # Create JSON structure for data.
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d1 PortSelect
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d2 SymbolErrorCounters
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d3 LinkErrorRecoveryCounter
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d4 LinkDownedCounter
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d5 PortRcvErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d6 PortRcvSwitchRelayErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d7 PortXmitDiscards
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d8 PortXmitConstraintErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6d9 PortRcvConstraintErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e0 LocalLinkIntegrityErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e1 ExcessiveBufferOverrunErrors
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e2 VL15Dropped
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e3 PortXmitData
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e4 PortRcvData
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e5 PortXmitPkts
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e6 PortRcvPkts
+        # sensorUUID afbfa80d-cd9d-487a-841c-6da12b10c6e7 PortXmitWait
 
         record = {
-            "uuid": str(self.myAgent_uuid), "timestamp": 1570135369000,
+            "uuid": str(self.myAgent_uuid),
+            "timestamp": 1570135369000,
             "measurementList": [
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6",
-                    "sensorValue": 0.0},
-                {"sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7", "sensorValue": 0.0}
-            ]
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6",
+                    "sensorValue": 0.0,
+                },
+                {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7",
+                    "sensorValue": 0.0,
+                },
+            ],
         }
 
         # Infinite loop
@@ -303,21 +336,22 @@ class IBswitchSimulator:
                 # Set time to milliseconds since the epoch for InfluxDB
                 timestamp = int(round(time.time() * 1000))
 
-                record['timestamp'] = timestamp
+                record["timestamp"] = timestamp
 
                 # go through sensors for device
                 for switch in query_data["Switch"]:
                     guid = str(switch["Node_GUID"])
                     # Read in the old query output
-                    output = self.seedOutputDir + \
-                        "/" + guid + ".perfquery.json"
+                    output = self.seedOutputDir + "/" + guid + ".perfquery.json"
                     with open(output, "r") as g:
                         query_output = json.load(g)
                     g.close()
 
                     query_output["Name"] = self.myAgentName
                     query_output["Timestamp"] = timestamp
-                    record['measurementList'][0]['sensorValue'] = query_output["PortSelect"]
+                    record["measurementList"][0]["sensorValue"] = query_output[
+                        "PortSelect"
+                    ]
 
                     x = random.random()
                     if x > 0.98:
@@ -327,8 +361,12 @@ class IBswitchSimulator:
                     elif x > 0.78:
                         query_output["SymbolErrorCounter"] += 1
 
-                    record['measurementList'][1]['sensorValue'] = query_output["SymbolErrorCounter"]
-                    record['measurementList'][2]['sensorValue'] = query_output["LinkErrorRecoveryCounter"]
+                    record["measurementList"][1]["sensorValue"] = query_output[
+                        "SymbolErrorCounter"
+                    ]
+                    record["measurementList"][2]["sensorValue"] = query_output[
+                        "LinkErrorRecoveryCounter"
+                    ]
 
                     x = random.random()
                     if x > 0.99:
@@ -338,11 +376,19 @@ class IBswitchSimulator:
                     elif x > 0.79:
                         query_output["LinkDownedCounter"] += 1
 
-                    record['measurementList'][3]['sensorValue'] = query_output["LinkDownedCounter"]
+                    record["measurementList"][3]["sensorValue"] = query_output[
+                        "LinkDownedCounter"
+                    ]
 
-                    record['measurementList'][4]['sensorValue'] = query_output["PortRcvErrors"]
-                    record['measurementList'][5]['sensorValue'] = query_output["PortRcvRemotePhysicalErrors"]
-                    record['measurementList'][6]['sensorValue'] = query_output["PortRcvSwitchRelayErrors"]
+                    record["measurementList"][4]["sensorValue"] = query_output[
+                        "PortRcvErrors"
+                    ]
+                    record["measurementList"][5]["sensorValue"] = query_output[
+                        "PortRcvRemotePhysicalErrors"
+                    ]
+                    record["measurementList"][6]["sensorValue"] = query_output[
+                        "PortRcvSwitchRelayErrors"
+                    ]
 
                     x = random.random()
                     if x > 0.99:
@@ -352,24 +398,46 @@ class IBswitchSimulator:
                     elif x > 0.79:
                         query_output["PortXmitDiscards"] += 2
 
-                    record['measurementList'][7]['sensorValue'] = query_output["PortXmitDiscards"]
+                    record["measurementList"][7]["sensorValue"] = query_output[
+                        "PortXmitDiscards"
+                    ]
 
-                    record['measurementList'][8]['sensorValue'] = query_output["PortXmitConstraintErrors"]
-                    record['measurementList'][9]['sensorValue'] = query_output["PortRcvConstraintErrors"]
-                    record['measurementList'][10]['sensorValue'] = query_output["LocalLinkIntegrityErrors"]
-                    record['measurementList'][10]['sensorValue'] = query_output["ExcessiveBufferOverrunErrors"]
-                    record['measurementList'][10]['sensorValue'] = query_output["VL15Dropped"]
+                    record["measurementList"][8]["sensorValue"] = query_output[
+                        "PortXmitConstraintErrors"
+                    ]
+                    record["measurementList"][9]["sensorValue"] = query_output[
+                        "PortRcvConstraintErrors"
+                    ]
+                    record["measurementList"][10]["sensorValue"] = query_output[
+                        "LocalLinkIntegrityErrors"
+                    ]
+                    record["measurementList"][10]["sensorValue"] = query_output[
+                        "ExcessiveBufferOverrunErrors"
+                    ]
+                    record["measurementList"][10]["sensorValue"] = query_output[
+                        "VL15Dropped"
+                    ]
 
                     query_output["PortXmitData"] += random.randint(1000, 4000)
-                    record['measurementList'][11]['sensorValue'] = query_output["PortXmitData"]
+                    record["measurementList"][11]["sensorValue"] = query_output[
+                        "PortXmitData"
+                    ]
                     query_output["PortRcvData"] += random.randint(1000, 4000)
-                    record['measurementList'][12]['sensorValue'] = query_output["PortRcvData"]
+                    record["measurementList"][12]["sensorValue"] = query_output[
+                        "PortRcvData"
+                    ]
                     query_output["PortXmitPkts"] += random.randint(100, 400)
-                    record['measurementList'][13]['sensorValue'] = query_output["PortXmitPkts"]
+                    record["measurementList"][13]["sensorValue"] = query_output[
+                        "PortXmitPkts"
+                    ]
                     query_output["PortRcvPkts"] += random.randint(100, 400)
-                    record['measurementList'][14]['sensorValue'] = query_output["PortRcvPkts"]
+                    record["measurementList"][14]["sensorValue"] = query_output[
+                        "PortRcvPkts"
+                    ]
                     query_output["PortXmitWait"] += random.randint(100, 200)
-                    record['measurementList'][15]['sensorValue'] = query_output["PortXmitWait"]
+                    record["measurementList"][15]["sensorValue"] = query_output[
+                        "PortXmitWait"
+                    ]
 
                     # Write output to the next input
                     with open(output, "w") as g:
@@ -377,11 +445,11 @@ class IBswitchSimulator:
                     g.close()
 
                     raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
-                        self.send_time_series_schema_id, record)
+                        self.send_time_series_schema_id, record
+                    )
 
             if pubsubType == "mqtt":
-                print(str(i) + ":Publishing via mqtt (topic:%s)" %
-                      self.data_topic)
+                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
                 client.publish(self.data_topic, raw_bytes)
             else:
                 print("error: shouldn't be here")
@@ -439,12 +507,10 @@ def main():
 
     if options.local is True:
         # load development config to run outside of container
-        myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator_dev.cfg", "local")
+        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator_dev.cfg", "local")
     else:
         # load container config
-        myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator.cfg", "container")
+        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", "container")
 
     if options.modename == "mqtt":
         myIBswitchSimulator.run(
