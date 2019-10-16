@@ -260,6 +260,8 @@ services:
     environment:
       MOSQUITTO_IP: mosquitto
       KAFKA_BROKER_IP: broker-1
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/run/secrets/kafka.connect.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.connect.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
+      SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
     <<: *deploy
     secrets:
       - zookeeper_jaas.conf
@@ -405,7 +407,6 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SASL_SSL://broker-1:29092,SASL_SSL://broker-2:29093,SASL_SSL://broker-3:29094"
-      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
       SCHEMA_REGISTRY_LISTENERS: "https://0.0.0.0:8081"
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
