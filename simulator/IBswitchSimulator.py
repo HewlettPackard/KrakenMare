@@ -249,6 +249,10 @@ class IBswitchSimulator:
             "timestamp": 1570135369000,
             "measurementList": [
                 {
+                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
+                    "sensorValue": 0.0,
+                },
+                {
                     "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1",
                     "sensorValue": 0.0,
                 },
@@ -417,31 +421,31 @@ class IBswitchSimulator:
                     record["measurementList"][10]["sensorValue"] = query_output[
                         "LocalLinkIntegrityErrors"
                     ]
-                    record["measurementList"][10]["sensorValue"] = query_output[
+                    record["measurementList"][11]["sensorValue"] = query_output[
                         "ExcessiveBufferOverrunErrors"
                     ]
-                    record["measurementList"][10]["sensorValue"] = query_output[
+                    record["measurementList"][12]["sensorValue"] = query_output[
                         "VL15Dropped"
                     ]
 
                     query_output["PortXmitData"] += random.randint(1000, 4000)
-                    record["measurementList"][11]["sensorValue"] = query_output[
+                    record["measurementList"][13]["sensorValue"] = query_output[
                         "PortXmitData"
                     ]
                     query_output["PortRcvData"] += random.randint(1000, 4000)
-                    record["measurementList"][12]["sensorValue"] = query_output[
+                    record["measurementList"][14]["sensorValue"] = query_output[
                         "PortRcvData"
                     ]
                     query_output["PortXmitPkts"] += random.randint(100, 400)
-                    record["measurementList"][13]["sensorValue"] = query_output[
+                    record["measurementList"][15]["sensorValue"] = query_output[
                         "PortXmitPkts"
                     ]
                     query_output["PortRcvPkts"] += random.randint(100, 400)
-                    record["measurementList"][14]["sensorValue"] = query_output[
+                    record["measurementList"][16]["sensorValue"] = query_output[
                         "PortRcvPkts"
                     ]
                     query_output["PortXmitWait"] += random.randint(100, 200)
-                    record["measurementList"][15]["sensorValue"] = query_output[
+                    record["measurementList"][17]["sensorValue"] = query_output[
                         "PortXmitWait"
                     ]
 
