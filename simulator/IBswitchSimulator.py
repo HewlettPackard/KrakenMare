@@ -20,7 +20,6 @@ import platform
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 from fastavro import schemaless_writer, schemaless_reader
-from fastavro.schema import parse_schema
 
 import io
 
