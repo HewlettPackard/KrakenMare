@@ -47,7 +47,7 @@ RUN cd /usr/src && git clone https://github.com/simonwahlgren/avrocat.git && cd 
 RUN pip3 install avro-python3
 RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro confluent-kafka
 
-COPY ./check-pipeline.sh ./client-sasl_ssl.conf ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh /tmp/
+COPY ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
