@@ -3,272 +3,63 @@
   "dataSchema": {
     "dataSource": "perfquery",
     "parser": {
-      "type": "string",
+      "type": "avro_stream",
+      "avroBytesDecoder": {
+        "type": "schema_registry",
+        "url": "http://srd:8085"
+      },
       "parseSpec": {
-        "format": "json",
-        "dimensionsSpec": {
-          "dimensions": [
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortXmitPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-SymbolErrorCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortXmitDiscards",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000740A-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E50-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000731E-PortRcvData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x080069000000755E-PortXmitWait",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007476-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortXmitData",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000007466-PortRcvPkts",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E58-LinkDownedCounter",
-              "type": "long"
-            },
-            {
-              "name": "tw-agent-ibswitchSim-1-0x0800690000005E60-PortXmitDiscards",
-              "type": "long"
-            }
-          ]
-        },
+        "format": "avro",
         "timestampSpec": {
           "column": "timestamp",
           "format": "millis"
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+            { "name": "uuid", "type": "string" },
+            { "name": "timestamp", "type": "long" },
+	    "PortSelect",
+	    "SymbolErrorCounters",
+            "LinkErrorRecoveryCounter",
+            "LinkDownedCounter",
+            "PortRcvErrors",
+	    "PortRcvRemotePhysicalErrors",
+            "PortRcvSwitchRelayErrors",
+            "PortXmitDiscards",
+            "PortXmitConstraintErrors",
+            "PortRcvConstraintErrors",
+            "LocalLinkIntegrityErrors",
+            "ExcessiveBufferOverrunErrors",
+            "VL15Dropped",
+            "PortXmitData",
+            "PortRcvData",
+            "PortXmitPkts",
+            "PortRcvPkts",
+            "PortXmitWait"
+          ]
+        },
+        "flattenSpec": {
+          "useFieldDiscovery": true,
+          "fields": [
+            { "type": "path", "name": "PortSelect", "expr": "$.measurementList[0]sensorValue"},
+            { "type": "path", "name": "SymbolErrorCounters", "expr": "$.measurementList[1]sensorValue"},
+            { "type": "path", "name": "LinkErrorRecoveryCounter", "expr": "$.measurementList[2]sensorValue"},
+            { "type": "path", "name": "LinkDownedCounter", "expr": "$.measurementList[3]sensorValue"},
+            { "type": "path", "name": "PortRcvErrors", "expr": "$.measurementList[4]sensorValue"},
+            { "type": "path", "name": "PortRcvRemotePhysicalErrors", "expr": "$.measurementList[5]sensorValue"},
+            { "type": "path", "name": "PortRcvSwitchRelayErrors", "expr": "$.measurementList[6]sensorValue"},
+            { "type": "path", "name": "PortXmitDiscards", "expr": "$.measurementList[7]sensorValue"},
+            { "type": "path", "name": "PortXmitConstraintErrors", "expr": "$.measurementList[8]sensorValue"},
+            { "type": "path", "name": "PortRcvConstraintErrors", "expr": "$.measurementList[9]sensorValue"},
+            { "type": "path", "name": "LocalLinkIntegrityErrors", "expr": "$.measurementList[10]sensorValue"},
+            { "type": "path", "name": "ExcessiveBufferOverrunErrors", "expr": "$.measurementList[11]sensorValue"},
+            { "type": "path", "name": "VL15Dropped", "expr": "$.measurementList[12]sensorValue"},
+            { "type": "path", "name": "PortXmitData", "expr": "$.measurementList[13]sensorValue"},
+            { "type": "path", "name": "PortRcvData", "expr": "$.measurementList[14]sensorValue"},
+            { "type": "path", "name": "PortXmitPkts", "expr": "$.measurementList[15]sensorValue"},
+            { "type": "path", "name": "PortRcvPkts", "expr": "$.measurementList[16]sensorValue"},
+            { "type": "path", "name": "PortXmitWait", "expr": "$.measurementList[17]sensorValue"}
+          ]
         }
       }
     },
