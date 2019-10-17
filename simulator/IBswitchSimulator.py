@@ -322,7 +322,6 @@ class IBswitchSimulator:
              for switch in query_data["Switch"]:
                  guid = str(switch["Node_GUID"])
                  sensor_uuid[cmc][guid] = {}
-
                  for ibmetric in ibmetrics:
                      sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(hashlib.md5((guid+cmc+ibmetric).encode()).hexdigest())
 
