@@ -36,6 +36,8 @@ public class MqttAgentTest {
 		agent.register(broker);
 		// at the end of registration process, agent UUID must be set
 		assertNotNull(agent.getUuid());
+
+		agent.registerDevices(broker);
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException, MqttException {
