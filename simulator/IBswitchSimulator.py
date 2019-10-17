@@ -227,7 +227,7 @@ class IBswitchSimulator:
             sys.exit(-1)
 
         # Create JSON structure for data.
-        ibmetrics = ["PortSelect", "SymbolErrorCounters", "LinkErrorRecoveryCounter", "LinkDownedCounter", "PortRcvErrors",
+        ibmetrics = ["PortSelect", "SymbolErrorCounter", "LinkErrorRecoveryCounter", "LinkDownedCounter", "PortRcvErrors", "PortRcvRemotePhysicalErrors",
                      "PortRcvSwitchRelayErrors", "PortXmitDiscards", "PortXmitConstraintErrors", "PortRcvConstraintErrors",
                      "LocalLinkIntegrityErrors", "ExcessiveBufferOverrunErrors", "VL15Dropped", "PortXmitData",
                      "PortRcvData", "PortXmitPkts", "PortRcvPkts", "PortXmitWait"]
@@ -313,7 +313,7 @@ class IBswitchSimulator:
         # read JSON data describing switches in the IRU (c stands for CMC)
         sensor_uuid = {}
         for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
-             sensor_uuid['cmc'] = {}
+             sensor_uuid[cmc] = {}
              with open(cmc, "r") as f:
                  query_data = json.load(f)
 
@@ -321,7 +321,7 @@ class IBswitchSimulator:
             # generate sensor uuid from has of seed sensor uuids + cmc + guid
              for switch in query_data["Switch"]:
                  guid = str(switch["Node_GUID"])
-                 sensor_uuid['cmc']['guid'] = {}
+                 sensor_uuid[cmc][guid] = {}
 
                  for ibmetric in ibmetrics:
                      sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(hashlib.md5((guid+cmc+ibmetric).encode()).hexdigest())
@@ -479,13 +479,12 @@ class IBswitchSimulator:
                         self.send_time_series_schema_id, record
                     )
 
-            if pubsubType == "mqtt":
-                print(str(i) + ":Publishing via mqtt (topic:%s)" %
-                      self.data_topic)
-                client.publish(self.data_topic, raw_bytes)
-            else:
-                print("error: shouldn't be here")
-                sys.exit(-1)
+                    if pubsubType == "mqtt":
+                        print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                        client.publish(self.data_topic, raw_bytes)
+                    else:
+                        print("error: shouldn't be here")
+                        sys.exit(-1)
 
             # Infinite loop
             time.sleep(self.sleepLoopTime)
