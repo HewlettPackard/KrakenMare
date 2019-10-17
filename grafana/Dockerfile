@@ -1,7 +1,7 @@
 FROM grafana/grafana
 
 USER root
-RUN apt update && apt install -y wget
+RUN apk update && apk add wget
 
 ARG commit=67400f89786b476635e0e87cf6ac038a83818672
 
