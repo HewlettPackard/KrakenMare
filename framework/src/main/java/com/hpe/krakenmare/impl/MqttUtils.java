@@ -8,7 +8,7 @@ import com.hpe.krakenmare.core.Agent;
 public class MqttUtils {
 
 	private static final String REGISTRATION_TOPIC = Main.getProperty("km.registration.mqtt.topic");
-	private static final String SENSOR_LIST_TOPIC = Main.getProperty("km.sensor-list.mqtt.topic");
+	private static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.mqtt.topic");
 
 	/* Registration */
 
@@ -29,7 +29,6 @@ public class MqttUtils {
 	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
 	public static String getRegistrationResponseTopic(CharSequence uid) {
 		return REGISTRATION_TOPIC + "/" + uid + "/response";
-
 	}
 
 	/* Sensor List */

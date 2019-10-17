@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.hpe.krakenmare.Main;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
 import com.hpe.krakenmare.impl.MqttRegistrationListener;
+import com.hpe.krakenmare.impl.MqttSensorListListener;
 import com.hpe.krakenmare.repositories.AgentMemoryRepository;
 
 public class MqttAgentTest {
@@ -28,6 +29,7 @@ public class MqttAgentTest {
 
 		AgentMemoryRepository agents = new AgentMemoryRepository();
 		MqttRegistrationListener.registerNew(listener, agents);
+		MqttSensorListListener.registerNew(listener, agents);
 	}
 
 	@Test
