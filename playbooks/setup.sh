@@ -17,6 +17,9 @@ unset $proxy;
 unset $setupRegistry;
 unset $restartDocker;
 unset $stop;
+
+dockerpull="--pull";
+
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
@@ -36,6 +39,7 @@ usage () {
      echo "-r: to create Registry"
      echo "-p: to Pull"
      echo "-b: to Build and Push"
+     echo "-f: do not force pulling newer image from dockerhub"
      echo "-d: to Deploy"
      echo "-i: to specify the inventory file (DEFAULT is ${DEFAULT_INVENTORY_FILE})"
      echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
@@ -61,7 +65,7 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdri:Rs" Option
+while getopts "hfapbdrfi:Rs" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
@@ -69,6 +73,7 @@ do
          p     ) pull=1         ;;
          b     ) build=1        ;;
          d     ) deploy=1       ;;
+	 f     ) dockerpull=""  ;;
          R     ) restartDocker=1;;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
@@ -94,9 +99,6 @@ unset $registry;
 registry=$(cat $DEFAULT_INVENTORY_FILE | sed -n -e '/\[registry\]/,$p' | grep -v "[\[,#,^$]" |sed  '/^$/d'| awk '{$1=$1};1' | head -1 | awk '{ print $1}' )
 export no_proxy=$registry
 export REGISTRY_FULL_PATH="$registry:$MIRROR_REGISTRY_PORT/" 
-
-
-
 
 if  [ -z $registry ]
 then
@@ -137,7 +139,7 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 
 if [  "$ansible" == "1"  ]; then
     #Build ansible
-    docker build --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
+    docker build $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
     
     mkdir -p $KM_HOME/download-cache || exit 1
     
@@ -170,8 +172,8 @@ if [ "$pull" == "1" ]; then
 fi
 
 if [ "$build" == "1" ]; then
-     docker-compose  build || exit 1
-     docker-compose  push || exit 1
+    docker-compose build $dockerpull || exit 1
+    docker-compose push || exit 1
 fi
 
 if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
