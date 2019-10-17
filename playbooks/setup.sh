@@ -17,9 +17,7 @@ unset $proxy;
 unset $setupRegistry;
 unset $restartDocker;
 unset $stop;
-
 dockerpull="--pull";
-
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
@@ -119,7 +117,7 @@ echo "Checking whether we are on the HPE LAN and needing a proxy..."
 { type wget &> /dev/null ; } || { echo "Unable to find wget in your env, install it to have automatic HPE proxy detection" ; exit 4 ;}
 
 
-wget --no-proxy -q --dns-timeout=2 --timeout=2 www.google.com ; r=$?
+wget --no-proxy -q --dns-timeout=2 --timeout=2 www.google.com -O /dev/null ; r=$?
 echo "$r"
 if [ ! $r -eq 0 ]; then
     wget -q --dns-timeout=5 --timeout=5 autocache.hpecorp.net -O /dev/null
