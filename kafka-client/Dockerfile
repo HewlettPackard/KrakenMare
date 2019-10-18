@@ -5,10 +5,10 @@ FROM ubuntu:18.04 as kafkabuild
 RUN apt-get update && apt-get upgrade -y
 
 #only required for building
-RUN apt-get update && apt-get install -y --force-yes gcc g++ make \
+RUN apt-get update && apt-get install -y  gcc g++ make \
 && apt-get install -y autoconf libtool wget libssl-dev \
 && cd / && wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - \
-&& apt-get install -y --force-yes gdb valgrind cppcheck
+&& apt-get install -y  gdb valgrind cppcheck
 
 RUN mv /jansson-2.12 /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
 
@@ -29,7 +29,7 @@ WORKDIR /
 # The demo configuration allows topics to be created. By the act of publishing we create the hello topic
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y --force-yes libssl-dev
+RUN apt-get update && apt-get install -y  libssl-dev
 COPY --from=kafkabuild /usr/local/lib/* /usr/local/lib/
 RUN mkdir -p /usr/local/include/librdkafka
 COPY --from=kafkabuild /usr/local/include/librdkafka/* /usr/local/include/librdkafka/

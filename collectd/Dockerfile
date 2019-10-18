@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y bash wget diffutils patch
 # Build deps
 RUN apt-get update && apt-get install -y gcc g++ make \
 	&& apt-get install -y autoconf libtool wget \
-	&& apt-get install -y --force-yes gdb valgrind cppcheck build-essential flex bison automake pkg-config
+	&& apt-get install -y  gdb valgrind cppcheck build-essential flex bison automake pkg-config
 
 RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
 && mv /librdkafka-1.1.0 /librdkafka && cd /librdkafka && ./configure && make && make install

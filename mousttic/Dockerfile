@@ -4,11 +4,11 @@ FROM ubuntu:18.04
 RUN apt-get update && apt-get -y upgrade && apt-get install software-properties-common -y && add-apt-repository ppa:mosquitto-dev/mosquitto-ppa && apt-get update
 
 #only required for building
-RUN apt-get update && apt-get install -y --force-yes gcc make libmosquittopp-dev wget autoconf libtool uuid-dev libuuid1\
+RUN apt-get update && apt-get install -y  gcc make libmosquittopp-dev wget autoconf libtool uuid-dev libuuid1\
 && cd / && wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - 
 
 #only required for debugging....
-RUN apt-get update && apt-get install -y --force-yes mosquitto-clients gdb valgrind cppcheck
+RUN apt-get update && apt-get install -y  mosquitto-clients gdb valgrind cppcheck
 
 RUN mv /jansson-2.12 /jansson && cd /jansson && autoreconf -fi ; ./configure && make && make install
 
