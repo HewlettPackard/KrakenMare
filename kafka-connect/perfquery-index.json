@@ -18,47 +18,10 @@
           "dimensions": [
             { "name": "uuid", "type": "string" },
             { "name": "timestamp", "type": "long" },
-	          { "name": "PortSelect", "type": "long" },
-	          { "name": "SymbolErrorCounter", "type": "long" },
-            { "name": "LinkErrorRecoveryCounter", "type": "long" },
-            { "name": "LinkDownedCounter", "type": "long" },
-            { "name": "PortRcvErrors", "type": "long" },
-	          { "name": "PortRcvRemotePhysicalErrors", "type": "long" },
-            { "name": "PortRcvSwitchRelayErrors", "type": "long" },
-            { "name": "PortXmitDiscards", "type": "long" },
-            { "name": "PortXmitConstraintErrors", "type": "long" },
-            { "name": "PortRcvConstraintErrors", "type": "long" },
-            { "name": "LocalLinkIntegrityErrors", "type": "long" },
-            { "name": "ExcessiveBufferOverrunErrors", "type": "long" },
-            { "name": "VL15Dropped", "type": "long" },
-            { "name": "PortXmitData", "type": "long" },
-            { "name": "PortRcvData", "type": "long" },
-            { "name": "PortXmitPkts", "type": "long" },
-            { "name": "PortRcvPkts", "type": "long" },
-            { "name": "PortXmitWait", "type": "long" }
-          ]
-        },
-        "flattenSpec": {
-          "useFieldDiscovery": true,
-          "fields": [
-            { "type": "path", "name": "PortSelect", "expr": "$.measurementList[0]sensorValue"},
-            { "type": "path", "name": "SymbolErrorCounter", "expr": "$.measurementList[1]sensorValue"},
-            { "type": "path", "name": "LinkErrorRecoveryCounter", "expr": "$.measurementList[2]sensorValue"},
-            { "type": "path", "name": "LinkDownedCounter", "expr": "$.measurementList[3]sensorValue"},
-            { "type": "path", "name": "PortRcvErrors", "expr": "$.measurementList[4]sensorValue"},
-            { "type": "path", "name": "PortRcvRemotePhysicalErrors", "expr": "$.measurementList[5]sensorValue"},
-            { "type": "path", "name": "PortRcvSwitchRelayErrors", "expr": "$.measurementList[6]sensorValue"},
-            { "type": "path", "name": "PortXmitDiscards", "expr": "$.measurementList[7]sensorValue"},
-            { "type": "path", "name": "PortXmitConstraintErrors", "expr": "$.measurementList[8]sensorValue"},
-            { "type": "path", "name": "PortRcvConstraintErrors", "expr": "$.measurementList[9]sensorValue"},
-            { "type": "path", "name": "LocalLinkIntegrityErrors", "expr": "$.measurementList[10]sensorValue"},
-            { "type": "path", "name": "ExcessiveBufferOverrunErrors", "expr": "$.measurementList[11]sensorValue"},
-            { "type": "path", "name": "VL15Dropped", "expr": "$.measurementList[12]sensorValue"},
-            { "type": "path", "name": "PortXmitData", "expr": "$.measurementList[13]sensorValue"},
-            { "type": "path", "name": "PortRcvData", "expr": "$.measurementList[14]sensorValue"},
-            { "type": "path", "name": "PortXmitPkts", "expr": "$.measurementList[15]sensorValue"},
-            { "type": "path", "name": "PortRcvPkts", "expr": "$.measurementList[16]sensorValue"},
-            { "type": "path", "name": "PortXmitWait", "expr": "$.measurementList[17]sensorValue"}
+	        { "name": "sensorUUID", "type": "string" },
+	        { "name": "sensorValue", "type": "float" },
+	        { "name": "deviceUUID", "type": "string" },
+	        { "name": "sensorName", "type": "string" }
           ]
         }
       }

@@ -22,6 +22,16 @@
 		"name": "sensorValue",
 		"type": "float",
 		"doc": "Sensor value"
+	},
+	{
+		"name": "deviceUUID",
+		"type": {"type": "string", "logicalType":"uuid"},
+		"doc": "Unique device identifier"
+	},
+	{
+		"name": "sensorName",
+		"type": "string",
+		"doc": "Human readable sensor name"
 	}
 ]
 }

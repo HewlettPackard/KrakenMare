@@ -229,6 +229,11 @@ class IBswitchSimulator:
 
         # Create a dictionary of the 18 IB metrics names
         ibmetrics = [
+            "SymbolErrorCounter",
+            "PortXmitData"
+            ]
+        
+        """ibmetrics = [
             "PortSelect",
             "SymbolErrorCounter",
             "LinkErrorRecoveryCounter",
@@ -247,8 +252,22 @@ class IBswitchSimulator:
             "PortXmitPkts",
             "PortRcvPkts",
             "PortXmitWait",
-        ]
-        # Sample data record for a timestamp of the 18 metrics.  This can probably be deleted but not yet.
+        ]"""
+        
+        """ Sample data record for a timestamp of the 18 metrics.  This can probably be deleted but not yet.
+        
+        new flat version:
+        record = {
+            "uuid": str(self.myAgent_uuid),
+            "timestamp": 1570135369000,
+            "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
+            "sensorValue": 0.0,
+            "deviceUUID" : "afbfd80d-cd9d-487a-841c-6da12b10c6d0",
+        }
+        
+                
+        array version:
+        
         record = {
             "uuid": str(self.myAgent_uuid),
             "timestamp": 1570135369000,
@@ -326,29 +345,40 @@ class IBswitchSimulator:
                     "sensorValue": 0.0,
                 },
             ],
-        }
+        }"""
+        
         # read JSON data describing switches in the IRU (c stands for CMC)
+        device_uuid = {}
         sensor_uuid = {}
+                
         for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
+            device_uuid[cmc] = {}
             sensor_uuid[cmc] = {}
+            
             with open(cmc, "r") as f:
                 query_data = json.load(f)
 
             # For each switch found in the JSON data ,
             # generate sensor uuid from has of seed sensor uuids + cmc + guid
+            # each is a device
             for switch in query_data["Switch"]:
                 guid = str(switch["Node_GUID"])
+                
+                #device UUID
+                device_uuid[cmc][guid] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + guid).encode()).hexdigest())
+                
                 sensor_uuid[cmc][guid] = {}
 
                 for ibmetric in ibmetrics:
-                    sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(
-                        hashlib.md5((guid + cmc + ibmetric).encode()).hexdigest()
-                    )
+                    
+                    #sensor UUIID
+                    sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + str(device_uuid) + ibmetric).encode()).hexdigest())
+                    if ibmetric in ["SymbolErrorCounter", "PortXmitData"]:
+                        print(ibmetric + ":" + str(sensor_uuid[cmc][guid][ibmetric]))
 
         # Infinite loop
         while True:
-            i = i + 1
-
+                             
             # read JSON data describing switches in the IRU (c stands for CMC)
             for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
 
@@ -367,6 +397,10 @@ class IBswitchSimulator:
 
                 # go through sensors for device
                 for switch in query_data["Switch"]:
+                    
+                    # reset record_list for each new switch
+                    record_list = []
+                    
                     guid = str(switch["Node_GUID"])
                     # Read in the old query output
                     output = self.seedOutputDir + "/" + guid + ".perfquery.json"
@@ -376,8 +410,7 @@ class IBswitchSimulator:
 
                     # Set time to milliseconds since the epoch
                     timestamp = int(round(time.time() * 1000))
-                    record["timestamp"] = timestamp
-
+                    
                     query_output["Name"] = self.myAgentName
                     query_output["Timestamp"] = timestamp
 
@@ -411,25 +444,25 @@ class IBswitchSimulator:
                     outfile.close()
 
                     # Assign the simulator values to the record to be serialized
-                    index = 0
                     for ibmetric in ibmetrics:
-                        record["measurementList"][index]["sensorUUID"] = sensor_uuid[
-                            cmc
-                        ][guid][ibmetric]
-                        record["measurementList"][index]["sensorValue"] = query_output[
-                            ibmetric
-                        ]
-                        index += 1
-
-                    raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
-                        self.send_time_series_schema_id, record
-                    )
+                        record = {}
+                        record["uuid"] = self.myAgent_uuid
+                        record["sensorUUID"] = sensor_uuid[cmc][guid][ibmetric]
+                        record["sensorValue"] = query_output[ibmetric]
+                        record["timestamp"] = timestamp
+                        record["deviceUUID"] = device_uuid[cmc][guid]
+                        record["sensorName"] = ibmetric
+                        #print(record)
+                        record_list.append(record)
 
                     if pubsubType == "mqtt":
-                        print(
-                            str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic
-                        )
-                        client.publish(self.data_topic, raw_bytes)
+                        for eachRecord in record_list:
+                            #print(str(eachRecord))
+                            print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                            
+                            raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, eachRecord)
+                            client.publish(self.data_topic, raw_bytes)
+                            i += 1
                     else:
                         print("error: shouldn't be here")
                         sys.exit(-1)
