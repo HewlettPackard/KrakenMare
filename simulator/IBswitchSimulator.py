@@ -33,6 +33,7 @@ from schema_registry.serializers import MessageSerializer
 
 # START IBswitchSimulator class
 
+
 class IBswitchSimulator:
     registered = False
     loggerName = None
@@ -226,12 +227,28 @@ class IBswitchSimulator:
             print("Unknown Pub/Sub type selected: " + pubsubType)
             sys.exit(-1)
 
-        # Create JSON structure for data.
-        ibmetrics = ["PortSelect", "SymbolErrorCounter", "LinkErrorRecoveryCounter", "LinkDownedCounter", "PortRcvErrors", "PortRcvRemotePhysicalErrors",
-                     "PortRcvSwitchRelayErrors", "PortXmitDiscards", "PortXmitConstraintErrors", "PortRcvConstraintErrors",
-                     "LocalLinkIntegrityErrors", "ExcessiveBufferOverrunErrors", "VL15Dropped", "PortXmitData",
-                     "PortRcvData", "PortXmitPkts", "PortRcvPkts", "PortXmitWait"]
-
+        # Create a dictionary of the 18 IB metrics names
+        ibmetrics = [
+            "PortSelect",
+            "SymbolErrorCounter",
+            "LinkErrorRecoveryCounter",
+            "LinkDownedCounter",
+            "PortRcvErrors",
+            "PortRcvRemotePhysicalErrors",
+            "PortRcvSwitchRelayErrors",
+            "PortXmitDiscards",
+            "PortXmitConstraintErrors",
+            "PortRcvConstraintErrors",
+            "LocalLinkIntegrityErrors",
+            "ExcessiveBufferOverrunErrors",
+            "VL15Dropped",
+            "PortXmitData",
+            "PortRcvData",
+            "PortXmitPkts",
+            "PortRcvPkts",
+            "PortXmitWait",
+        ]
+        # Sample data record for a timestamp of the 18 metrics.  This can probably be deleted but not yet.
         record = {
             "uuid": str(self.myAgent_uuid),
             "timestamp": 1570135369000,
@@ -313,17 +330,20 @@ class IBswitchSimulator:
         # read JSON data describing switches in the IRU (c stands for CMC)
         sensor_uuid = {}
         for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
-             sensor_uuid[cmc] = {}
-             with open(cmc, "r") as f:
-                 query_data = json.load(f)
+            sensor_uuid[cmc] = {}
+            with open(cmc, "r") as f:
+                query_data = json.load(f)
 
             # For each switch found in the JSON data ,
             # generate sensor uuid from has of seed sensor uuids + cmc + guid
-             for switch in query_data["Switch"]:
-                 guid = str(switch["Node_GUID"])
-                 sensor_uuid[cmc][guid] = {}
-                 for ibmetric in ibmetrics:
-                     sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(hashlib.md5((guid+cmc+ibmetric).encode()).hexdigest())
+            for switch in query_data["Switch"]:
+                guid = str(switch["Node_GUID"])
+                sensor_uuid[cmc][guid] = {}
+
+                for ibmetric in ibmetrics:
+                    sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(
+                        hashlib.md5((guid + cmc + ibmetric).encode()).hexdigest()
+                    )
 
         # Infinite loop
         while True:
@@ -350,9 +370,9 @@ class IBswitchSimulator:
                     guid = str(switch["Node_GUID"])
                     # Read in the old query output
                     output = self.seedOutputDir + "/" + guid + ".perfquery.json"
-                    with open(output, "r") as g:
-                        query_output = json.load(g)
-                    g.close()
+                    with open(output, "r") as infile:
+                        query_output = json.load(infile)
+                    infile.close()
 
                     # Set time to milliseconds since the epoch
                     timestamp = int(round(time.time() * 1000))
@@ -360,10 +380,6 @@ class IBswitchSimulator:
 
                     query_output["Name"] = self.myAgentName
                     query_output["Timestamp"] = timestamp
-                    record["measurementList"][0]["sensorValue"] = query_output[
-                        "PortSelect"
-                    ]
-                    record["measurementList"][0]["sensorUUID"] = sensor_uuid[cmc][guid]["PortSelect"]
 
                     x = random.random()
                     if x > 0.98:
@@ -373,16 +389,6 @@ class IBswitchSimulator:
                     elif x > 0.78:
                         query_output["SymbolErrorCounter"] += 1
 
-                    record["measurementList"][1]["sensorValue"] = query_output[
-                        "SymbolErrorCounter"
-                    ]
-                    record["measurementList"][1]["sensorUUID"] = sensor_uuid[cmc][guid]["SymbolErrorCounter"]
-
-                    record["measurementList"][2]["sensorValue"] = query_output[
-                        "LinkErrorRecoveryCounter"
-                    ]
-                    record["measurementList"][2]["sensorUUID"] = sensor_uuid[cmc][guid]["LinkErrorRecoveryCounter"]
-
                     x = random.random()
                     if x > 0.99:
                         query_output["LinkDownedCounter"] += 100
@@ -390,24 +396,6 @@ class IBswitchSimulator:
                         query_output["LinkDownedCounter"] += 5
                     elif x > 0.79:
                         query_output["LinkDownedCounter"] += 1
-
-                    record["measurementList"][3]["sensorValue"] = query_output[
-                        "LinkDownedCounter"
-                    ]
-                    record["measurementList"][3]["sensorUUID"] = sensor_uuid[cmc][guid]["LinkDownedCounter"]
-
-                    record["measurementList"][4]["sensorValue"] = query_output[
-                        "PortRcvErrors"
-                    ]
-                    record["measurementList"][4]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvErrors"]
-                    record["measurementList"][5]["sensorValue"] = query_output[
-                        "PortRcvRemotePhysicalErrors"
-                    ]
-                    record["measurementList"][5]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvRemotePhysicalErrors"]
-                    record["measurementList"][6]["sensorValue"] = query_output[
-                        "PortRcvSwitchRelayErrors"
-                    ]
-                    record["measurementList"][6]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvSwitchRelayErrors"]
 
                     x = random.random()
                     if x > 0.99:
@@ -417,69 +405,30 @@ class IBswitchSimulator:
                     elif x > 0.79:
                         query_output["PortXmitDiscards"] += 2
 
-                    record["measurementList"][7]["sensorValue"] = query_output[
-                        "PortXmitDiscards"
-                    ]
-                    record["measurementList"][7]["sensorUUID"] = sensor_uuid[cmc][guid]["PortXmitDiscards"]
-
-                    record["measurementList"][8]["sensorValue"] = query_output[
-                        "PortXmitConstraintErrors"
-                    ]
-                    record["measurementList"][8]["sensorUUID"] = sensor_uuid[cmc][guid]["PortXmitConstraintErrors"]
-                    record["measurementList"][9]["sensorValue"] = query_output[
-                        "PortRcvConstraintErrors"
-                    ]
-                    record["measurementList"][9]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvConstraintErrors"]
-                    record["measurementList"][10]["sensorValue"] = query_output[
-                        "LocalLinkIntegrityErrors"
-                    ]
-                    record["measurementList"][10]["sensorUUID"] = sensor_uuid[cmc][guid]["LocalLinkIntegrityErrors"]
-                    record["measurementList"][11]["sensorValue"] = query_output[
-                        "ExcessiveBufferOverrunErrors"
-                    ]
-                    record["measurementList"][11]["sensorUUID"] = sensor_uuid[cmc][guid]["ExcessiveBufferOverrunErrors"]
-                    record["measurementList"][12]["sensorValue"] = query_output[
-                        "VL15Dropped"
-                    ]
-                    record["measurementList"][12]["sensorUUID"] = sensor_uuid[cmc][guid]["VL15Dropped"]
-
-                    query_output["PortXmitData"] += random.randint(1000, 4000)
-                    record["measurementList"][13]["sensorValue"] = query_output[
-                        "PortXmitData"
-                    ]
-                    record["measurementList"][13]["sensorUUID"] = sensor_uuid[cmc][guid]["PortXmitData"]
-                    query_output["PortRcvData"] += random.randint(1000, 4000)
-                    record["measurementList"][14]["sensorValue"] = query_output[
-                        "PortRcvData"
-                    ]
-                    record["measurementList"][14]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvData"]
-                    query_output["PortXmitPkts"] += random.randint(100, 400)
-                    record["measurementList"][15]["sensorValue"] = query_output[
-                        "PortXmitPkts"
-                    ]
-                    record["measurementList"][15]["sensorUUID"] = sensor_uuid[cmc][guid]["PortXmitPkts"]
-                    query_output["PortRcvPkts"] += random.randint(100, 400)
-                    record["measurementList"][16]["sensorValue"] = query_output[
-                        "PortRcvPkts"
-                    ]
-                    record["measurementList"][16]["sensorUUID"] = sensor_uuid[cmc][guid]["PortRcvPkts"]
-                    query_output["PortXmitWait"] += random.randint(100, 200)
-                    record["measurementList"][17]["sensorValue"] = query_output[
-                        "PortXmitWait"
-                    ]
-                    record["measurementList"][17]["sensorUUID"] = sensor_uuid[cmc][guid]["PortXmitWait"]
-
                     # Write output to the next input
-                    with open(output, "w") as g:
-                        json.dump(query_output, g)
-                    g.close()
+                    with open(output, "w") as outfile:
+                        json.dump(query_output, outfile)
+                    outfile.close()
+
+                    # Assign the simulator values to the record to be serialized
+                    index = 0
+                    for ibmetric in ibmetrics:
+                        record["measurementList"][index]["sensorUUID"] = sensor_uuid[
+                            cmc
+                        ][guid][ibmetric]
+                        record["measurementList"][index]["sensorValue"] = query_output[
+                            ibmetric
+                        ]
+                        index += 1
 
                     raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(
                         self.send_time_series_schema_id, record
                     )
 
                     if pubsubType == "mqtt":
-                        print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                        print(
+                            str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic
+                        )
                         client.publish(self.data_topic, raw_bytes)
                     else:
                         print("error: shouldn't be here")
