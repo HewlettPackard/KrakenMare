@@ -14,27 +14,14 @@
 		"doc": "Timestamp of sensor value, milliseconds since the epoch"
 	},
 	{
-		"name": "measurementList",
-		"type": {
-			"type": "array",
-			"items": {
-				"type": "record",
-				"name": "TimeSeriesMeasurement",
-				"fields": [
-					{
-					"name": "sensorUUID",
-					"type": {"type": "string", "logicalType":"uuid"},
-					"doc": "Unique sensor identifier"
-					},
-					{
-					"name": "sensorValue",
-					"type": "float",
-					"doc": "Sensor value"
-					}
-				]
-			}
-
-		}
+		"name": "sensorUUID",
+		"type": {"type": "string", "logicalType":"uuid"},
+		"doc": "Unique sensor identifier"
+	},
+	{
+		"name": "sensorValue",
+		"type": "float",
+		"doc": "Sensor value"
 	}
 ]
 }
