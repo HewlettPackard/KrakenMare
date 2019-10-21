@@ -167,8 +167,7 @@ class IBswitchSimulator:
         self.myAgent_uuid = data["uuid"]
 
     def mqtt_registration(self):
-        registration_client = mqtt.Client(
-            "RegistrationClient"+str(self.myAgent_uid))
+        registration_client = mqtt.Client("RegistrationClient-" + str(self.myAgent_uid))
         registration_client.on_log = self.mqtt_on_log
         registration_client.on_message = self.mqtt_on_registration_result
         print("connecting to mqtt broker:" + self.mqtt_broker)
