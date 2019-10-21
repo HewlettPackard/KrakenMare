@@ -143,8 +143,13 @@
 							<stringType>Utf8</stringType>
 							<customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
 							<templateDirectory>${project.basedir}/src/main/resources/velocity-templates/</templateDirectory>
-							<sourceDirectory>${project.basedir}/../config-schemaregistry/</sourceDirectory>
+							<sourceDirectory>${project.basedir}/../config-schemaregistry/framework/</sourceDirectory>
 							<outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+							<imports>
+								<import>${project.basedir}/../config-schemaregistry/framework/com.hpe.krakenmare.core-sensor.avsc</import>
+								<import>${project.basedir}/../config-schemaregistry/framework/com.hpe.krakenmare.core-device.avsc</import>
+								<import>${project.basedir}/../config-schemaregistry/framework/com.hpe.krakenmare.core-agent.avsc</import>
+							</imports>
 						</configuration>
 					</execution>
 				</executions>

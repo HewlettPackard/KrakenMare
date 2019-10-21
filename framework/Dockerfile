@@ -11,7 +11,7 @@ WORKDIR /opt/krakenmare/framework
 
 # this is image MUST be built from the upper directory (docker build -f framework/Dockerfile .) to access avro schema
 COPY framework/pom.xml /opt/krakenmare/framework/
-COPY config-schemaregistry/*.avsc /opt/krakenmare/config-schemaregistry/
+COPY config-schemaregistry/framework/*.avsc /opt/krakenmare/config-schemaregistry/framework/
 
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"

@@ -114,14 +114,17 @@ public class MqttAgent extends Agent {
 				}
 			});
 
-			Sensor sensor = new Sensor(MqttUtils.EMPTY_UUID,
-					new Utf8("mySensor-1"),
-					new Utf8("mySensor"),
-					Collections.emptyMap(), // collectionFrequency,
+			Sensor sensor = new Sensor(MqttUtils.EMPTY_UUID, // uuid
+					new Utf8("mySensor-1"), // id
+					new Utf8("mySensor"), // name
+					42f, // collectionFrequencyMin
+					42f, // collectionFrequencyMax
+					42f, // collectionFrequencyDefault
 					new Utf8(), // measuringAccuracy,
 					new Utf8(), // unit,
 					new Utf8(), // type,
-					Collections.emptyMap(), // valueRange,
+					42f, // valueRangeMin
+					42f, // valueRangeMax
 					42f, // changeFrequency,
 					42f, // currentCollectionFrequency,
 					42); // , storageTime);

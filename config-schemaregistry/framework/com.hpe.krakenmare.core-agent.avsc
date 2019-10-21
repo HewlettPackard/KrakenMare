@@ -1,0 +1,11 @@
+{"namespace": "com.hpe.krakenmare.core",
+  "type": "record",
+  "name": "Agent",
+  "fields": [
+     {"name": "id", "type": "long"},
+     {"name": "uid", "type": "string"},
+     {"name": "uuid", "type": {"type": "string", "logicalType":"uuid"}},
+     {"name": "name", "type": "string"},
+     {"name": "devices", "type": {"type": "array", "items": "com.hpe.krakenmare.core.Device"}}
+  ]
+}

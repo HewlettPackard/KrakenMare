@@ -1,0 +1,36 @@
+{
+"type": "record",
+"name": "Device",
+"namespace": "com.hpe.krakenmare.core",
+"fields": [
+	{
+		"name": "uuid",
+		"type": {"type": "string", "logicalType":"uuid"},
+		"doc": "UUID of the device"
+	},
+	{
+		"name": "id",
+		"type": "string",
+		"doc": "Unique id as created by the Agent for the Device"
+	},
+	{
+		"name": "name",
+		"type": "string",
+		"doc": "Human readable name"
+	},
+	{
+		"name": "type",
+		"type": "string",
+		"doc": "Type of device such as node, chassis manager, ..."
+	},
+	{
+		"name": "location",
+		"type": "string",
+		"doc": "Location of device in the system"
+	},
+	{
+		"name": "sensors",
+		"type": {"type": "array", "items": "com.hpe.krakenmare.core.Sensor"}
+	}
+]
+}

@@ -1,0 +1,37 @@
+{
+"type": "record",
+"name": "SensorListResponse",
+"namespace": "com.hpe.krakenmare.message.manager",
+"fields": [
+	{
+		"name": "uuid",
+		"type": {"type": "string", "logicalType":"uuid"},
+		"doc": "Agent unique framework identifier"
+	},
+	{
+		"name": "deviceUuids",
+		"type": {
+			"type": "map",
+			"values": {
+				"type": "record",
+				"name": "SensorUuids",
+				"fields": [
+					{
+						"name": "uuid",
+						"type": {"type": "string", "logicalType":"uuid"},
+						"doc": "Device unique framework identifier"
+					},
+					{
+						"name": "sensorUuids",
+						"type": {
+							"type": "map",
+							"values": {"type": "string", "logicalType":"uuid"},
+							"doc": "Sensors unique framework identifiers"
+						}
+					}
+				]
+			}
+		}
+	}
+]
+}
