@@ -173,7 +173,12 @@ class IBswitchSimulator:
         registration_client.connect(self.mqtt_broker)
         registration_client.loop_start()
 
-        registration_client.subscribe("registration/" + self.myAgent_uid + "/response")
+        (result, mid) = registration_client.subscribe(
+            "registration/" + self.myAgent_uid + "/response")
+
+        while result != mqtt.MQTT_ERR_SUCCESS:
+            (result, mid) = registration_client.subscribe(
+                "registration/"+self.myAgent_uid + "/response")
 
         RegistrationData = {
             "agentID": self.myAgent_uid,
@@ -185,7 +190,8 @@ class IBswitchSimulator:
 
         w_bytes = io.BytesIO()
 
-        schemaless_writer(w_bytes, self.register_request_schema, RegistrationData)
+        schemaless_writer(
+            w_bytes, self.register_request_schema, RegistrationData)
 
         raw_bytes = w_bytes.getvalue()
 
@@ -449,7 +455,8 @@ class IBswitchSimulator:
                     )
 
             if pubsubType == "mqtt":
-                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                print(str(i) + ":Publishing via mqtt (topic:%s)" %
+                      self.data_topic)
                 client.publish(self.data_topic, raw_bytes)
             else:
                 print("error: shouldn't be here")
@@ -507,10 +514,12 @@ def main():
 
     if options.local is True:
         # load development config to run outside of container
-        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator_dev.cfg", "local")
+        myIBswitchSimulator = IBswitchSimulator(
+            "IBswitchSimulator_dev.cfg", "local")
     else:
         # load container config
-        myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", "container")
+        myIBswitchSimulator = IBswitchSimulator(
+            "IBswitchSimulator.cfg", "container")
 
     if options.modename == "mqtt":
         myIBswitchSimulator.run(
