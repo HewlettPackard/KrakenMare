@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
+import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.message.agent.SensorList;
 import com.hpe.krakenmare.message.manager.SensorListResponse;
 import com.hpe.krakenmare.message.manager.SensorUuids;
@@ -43,6 +44,13 @@ public class MqttSensorListListener extends FrameworkMqttListener<SensorList, Se
 	SensorListResponse process(SensorList sensorList) {
 		UUID agentUuid = sensorList.getUuid();
 		List<Device> devices = sensorList.getDevices();
+
+		for (Device device : devices) {
+			device.setUuid(UUID.randomUUID());
+			for (Sensor sensor : device.getSensors()) {
+				sensor.setUuid(UUID.randomUUID());
+			}
+		}
 
 		Agent agent = repository.get(agentUuid);
 		agent.setDevices(devices);

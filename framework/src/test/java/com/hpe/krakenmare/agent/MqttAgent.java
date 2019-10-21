@@ -26,6 +26,7 @@ import com.hpe.krakenmare.message.agent.RegisterRequest;
 import com.hpe.krakenmare.message.agent.SensorList;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
 import com.hpe.krakenmare.message.manager.SensorListResponse;
+import com.hpe.krakenmare.message.manager.SensorUuids;
 
 public class MqttAgent extends Agent {
 
@@ -97,8 +98,20 @@ public class MqttAgent extends Agent {
 				LOG.info("Message received on topic '" + topic + "': " + message);
 				SensorListResponse response = SensorListResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
 				LOG.info("Devices UUID received from manager: " + response.getDeviceUuids());
-				// TODO
-				registrationLatch.countDown();
+
+				try {
+					for (Device device : getDevices()) {
+						SensorUuids uuids = response.getDeviceUuids().get(device.getId());
+						device.setUuid(uuids.getUuid());
+						for (Sensor sensor : device.getSensors()) {
+							sensor.setUuid(uuids.getSensorUuids().get(sensor.getId()));
+						}
+					}
+				} catch (Exception e) {
+					LOG.error("Error while registering devices", e);
+				} finally {
+					registrationLatch.countDown();
+				}
 			});
 
 			Sensor sensor = new Sensor(MqttUtils.EMPTY_UUID,
@@ -123,7 +136,9 @@ public class MqttAgent extends Agent {
 					sensors);
 			List<Device> devices = new ArrayList<>();
 			devices.add(device);
-			SensorList req = new SensorList(getUuid(), devices);
+			setDevices(devices);
+
+			SensorList req = new SensorList(getUuid(), getDevices());
 			byte[] payload = req.toByteBuffer().array();
 
 			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");

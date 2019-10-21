@@ -7,6 +7,8 @@ import com.hpe.krakenmare.core.Agent;
 
 public class MqttUtils {
 
+	public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
 	private static final String REGISTRATION_TOPIC = Main.getProperty("km.registration.mqtt.topic");
 	private static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.mqtt.topic");
 

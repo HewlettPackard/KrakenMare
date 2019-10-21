@@ -1,5 +1,6 @@
 package com.hpe.krakenmare.agent;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
@@ -11,9 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hpe.krakenmare.Main;
+import com.hpe.krakenmare.core.Device;
+import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
 import com.hpe.krakenmare.impl.MqttRegistrationListener;
 import com.hpe.krakenmare.impl.MqttSensorListListener;
+import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.repositories.AgentMemoryRepository;
 
 public class MqttAgentTest {
@@ -40,6 +44,12 @@ public class MqttAgentTest {
 		assertNotNull(agent.getUuid());
 
 		agent.registerDevices(broker);
+		for (Device device : agent.getDevices()) {
+			assertNotEquals(MqttUtils.EMPTY_UUID, device.getUuid());
+			for (Sensor sensor : device.getSensors()) {
+				assertNotEquals(MqttUtils.EMPTY_UUID, sensor.getUuid());
+			}
+		}
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException, MqttException {
