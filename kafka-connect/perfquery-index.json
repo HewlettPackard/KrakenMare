@@ -16,12 +16,14 @@
         },
         "dimensionsSpec": {
           "dimensions": [
-            { "name": "uuid", "type": "string" },
-            { "name": "timestamp", "type": "long" },
-	        { "name": "sensorUUID", "type": "string" },
-	        { "name": "sensorValue", "type": "float" },
-	        { "name": "deviceUUID", "type": "string" },
-	        { "name": "sensorName", "type": "string" }
+          { "name": "agentUUID", "type": "string" },
+          { "name": "agentID", "type": "string" },
+          { "name": "timestamp", "type": "long" },
+	      { "name": "sensorUUID", "type": "string" },
+	      { "name": "sensorValue", "type": "float" },
+	      { "name": "deviceUUID", "type": "string" },
+	      { "name": "deviceID", "type": "string" },
+	      { "name": "sensorName", "type": "string" }
           ]
         }
       }

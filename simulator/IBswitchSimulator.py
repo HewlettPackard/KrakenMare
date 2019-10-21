@@ -446,12 +446,14 @@ class IBswitchSimulator:
                     # Assign the simulator values to the record to be serialized
                     for ibmetric in ibmetrics:
                         record = {}
-                        record["uuid"] = self.myAgent_uuid
+                        record["agentUUID"] = self.myAgent_uuid
+                        record["agentID"] = self.myAgent_uid
                         record["sensorUUID"] = sensor_uuid[cmc][guid][ibmetric]
                         record["sensorValue"] = query_output[ibmetric]
                         record["timestamp"] = timestamp
                         record["deviceUUID"] = device_uuid[cmc][guid]
                         record["sensorName"] = ibmetric
+                        record["deviceID"] = guid
                         #print(record)
                         record_list.append(record)
 
