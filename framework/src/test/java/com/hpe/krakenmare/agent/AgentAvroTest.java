@@ -20,6 +20,7 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.avro.util.Utf8;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ import com.hpe.krakenmare.core.Agent;
 public class AgentAvroTest {
 
 	static final UUID THE_UUID = UUID.fromString("12345678-abcd-dcba-1234-000000000000");
-	static final Agent THE_AGENT = new Agent(42l, "agent-42", THE_UUID, "myAgent", Collections.emptyList());
+	static final Agent THE_AGENT = new Agent(42l, new Utf8("agent-42"), THE_UUID, new Utf8("myAgent"), Collections.emptyList());
 	static final String THE_JSON = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":\"12345678-abcd-dcba-1234-000000000000\",\"name\":\"myAgent\",\"devices\":[]}";
 
 	@Test

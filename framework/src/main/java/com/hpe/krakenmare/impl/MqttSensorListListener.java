@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.avro.util.Utf8;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -47,9 +48,9 @@ public class MqttSensorListListener extends FrameworkMqttListener<SensorList, Se
 		agent.setDevices(devices);
 		repository.save(agent);
 
-		Map<CharSequence, SensorUuids> uuids = new HashMap<>();
+		Map<Utf8, SensorUuids> uuids = new HashMap<>();
 		devices.forEach(d -> {
-			Map<CharSequence, UUID> sensorUuidsMap = new HashMap<>();
+			Map<Utf8, UUID> sensorUuidsMap = new HashMap<>();
 			d.getSensors().forEach(s -> sensorUuidsMap.put(s.getId(), s.getUuid()));
 			SensorUuids sensorUuids = new SensorUuids(d.getUuid(), sensorUuidsMap);
 			uuids.put(d.getId(), sensorUuids);

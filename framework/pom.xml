@@ -132,12 +132,6 @@
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro-maven-plugin</artifactId>
 				<version>${avro.version}</version>
-				<configuration>
-					<fieldVisibility>private</fieldVisibility>
-					<!-- <stringType>Utf8</stringType> -->
-					<customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
-					<templateDirectory>${project.basedir}/src/main/resources/velocity-templates/</templateDirectory>
-				</configuration>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -145,6 +139,10 @@
 							<goal>schema</goal>
 						</goals>
 						<configuration>
+							<fieldVisibility>private</fieldVisibility>
+							<stringType>Utf8</stringType>
+							<customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
+							<templateDirectory>${project.basedir}/src/main/resources/velocity-templates/</templateDirectory>
 							<sourceDirectory>${project.basedir}/../config-schemaregistry/</sourceDirectory>
 							<outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
 						</configuration>

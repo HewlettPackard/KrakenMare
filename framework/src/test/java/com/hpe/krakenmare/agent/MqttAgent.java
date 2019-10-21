@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.avro.util.Utf8;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -34,9 +35,9 @@ public class MqttAgent extends Agent {
 
 	public MqttAgent() {
 		super(-1l,
-				NAME + "-" + System.currentTimeMillis(),
+				new Utf8(NAME + "-" + System.currentTimeMillis()),
 				null,
-				NAME,
+				new Utf8(NAME),
 				Collections.emptyList());
 	}
 
@@ -61,7 +62,7 @@ public class MqttAgent extends Agent {
 				registrationLatch.countDown();
 			});
 
-			RegisterRequest req = new RegisterRequest(getUid(), "test-agent", getName(), "A Java based test agent", false);
+			RegisterRequest req = new RegisterRequest(getUid(), new Utf8("test-agent"), getName(), new Utf8("A Java based test agent"), false);
 			byte[] payload = req.toByteBuffer().array();
 
 			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");
@@ -100,26 +101,26 @@ public class MqttAgent extends Agent {
 				registrationLatch.countDown();
 			});
 
-			Sensor sensor = new Sensor(UUID.randomUUID(),
-					"mySensor-1",
-					"mySensor",
-					null, // collectionFrequency,
-					null, // measuringAccuracy,
-					null, // unit,
-					null, // type,
-					null, // valueRange,
+			Sensor sensor = new Sensor(MqttUtils.EMPTY_UUID,
+					new Utf8("mySensor-1"),
+					new Utf8("mySensor"),
+					Collections.emptyMap(), // collectionFrequency,
+					new Utf8(), // measuringAccuracy,
+					new Utf8(), // unit,
+					new Utf8(), // type,
+					Collections.emptyMap(), // valueRange,
 					42f, // changeFrequency,
 					42f, // currentCollectionFrequency,
 					42); // , storageTime);
 			List<Sensor> sensors = new ArrayList<>();
 			sensors.add(sensor);
 
-			Device device = new Device(UUID.randomUUID(),
-					"myDevice-1",
-					"myDevice",
-					"test-device",
-					"somewhere",
-					Collections.emptyList());
+			Device device = new Device(MqttUtils.EMPTY_UUID,
+					new Utf8("myDevice-1"),
+					new Utf8("myDevice"),
+					new Utf8("test-device"),
+					new Utf8("somewhere"),
+					sensors);
 			List<Device> devices = new ArrayList<>();
 			devices.add(device);
 			SensorList req = new SensorList(getUuid(), devices);

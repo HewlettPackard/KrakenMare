@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
+import org.apache.avro.util.Utf8;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class AgentRedisRepositoryTest {
 
 	static Agent newAgent(String name) {
 		String uid = name + "-" + System.currentTimeMillis();
-		return new Agent(-1l, uid, UUID.randomUUID(), name, Collections.emptyList());
+		return new Agent(-1l, new Utf8(uid), UUID.randomUUID(), new Utf8(name), Collections.emptyList());
 	}
 
 	@BeforeEach
