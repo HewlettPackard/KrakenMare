@@ -24,6 +24,7 @@
       "dashes": false,
       "datasource": "Druid",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 12,
         "w": 19,
@@ -48,6 +49,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 0.5,
       "points": true,
@@ -60,8 +64,8 @@
         {
           "aggregators": [
             {
-              "fieldName": "SymbolErrorCounter",
-              "name": "Counter",
+              "fieldName": "sensorValue",
+              "name": "sensorValue",
               "type": "longSum"
             }
           ],
@@ -80,10 +84,19 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceID",
+          "dimension": "deviceUUID",
           "druidDS": "perfquery",
-          "druidMetric": "Counter",
-          "errors": {},
+          "druidMetric": "sensorValue",
+          "errors": {
+            "aggregators": "You must supply at least one aggregator"
+          },
+          "filters": [
+            {
+              "dimension": "sensorName",
+              "type": "selector",
+              "value": "SymbolErrorCounter"
+            }
+          ],
           "hide": false,
           "limit": 9999,
           "queryType": "topN",
@@ -146,6 +159,7 @@
       "dashes": false,
       "datasource": "Druid",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 12,
         "w": 19,
@@ -170,6 +184,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 0.5,
       "points": true,
@@ -182,8 +199,9 @@
         {
           "aggregators": [
             {
-              "fieldName": "PortXmitData",
-              "name": "Counter",
+              "fieldName": "sensorValue",
+              "fieldNames": "sensorValue",
+              "name": "sensorValue",
               "type": "longSum"
             }
           ],
@@ -202,12 +220,19 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceID",
+          "dimension": "deviceUUID",
           "druidDS": "perfquery",
-          "druidMetric": "Counter",
+          "druidMetric": "sensorValue",
           "errors": {
             "aggregators": "You must supply at least one aggregator"
           },
+          "filters": [
+            {
+              "dimension": "sensorName",
+              "type": "selector",
+              "value": "PortXmitData"
+            }
+          ],
           "hide": false,
           "limit": 9999,
           "queryType": "topN",
@@ -265,7 +290,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 16,
+  "schemaVersion": 20,
   "style": "dark",
   "tags": [],
   "templating": {
