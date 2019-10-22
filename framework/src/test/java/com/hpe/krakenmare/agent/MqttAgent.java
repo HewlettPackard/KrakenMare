@@ -22,10 +22,10 @@ import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.MqttUtils;
+import com.hpe.krakenmare.message.agent.DeviceList;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
-import com.hpe.krakenmare.message.agent.SensorList;
+import com.hpe.krakenmare.message.manager.DeviceListResponse;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
-import com.hpe.krakenmare.message.manager.SensorListResponse;
 import com.hpe.krakenmare.message.manager.SensorUuids;
 
 public class MqttAgent extends Agent {
@@ -96,7 +96,7 @@ public class MqttAgent extends Agent {
 			CountDownLatch registrationLatch = new CountDownLatch(1);
 			mqtt.subscribe(myManagerTopic, (topic, message) -> {
 				LOG.info("Message received on topic '" + topic + "': " + message);
-				SensorListResponse response = SensorListResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
+				DeviceListResponse response = DeviceListResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
 				LOG.info("Devices UUID received from manager: " + response.getDeviceUuids());
 
 				try {
@@ -141,7 +141,7 @@ public class MqttAgent extends Agent {
 			devices.add(device);
 			setDevices(devices);
 
-			SensorList req = new SensorList(getUuid(), getDevices());
+			DeviceList req = new DeviceList(getUuid(), getDevices());
 			byte[] payload = req.toByteBuffer().array();
 
 			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");

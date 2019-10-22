@@ -29,7 +29,7 @@ public class FrameworkImpl implements Framework {
 		collectdStream.start();
 
 		MqttRegistrationListener.registerNew(mqttListener, agents);
-		MqttSensorListListener.registerNew(mqttListener, agents);
+		MqttDeviceListListener.registerNew(mqttListener, agents);
 	}
 
 	public void stopFramework() {

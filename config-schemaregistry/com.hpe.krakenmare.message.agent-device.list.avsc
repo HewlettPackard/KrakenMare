@@ -84,7 +84,7 @@
 }
 {
 "type": "record",
-"name": "SensorList",
+"name": "DeviceList",
 "namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
 	{

@@ -1,6 +1,6 @@
 {
 "type": "record",
-"name": "SensorListResponse",
+"name": "DeviceListResponse",
 "namespace": "com.hpe.krakenmare.message.manager",
 "fields": [
 	{

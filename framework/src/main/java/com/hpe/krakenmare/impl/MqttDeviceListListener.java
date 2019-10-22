@@ -19,29 +19,29 @@ import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
-import com.hpe.krakenmare.message.agent.SensorList;
-import com.hpe.krakenmare.message.manager.SensorListResponse;
+import com.hpe.krakenmare.message.agent.DeviceList;
+import com.hpe.krakenmare.message.manager.DeviceListResponse;
 import com.hpe.krakenmare.message.manager.SensorUuids;
 
-public class MqttSensorListListener extends FrameworkMqttListener<SensorList, SensorListResponse> {
+public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, DeviceListResponse> {
 
-	public final static Logger LOG = LoggerFactory.getLogger(MqttSensorListListener.class);
+	public final static Logger LOG = LoggerFactory.getLogger(MqttDeviceListListener.class);
 
 	public static void registerNew(FrameworkMqttClient listener, Repository<Agent> agentRepo) throws MqttException {
-		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttSensorListListener(agentRepo, listener.getClient()));
+		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttDeviceListListener(agentRepo, listener.getClient()));
 	}
 
-	public MqttSensorListListener(Repository<Agent> repository, IMqttClient mqtt) {
+	public MqttDeviceListListener(Repository<Agent> repository, IMqttClient mqtt) {
 		super(repository, mqtt);
 	}
 
 	@Override
-	SensorList fromByteBuffer(ByteBuffer b) throws IOException {
-		return SensorList.fromByteBuffer(b);
+	DeviceList fromByteBuffer(ByteBuffer b) throws IOException {
+		return DeviceList.fromByteBuffer(b);
 	}
 
 	@Override
-	SensorListResponse process(SensorList sensorList) {
+	DeviceListResponse process(DeviceList sensorList) {
 		UUID agentUuid = sensorList.getUuid();
 		List<Device> devices = sensorList.getDevices();
 
@@ -64,11 +64,11 @@ public class MqttSensorListListener extends FrameworkMqttListener<SensorList, Se
 			uuids.put(d.getId(), sensorUuids);
 		});
 
-		return new SensorListResponse(agentUuid, uuids);
+		return new DeviceListResponse(agentUuid, uuids);
 	}
 
 	@Override
-	void afterProcess(SensorList payload, SensorListResponse response) throws IOException, MqttPersistenceException, MqttException {
+	void afterProcess(DeviceList payload, DeviceListResponse response) throws IOException, MqttPersistenceException, MqttException {
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = response.toByteBuffer().array();
 		MqttMessage mqttResponse = new MqttMessage(respPayload);

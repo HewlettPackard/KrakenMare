@@ -16,7 +16,7 @@ import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
 import com.hpe.krakenmare.impl.MqttRegistrationListener;
-import com.hpe.krakenmare.impl.MqttSensorListListener;
+import com.hpe.krakenmare.impl.MqttDeviceListListener;
 import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.repositories.AgentMemoryRepository;
 
@@ -33,7 +33,7 @@ public class MqttAgentTest {
 
 		AgentMemoryRepository agents = new AgentMemoryRepository();
 		MqttRegistrationListener.registerNew(listener, agents);
-		MqttSensorListListener.registerNew(listener, agents);
+		MqttDeviceListListener.registerNew(listener, agents);
 	}
 
 	@Test
