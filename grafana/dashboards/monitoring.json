@@ -20,6 +20,7 @@
     {
       "aliasColors": {},
       "bars": false,
+      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Druid",
@@ -35,13 +36,12 @@
       "legend": {
         "alignAsTable": true,
         "avg": false,
-        "current": false,
+        "current": true,
         "hideEmpty": false,
-        "max": true,
-        "min": true,
+        "max": false,
+        "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 320,
         "total": false,
         "values": true
       },
@@ -53,6 +53,7 @@
         "dataLinks": []
       },
       "percentage": false,
+      "pluginVersion": "6.4.3",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -170,13 +171,13 @@
       "legend": {
         "alignAsTable": true,
         "avg": false,
-        "current": false,
+        "current": true,
         "hideEmpty": false,
-        "max": true,
-        "min": true,
+        "max": false,
+        "min": false,
         "rightSide": true,
         "show": true,
-        "sideWidth": 320,
+        "sideWidth": null,
         "total": false,
         "values": true
       },
@@ -328,5 +329,5 @@
   "timezone": "",
   "title": "Monitoring",
   "uid": "E_KTP6lmk",
-  "version": 1
+  "version": 38
 }
