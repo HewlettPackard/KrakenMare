@@ -117,15 +117,15 @@ class FanIn():
 	# connect to MQTT broker and subscribe to receive agent messages
 	def mqtt_subscription(self):
 		self.myMQTTtopic = "ibswitch"
-		
-		self.mqtt_client = mqtt.Client("FanInUUID")
-		self.mqtt_client.on_connect = self.mqtt_on_connect
-		self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
-		self.mqtt_client.on_message = self.mqtt_on_agent_message
-		self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
-		self.mqtt_client.subscribe(self.myMQTTtopic) # use '#' to subscribe to all topics
-		self.mqtt_client.loop_forever(timeout=0, retry_first_connection=True)
-		
+
+               self.mqtt_client = mqtt.Client(client_id="FanInUUID", clean_session=True)
+               self.mqtt_client.on_connect = self.mqtt_on_connect
+               self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
+               self.mqtt_client.on_message = self.mqtt_on_agent_message
+               self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
+               self.mqtt_client.subscribe(self.myMQTTtopic, qos=0) # use '#' to subscribe to all topics
+               self.mqtt_client.loop_forever(retry_first_connection=True)
+
 		print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": subscribed to MQTT for topics: " + self.myMQTTtopic)
 		
 	# The callback for when the client receives LOG response
