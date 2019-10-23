@@ -71,6 +71,8 @@ class FanIn:
         self.myMQTTregistered = False
         self.kafka_producer = None
         self.kafka_consumer = None
+        
+        self.kafka_msg_counter = 0
 
     def resetLogLevel(self, logLevel):
         """
@@ -165,12 +167,11 @@ class FanIn:
     # converts message to AVRO and sends message to Kafka (in batches)
     # TODO: do we need multiple threads here?
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
-    # TODO: or should the MQTT agent convert message into our schema before sending via MQTT?
     def mqtt_on_agent_message(self, client, userdata, message):
-
         if message.topic == "ibswitch":
-            print(str(message))
-            self.kafka_producer.produce("fabric", message.payload)
+            self.kafka_msg_counter += 1
+            print(str(self.kafka_msg_counter) + ":published to Kafka")
+            self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
         else:
             print("Not ibswitch topic")
 
@@ -185,6 +186,9 @@ class FanIn:
     def kafka_producer_error_cb(self, err):
         print("error_cb", err)
 
+    def kafka_producer_on_delivery(self, err, msg):
+        print("message.offset={}".format(msg.offset()))
+    
     # connect to Kafka broker as producer to check topic 'myTopic'
     def kafka_check_topic(self, myTopic):
 
@@ -197,6 +201,7 @@ class FanIn:
             "socket.timeout.ms": 10,
             "error_cb": self.kafka_producer_error_cb,
             "message.timeout.ms": 10,
+            "produce.offset.report": True,
         }
 
         while test == False:

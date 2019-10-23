@@ -151,13 +151,10 @@ class IBswitchSimulator:
 
     # MQTT agent methods
     def mqtt_on_log(self, client, userdata, level, buf):
-
         print("log: %s" % buf)
 
-    # TODO: for now we listen to any response, not only ours
     # defines self.myMQTTregistered and self.myAgent_id
     def mqtt_on_registration_result(self, client, userdata, message):
-
         print("message received: %s " % message.payload)
         print("message topic: %s" % message.topic)
         r_bytes = io.BytesIO(message.payload)
@@ -216,7 +213,7 @@ class IBswitchSimulator:
 
     # send simulated sensor data via MQTT
     def send_data(self, pubsubType):
-        i = 0
+        i = 1
 
         if pubsubType == "mqtt":
             client = mqtt.Client(self.myAgent_uid)
@@ -253,7 +250,7 @@ class IBswitchSimulator:
             "PortXmitWait",
         ]"""
         
-        """ Sample data record for a timestamp of the 18 metrics.  This can probably be deleted but not yet.
+        """ Sample data record for a timestamp
         
         new flat version:
         record = {
@@ -263,88 +260,7 @@ class IBswitchSimulator:
             "sensorValue": 0.0,
             "deviceUUID" : "afbfd80d-cd9d-487a-841c-6da12b10c6d0",
         }
-        
-                
-        array version:
-        
-        record = {
-            "uuid": str(self.myAgent_uuid),
-            "timestamp": 1570135369000,
-            "measurementList": [
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d1",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d2",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d3",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d4",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d5",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d6",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d7",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d8",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d9",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e0",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e1",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e2",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e3",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e4",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e5",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e6",
-                    "sensorValue": 0.0,
-                },
-                {
-                    "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6e7",
-                    "sensorValue": 0.0,
-                },
-            ],
-        }"""
+        """
         
         # read JSON data describing switches in the IRU (c stands for CMC)
         device_uuid = {}
