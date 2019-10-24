@@ -71,7 +71,7 @@ do
          p     ) pull=1         ;;
          b     ) build=1        ;;
          d     ) deploy=1       ;;
-	 f     ) dockerpull=""  ;;
+         f     ) dockerpull=""  ;;
          R     ) restartDocker=1;;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
@@ -188,6 +188,11 @@ if [ "$deploy" == "1" ]; then
     ./km-secrets-tool.sh -wcgpd || exit 1
 
     cd ../playbooks || exit 1
+    #wait until that the stack is stopped
+    until (( $(docker network ls | grep -c krakenmare) == 0 ))
+    do
+      sleep 3
+    done
     docker stack deploy $compose_args $project_name || exit 1 
 
 fi
