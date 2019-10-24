@@ -4,14 +4,9 @@
 "namespace": "com.hpe.krakenmare.message.agent",
 "fields": [
 	{
-		"name": "agentUUID",
+		"name": "uuid",
 		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Unique framework identifier for agent"
-	},
-	{
-		"name": "agentID",
-		"type": {"type": "string"},
-		"doc": "Agent's identifier"
+		"doc": "Unique framework identifier"
 	},
 	{
 		"name": "timestamp",
@@ -19,29 +14,27 @@
 		"doc": "Timestamp of sensor value, milliseconds since the epoch"
 	},
 	{
-		"name": "sensorUUID",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Unique sensor identifier"
-	},
-	{
-		"name": "sensorValue",
-		"type": "float",
-		"doc": "Sensor value"
-	},
-	{
-		"name": "deviceUUID",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Unique device identifier"
-	},
-	{
-		"name": "deviceID",
-		"type": {"type": "string"},
-		"doc": "Device's identifier"
-	},
-	{
-		"name": "sensorName",
-		"type": "string",
-		"doc": "Human readable sensor name"
+		"name": "measurementList",
+		"type": {
+			"type": "array",
+			"items": {
+				"type": "record",
+				"name": "TimeSeriesMeasurement",
+				"fields": [
+					{
+					"name": "sensorUUID",
+					"type": {"type": "string", "logicalType":"uuid"},
+					"doc": "Unique sensor identifier"
+					},
+					{
+					"name": "sensorValue",
+					"type": "float",
+					"doc": "Sensor value"
+					}
+				]
+			}
+
+		}
 	}
 ]
 }
