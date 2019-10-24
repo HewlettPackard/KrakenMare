@@ -91,7 +91,7 @@ class IBswitchSimulator:
 
         self.register_response_schema = cg.schema.schema
 
-        subject = "com-hpe-krakenmare-message-agent-send-time-series"
+        subject = "com-hpe-krakenmare-message-agent-send-time-series-druid"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
