@@ -18,9 +18,9 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 # - Java 8 is required by avro-cli (java 11 causes issues with Springframework)
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash netcat curl apt-utils
+RUN apt-get update && apt-get install -y bash wget netcat curl apt-utils jq
 COPY --from=configbase /tmp/wait-for /tmp/wait-for
 
-COPY *.json /tmp/
+COPY entrypoint.sh *.json /tmp/
 
 CMD ["/tmp/entrypoint.sh"]
