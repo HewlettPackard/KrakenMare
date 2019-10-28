@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 /tmp/wait-for --timeout=240 druid:8090 || exit 1
 
