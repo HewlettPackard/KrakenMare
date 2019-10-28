@@ -8,4 +8,5 @@ kafka-configs --zookeeper zookeeper:2181 --alter --add-config 'SCRAM-SHA-256=[pa
 kafka-configs --zookeeper zookeeper:2181 --alter --add-config 'SCRAM-SHA-256=[password=broker-secret],SCRAM-SHA-512=[password=broker-secret]' --entity-type users --entity-name broker
 kafka-configs --zookeeper zookeeper:2181 --alter --add-config 'SCRAM-SHA-256=[password=kakfasecret],SCRAM-SHA-512=[password=kafkasecret]' --entity-type users --entity-name kafka
 
-kafka-topics --zookeeper zookeeper:2181 --topic fabric --partitions 10 --create
+kafka-topics --zookeeper zookeeper:2181 --topic fabric --create --partitions 10 --replication-factor 2
+kafka-topics --zookeeper zookeeper:2181 --topic fabric --describe
