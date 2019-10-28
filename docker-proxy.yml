@@ -70,3 +70,6 @@ services:
 
   redfish:
     <<: *proxy
+
+  config-druid:
+    <<: *proxy
