@@ -1,0 +1,52 @@
+{
+  "type": "kafka",
+  "dataSchema": {
+    "dataSource": "perfquery",
+    "parser": {
+      "type": "avro_stream",
+      "avroBytesDecoder": {
+        "type": "schema_registry",
+        "url": "http://schemaregistrydruid:8085"
+      },
+      "parseSpec": {
+        "format": "avro",
+        "timestampSpec": {
+          "column": "timestamp",
+          "format": "millis"
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+          { "name": "agentUUID", "type": "string" },
+          { "name": "agentID", "type": "string" },
+          { "name": "timestamp", "type": "long" },
+	      { "name": "sensorUUID", "type": "string" },
+	      { "name": "sensorValue", "type": "float" },
+	      { "name": "deviceUUID", "type": "string" },
+	      { "name": "deviceID", "type": "string" },
+	      { "name": "sensorName", "type": "string" }
+          ]
+        }
+      }
+    },
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "rollup": false,
+      "queryGranularity": "none"
+    },
+    "metricsSpec": []
+  },
+  "ioConfig": {
+    "type": "kafka",
+    "topic": "fabric",
+    "consumerProperties": {
+      "bootstrap.servers": "broker-1:9092,broker-2:9093,broker-3:9094"
+    }
+  },
+  "tuningConfig": {
+    "type": "kafka",
+    "forceExtendableShardSpecs": true,
+    "maxParseExceptions": 100,
+    "maxSavedParseExceptions": 10
+  }
+}
