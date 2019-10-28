@@ -38,12 +38,6 @@ services:
   grafana:
     <<: *proxy
 
-  kafka-embedded-client-1:
-    <<: *proxy
-
-  mousttic-1:
-    <<: *proxy
-
   test-tools:
     <<: *proxy
 

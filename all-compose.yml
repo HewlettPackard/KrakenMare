@@ -331,30 +331,6 @@ services:
     networks:
       - krakenmare
 
-  kafka-embedded-client-1:
-    image: ${REGISTRY_FULL_PATH}kafka-embedded-client-1
-    build:
-      context: kafka-client
-      dockerfile: Dockerfile
-    hostname: kafka-emb1
-    environment:
-      KAFKA_BROKER_IP: broker-1
-    <<: *deploy
-    networks:
-      - krakenmare
-
-  mousttic-1:
-    image: ${REGISTRY_FULL_PATH}mousttic-1
-    build:
-      context: mousttic
-      dockerfile: Dockerfile
-    hostname: mousttic-1
-    environment:
-      MOSQUITTO_IP: mosquitto
-    <<: *deploy
-    networks:
-      - krakenmare
-
   druid:
     image: ${REGISTRY_FULL_PATH}druid
     build:
@@ -688,6 +664,8 @@ services:
     secrets:
       - client-sasl_ssl.conf
       - broker_jaas.conf
+      - kafka.client.keystore.pfx
+      - kafka.client.truststore.pfx
     networks:
       - zookeeper_kafka
 
