@@ -678,6 +678,16 @@ services:
     networks:
       - krakenmare
 
+  config-kafka:
+    image: ${REGISTRY_FULL_PATH}config-kafka
+    build:
+      context: config-kafka
+      dockerfile: Dockerfile
+    hostname: config-kafka
+    <<: *deploy
+    networks:
+      - zookeeper_kafka
+
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
 # it is not attachable to prevent other containers from connecting

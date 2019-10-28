@@ -73,3 +73,6 @@ services:
 
   config-druid:
     <<: *proxy
+
+  config-kafka:
+    <<: *proxy
