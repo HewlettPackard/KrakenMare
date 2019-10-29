@@ -3,6 +3,7 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /tmp
+./assemble.sh
 for schema in *.avsc
 do
   topic=$(echo $schema | awk -F "." '{$NF=""; print $0}' | sed "s/ /-/g" | sed 's/.$//')
