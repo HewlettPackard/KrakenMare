@@ -1,37 +1,46 @@
 {
-"type": "record",
-"name": "DeviceListResponse",
-"namespace": "com.hpe.krakenmare.message.manager",
-"fields": [
-	{
-		"name": "uuid",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Agent unique framework identifier"
-	},
-	{
-		"name": "deviceUuids",
-		"type": {
-			"type": "map",
-			"values": {
-				"type": "record",
-				"name": "SensorUuids",
-				"fields": [
-					{
-						"name": "uuid",
-						"type": {"type": "string", "logicalType":"uuid"},
-						"doc": "Device unique framework identifier"
-					},
-					{
-						"name": "sensorUuids",
-						"type": {
-							"type": "map",
-							"values": {"type": "string", "logicalType":"uuid"},
-							"doc": "Sensors unique framework identifiers"
-						}
-					}
-				]
-			}
-		}
-	}
-]
+  "type": "record",
+  "name": "DeviceListResponse",
+  "namespace": "com.hpe.krakenmare.message.manager",
+  "fields": [
+    {
+      "name": "agentUUID",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Agent unique framework identifier"
+    },
+    {
+      "name": "deviceUuids",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "deviceUuid",
+          "fields": [
+            {
+              "name": "deviceUUID",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              },
+              "doc": "Device unique framework identifier"
+            },
+            {
+              "name": "sensorUuids",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "logicalType": "uuid"
+                },
+                "doc": "Sensors unique framework identifiers"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
 }
