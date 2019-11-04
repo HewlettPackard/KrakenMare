@@ -28,7 +28,7 @@
               "doc": "Device unique framework identifier"
             },
             {
-              "name": "sensorUuids",
+              "name": "SensorUuids",
               "type": {
                 "type": "array",
                 "items": {
