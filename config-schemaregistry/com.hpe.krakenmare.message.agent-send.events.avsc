@@ -1,40 +1,48 @@
 {
-"type": "record",
-"name": "SendEvents",
-"namespace": "com.hpe.krakenmare.message.agent",
-"fields": [
-	{
-		"name": "uuid",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Unique framework identifier"
-	},
-  {
-		"name": "timestamp",
-		"type": {"type": "long", "logicalType":"timestamp-millis"},
-		"doc": "Timestamp of sensor value, milliseconds since the epoch"
-	},
-	{
-		"name": "measurementList",
-		"type": {
-			"type": "array",
-			"items": {
-				"type": "record",
-				"name": "EventMeasurement",
-				"fields": [
-					{
-					"name": "sensorUUID",
-					"type": {"type": "string", "logicalType":"uuid"},
-					"doc": "Unique sensor identifier"
-					},
-					{
-					"name": "event",
-					"type": "string",
-					"doc": "Event"
-					}
-				]
-			}
-
-		}
-	}
-]
+  "type": "record",
+  "name": "SendEvents",
+  "namespace": "com.hpe.krakenmare.message.agent",
+  "fields": [
+    {
+      "name": "agentUUID",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Unique framework identifier"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp of sensor value, milliseconds since the epoch"
+    },
+    {
+      "name": "measurementList",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "EventMeasurement",
+          "fields": [
+            {
+              "name": "sensorUUID",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              },
+              "doc": "Unique sensor identifier"
+            },
+            {
+              "name": "event",
+              "type": "string",
+              "doc": "Event"
+            }
+          ]
+        }
+      }
+    }
+  ]
 }
