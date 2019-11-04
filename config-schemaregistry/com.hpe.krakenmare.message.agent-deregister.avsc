@@ -1,17 +1,20 @@
 {
-"type": "record",
-"name": "Deregister",
-"namespace": "com.hpe.krakenmare.message.agent",
-"fields": [
-	{
-		"name": "uuid",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Agent Framework identifier"
-	},
-	{
-		"name": "deregister",
-		"type": "boolean",
-		"doc": "False == do nothing, True == deregister agent"
-	}
-]
+  "type": "record",
+  "name": "Deregister",
+  "namespace": "com.hpe.krakenmare.message.agent",
+  "fields": [
+    {
+      "name": "agentUUID",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Agent Framework identifier"
+    },
+    {
+      "name": "deregister",
+      "type": "boolean",
+      "doc": "False == do nothing, True == deregister agent"
+    }
+  ]
 }
