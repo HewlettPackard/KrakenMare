@@ -3,7 +3,7 @@
   "name": "Agent",
   "namespace": "com.hpe.krakenmare.core",
   "fields": [
-     {"name": "id", 
+     {"name": "agentId", 
      "type": "long",
      "doc": "Unique id as created by the Agent"},
     {
@@ -19,9 +19,9 @@
       "doc": "UUID of the agent"
     },
     {
-      "name": "type",
+      "name": "agentName",
       "type": "string",
-      "doc": "Type of agent such as OS, IB switch, ..."
+      "doc": "Name of agent"
     },
      {"name": "devices",
      "type": {
