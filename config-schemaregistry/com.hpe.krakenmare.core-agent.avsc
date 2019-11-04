@@ -1,11 +1,197 @@
-{"namespace": "com.hpe.krakenmare.core",
+{
   "type": "record",
   "name": "Agent",
+  "namespace": "com.hpe.krakenmare.core",
   "fields": [
-     {"name": "id", "type": "long"},
-     {"name": "uid", "type": "string"},
-     {"name": "uuid", "type": {"type": "string", "logicalType":"uuid"}},
-     {"name": "name", "type": "string"},
-     {"name": "devices", "type": {"type": "array", "items": "com.hpe.krakenmare.core.Device"}}
+     {"name": "id", 
+     "type": "long",
+     "doc": "Unique id as created by the Agent"},
+    {
+    "name": "agentUUID",
+      "type": [
+        "null",
+        {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+      ],
+      "default": null,
+      "doc": "UUID of the agent"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "doc": "Type of agent such as OS, IB switch, ..."
+    },
+     {"name": "devices",
+     "type": {
+     "type": "array", 
+     "items": {
+  "type": "record",
+  "name": "Device",
+  "fields": [
+    {
+      "name": "deviceUUID",
+      "type": [
+        "null",
+        {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+      ],
+      "default": null,
+      "doc": "UUID of the device"
+    },
+    {
+      "name": "deviceID",
+      "type": "string",
+      "doc": "Unique id as created by the Agent for the Device"
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "doc": "Human readable name"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "doc": "Type of device such as node, chassis manager, ..."
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "doc": "Location of device in the system"
+    },
+    {
+      "name": "sensors",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "Sensor",
+          "type": "record",
+          "fields": [
+            {
+              "name": "sensorUUID",
+              "type": [
+                "null",
+                {
+                  "type": "string",
+                  "logicalType": "uuid"
+                }
+              ],
+              "default": null,
+              "doc": "UUID of the sensor"
+            },
+            {
+              "name": "sensorID",
+              "type": "string",
+              "doc": "Unique id as created by the Agent for the Sensor"
+            },
+            {
+              "name": "sensorName",
+              "type": "string",
+              "doc": "Human readable name"
+            },
+            {
+              "name": "collectionFrequencyMin",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "Collection frequenciy minimum"
+            },
+            {
+              "name": "collectionFrequencyMax",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "Collection frequenciy maximum"
+            },
+            {
+              "name": "collectionFrequencyDefault",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "Collection frequenciy default"
+            },
+            {
+              "name": "measuringAccuracy",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null,
+              "doc": "Description of the accuracy of measurement"
+            },
+            {
+              "name": "unit",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null,
+              "doc": "Unit such as amps, degrees c"
+            },
+            {
+              "name": "type",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null,
+              "doc": "Description of the type of sensor such as temperature, pressure"
+            },
+            {
+              "name": "valueRangeMin",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "Value range for sensor. Minimum"
+            },
+            {
+              "name": "valueRangeMax",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "Value range for sensor. Maximum"
+            },
+            {
+              "name": "changeFrequency",
+              "type": [
+                "null",
+                "float"
+              ],
+              "default": null,
+              "doc": "How frequently a sensor is expect to change the value"
+            },
+            {
+              "name": "currentCollectionFrequency",
+              "type": "float",
+              "default": 1,
+              "doc": "Current collection frequency is HZ"
+            },
+            {
+              "name": "storageTime",
+              "type": "int",
+              "default": 1,
+              "doc": "How many weeks to store this sensor's values. -1 means forever"
+            }
+          ]
+        }
+      }
+    }
   ]
+}
+}
+}
+]
 }
