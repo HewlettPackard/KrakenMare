@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.message.manager",
   "fields": [
     {
-      "name": "AgentUUID",
+      "name": "agentUUID",
       "type": {
         "type": "string",
         "logicalType": "uuid"
