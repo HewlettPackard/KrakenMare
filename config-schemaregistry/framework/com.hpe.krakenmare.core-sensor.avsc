@@ -5,10 +5,13 @@
   "fields": [
     {
       "name": "sensorUUID",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      },
+      "type": [
+        "null",
+        {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+      ],
       "default": null,
       "doc": "UUID of the sensor"
     },
