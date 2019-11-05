@@ -9,6 +9,7 @@ RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro
 
 COPY IBswitchSimulator.py version.py IBswitchSimulator.cfg r1i0c-ibswitch r1i1c-ibswitch entrypoint.sh /simulator/
 COPY seed/* /tmp/
+COPY SensorDescriptors/*.json /simulator/
 
 WORKDIR /simulator
 ENV PYTHONUNBUFFERED=1

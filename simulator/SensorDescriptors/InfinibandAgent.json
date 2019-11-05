@@ -1,3 +1,5 @@
+{"uuid":"699c4461-1bd9-4be1-b5d4-6246fa463753",
+"devices":[
 { "deviceUUID": null,
   "deviceID": "use guid",
   "deviceName": "use CMC or node with -ib postfix",
@@ -23,4 +25,6 @@
 	{"sensorUUID": null, "sensorID": "guid+metricname", "sensorName": "PortRcvPkts", "type": "Counter", "valueRangeMin": 0.0, "valueRangeMax": 2147483647.0, "currentCollectionFrequency": 0.1, "storageTime": 1},
 	{"sensorUUID": null, "sensorID": "guid+metricname", "sensorName": "PortXmitWait", "type": "Counter", "valueRangeMin": 0.0, "valueRangeMax": 65535.0, "currentCollectionFrequency": 0.1, "storageTime": 1}
 	]
+}
+]
 }

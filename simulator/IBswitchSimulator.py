@@ -31,17 +31,17 @@ from version import __version__
 from schema_registry.client import SchemaRegistryClient
 from schema_registry.serializers import MessageSerializer
 
+
 # START IBswitchSimulator class
-
-
 class IBswitchSimulator:
     registered = False
     loggerName = None
 
     def __init__(self, configFile, mode):
         """
-                        Class init
-                """
+            Class init
+            
+        """
 
         self.loggerName = "simulator.agent." + __version__ + ".log"
 
@@ -49,22 +49,33 @@ class IBswitchSimulator:
             configFile, ["Daemon", "Logger", "MQTT"]
         )
 
-        self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
-        self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
-        self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
-        self.seedOutputDir = self.config.get("Others", "seedOutputDir")
-
-        # id comes from the framework manager as a convenience incremental id
-        self.myAgent_id = -1
+        self.myAgentName = "IBSwitchSimulator"
+        
+        # Agent uid as provided by the discovery mechanism.
+        # for now use the hostname and random number to insure we are always unique
+        # used for Agent registration and MQTT client id
+        self.myAgent_uid = platform.node() + str(random.randint(1, 100001))
+        
         # uuid comes from the central framework manager
         self.myAgent_uuid = -1
-        self.myAgentName = "IBSwitchSimulator"
+
+        self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
+        self.seedOutputDir = self.config.get("Others", "seedOutputDir")
+        self.device_json_dir = self.config.get("Others", "deviceJSONdir")
+        self.myDeviceMap = {}
+        
+        # MQTT setup
+        self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
+        self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         self.data_topic = "ibswitch"
         self.myMQTTregistered = False
-        # Agent uid as provided by the discovery mecanism.
-        # for now use the hostname, should be the output of the disc mecanism
-        self.myAgent_uid = platform.node() + str(random.randint(1, 100001))
-
+        self.myDeviceRegistered = False
+        self.myAgent_registration_response_topic = "registration/" + self.myAgent_uid + "/response"
+        self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
+        self.myDevice_registration_response_topic = False
+        self.myDevice_registration_request_topic = "device-registration/"
+        
+        # schemas and schema registry setup
         conf = {
             "url": "https://schemaregistry:8081",
             "ssl.ca.location": "/run/secrets/km-ca-1.crt",
@@ -73,34 +84,53 @@ class IBswitchSimulator:
         }
 
         client = SchemaRegistryClient(conf)
+        self.msg_serializer = MessageSerializer(client)
+        
         subject = "com-hpe-krakenmare-message-agent-register-request"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-
-        self.register_request_schema = cg.schema.schema
+            time.sleep(5)
+        self.agent_register_request_schema = cg.schema.schema
+        self.agent_register_request_schema_id = cg.schema_id
 
         subject = "com-hpe-krakenmare-message-manager-register-response"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-
-        self.register_response_schema = cg.schema.schema
+            time.sleep(5)
+        self.agent_register_response_schema = cg.schema.schema
+        self.agent_register_response_schema_id = cg.schema_id
 
         subject = "com-hpe-krakenmare-message-agent-send-time-series-druid"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-
+            time.sleep(5)
         self.send_time_series_schema = cg.schema.schema
         self.send_time_series_schema_id = cg.schema_id
-        self.send_time_series_serializer = MessageSerializer(client)
+        
+        subject = "com-hpe-krakenmare-message-agent-device-list"
+        cg = None
+        while cg is None:
+            cg = client.get_schema(subject)
+            print("getting schema %s from schemaregistry" % subject)
+            time.sleep(5)
+        self.device_register_request_schema = cg.schema.schema
+        self.device_register_request_schema_id = cg.schema_id
+        
+        subject = "com-hpe-krakenmare-message-manager-device-list-response"
+        cg = None
+        while cg is None:
+            cg = client.get_schema(subject)
+            print("getting schema %s from schemaregistry" % subject)
+            time.sleep(5)
+        self.device_register_response_schema = cg.schema.schema
+        self.device_register_response_schema_id = cg.schema_id
+        
 
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
@@ -149,35 +179,80 @@ class IBswitchSimulator:
 
         return config
 
+    ###########################################################################################
     # MQTT agent methods
     def mqtt_on_log(self, client, userdata, level, buf):
-        print("log: %s" % buf)
+        print("on_log: %s" % buf)
 
-    # defines self.myMQTTregistered and self.myAgent_id
-    def mqtt_on_registration_result(self, client, userdata, message):
-        print("message received: %s " % message.payload)
-        print("message topic: %s" % message.topic)
-        r_bytes = io.BytesIO(message.payload)
-        data = schemaless_reader(r_bytes, self.register_response_schema)
-        print("registration-result with km UUID: %s" % data["uuid"])
-        self.myMQTTregistered = True
-        self.myAgent_uuid = data["uuid"]
+    def mqtt_on_subscribe(self, client, userdata, mid, granted_qos):
+        print("on_subscribe: Subscribed with message id (mid): " + str(mid))
+        
+    # The callback for when the client receives a CONNACK response from the server.
+    def mqtt_on_connect(self, client, userdata, flags, rc):
+        
+        if (rc != 0):
+            print("on_connect: Connection error: " + mqtt.connack_string(rc))
+        else:
+            print("on_connect: Connected with result code: " + mqtt.connack_string(rc))
 
+        # Subscribing in on_connect() means that if we lose the connection and
+        # reconnect then subscriptions will be renewed.
+        if self.myAgent_registration_response_topic != False:
+            self.registration_client.subscribe(self.myAgent_registration_response_topic)
+        
+        if self.myDevice_registration_response_topic != False:
+            self.registration_client.subscribe(self.myDevice_registration_response_topic)
+
+    def mqtt_on_disconnect(self, client, userdata, rc):
+        print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
+    
+    def mqtt_on_publish(self, client, userdata, mid):
+        print("on_publish: Published message with mid: " + str(mid))
+
+    # defines self.myMQTTregistered and self.myAgent_uuid
+    def mqtt_on_message(self, client, userdata, message):
+        print("on_message: message received on topic: %s" % message.topic)
+        
+        if message.topic == self.myAgent_registration_response_topic:
+            print("message received: %s " % message.payload)
+            # TO-DO, decoding with schema-registry requires magic byte in message
+            #decode_msg_obj = self.msg_serializer.decode_message(message.payload)
+            #print("registration-result with km UUID: %s" % decode_msg_obj["uuid"])
+            
+            r_bytes = io.BytesIO(message.payload)
+            data = schemaless_reader(r_bytes, self.agent_register_response_schema)
+            print("registration-result with KrakenMare UUID: %s" % data["uuid"])
+            self.myMQTTregistered = True
+            self.myAgent_uuid = data["uuid"]
+            self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid)
+        
+        if message.topic == self.myDevice_registration_response_topic:
+            print("message received: %s " % message.payload)
+            r_bytes = io.BytesIO(message.payload)
+            data = schemaless_reader(r_bytes, self.device_register_response_schema)
+            self.myDeviceRegistered = True
+            
+    # this method takes care of Agent registration and device/sensor registration
     def mqtt_registration(self):
-        registration_client = mqtt.Client("RegistrationClient-" + str(self.myAgent_uid))
-        registration_client.on_log = self.mqtt_on_log
-        registration_client.on_message = self.mqtt_on_registration_result
+        self.registration_client = mqtt.Client("RegistrationClient-" + str(self.myAgent_uid))
+        self.registration_client.on_log = self.mqtt_on_log
+        self.registration_client.on_message = self.mqtt_on_message
+        self.registration_client.on_subscribe = self.mqtt_on_subscribe
+        self.registration_client.on_disconnect = self.mqtt_on_disconnect
+        self.registration_client.on_connect = self.mqtt_on_connect
+        self.registration_client.on_publish = self.mqtt_on_publish
         print("connecting to mqtt broker:" + self.mqtt_broker)
-        registration_client.connect(self.mqtt_broker)
-        registration_client.loop_start()
+        self.registration_client.connect(self.mqtt_broker)
+        
+        # start listening loop
+        self.registration_client.loop_start()
 
-        (result, mid) = registration_client.subscribe(
-            "registration/" + self.myAgent_uid + "/response")
-
+        # subscribe to registration response topic
+        result = -1
         while result != mqtt.MQTT_ERR_SUCCESS:
-            (result, mid) = registration_client.subscribe(
-                "registration/"+self.myAgent_uid + "/response")
-
+            (result, mid) = self.registration_client.subscribe(self.myAgent_registration_response_topic)      
+        
+        # assemble my agent registration data
         RegistrationData = {
             "agentID": self.myAgent_uid,
             "type": "simulatorAgent",
@@ -185,34 +260,152 @@ class IBswitchSimulator:
             "description": "This is a fine description",
             "useSensorTemplate": False,
         }
-
+        
+        # publish registration data
         w_bytes = io.BytesIO()
 
         schemaless_writer(
-            w_bytes, self.register_request_schema, RegistrationData)
+            w_bytes, self.agent_register_request_schema, RegistrationData)
 
         raw_bytes = w_bytes.getvalue()
 
+        # TO-DO: change to magic byte in Avro message on FM site
+        #raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.agent_register_request_schema_id, RegistrationData)
+
         # use highest QoS for now
         print("sending registration payload: --%s--" % raw_bytes)
-        registration_client.publish(
-            "registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True
-        )
+        MQTTMessageInfo = self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
+        print("mqtt published with publishing code: " + mqtt.connack_string(MQTTMessageInfo.rc))
+        if MQTTMessageInfo.is_published() == False:
+            print("Waiting for message to be published.")
+            MQTTMessageInfo.wait_for_publish()
+            
+        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
 
         while not self.myMQTTregistered:
-            time.sleep(1)
-            print("waiting for registration result...")
+            print("waiting for agent registration result...")
+            time.sleep(5)
+            '''
+            if not self.myMQTTregistered:
+                print("re-sending registration payload")
+                self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
+            '''
 
-        registration_client.loop_stop()
+        # subscribe to registration response topic
+        result = -1
+        while result != mqtt.MQTT_ERR_SUCCESS:
+            (result, mid) = self.registration_client.subscribe(self.myDevice_registration_response_topic)   
+        
+        # register devices/sensors
+        self.myDeviceMap = self.create_my_device_map()
+        
+        #print(self.myDeviceMap)
+        
+        # publish registration data
+        w_bytes = io.BytesIO()
+
+        schemaless_writer(
+            w_bytes, self.device_register_request_schema, self.myDeviceMap)
+
+        raw_bytes = w_bytes.getvalue()
+        
+        # use highest QoS for now
+        print("sending device/sensor registration payload: --%s--" % raw_bytes)
+        self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
+        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
+
+        while not self.myDeviceRegistered:
+            print("waiting for device registration result...")
+            time.sleep(10)
+            if not self.myDeviceRegistered:
+                print("re-sending device/sensor registration payload")
+                self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
+        
+
+        self.registration_client.loop_stop()
         print(
             "registered with uid '%s' and km-uuid '%s'"
             % (self.myAgent_uid, self.myAgent_uuid)
         )
 
     # END MQTT agent methods
+    ################################################################################
 
-    # send simulated sensor data via MQTT
+    ################################################################################
+    # create my device and sensor map
+    def create_my_device_map(self):
+        
+        # store for final device and sensor map according to InfinibandAgent.json syntax
+        deviceMap = {}
+        
+        # read device json template
+        with open(self.device_json_dir + "/InfinibandDevice.json", "r") as f:
+                deviceTemplate = json.load(f)
+           
+        deviceMap["uuid"] = str(self.myAgent_uuid)
+        deviceMap["devices"] = []
+        
+        # set my informations in device/sensor map
+        # go through high level devices and add each switch as device (deviceUID = myAgentUUID + device guid
+        for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
+            
+            with open(cmc, "r") as f:
+                query_data = json.load(f)
+
+            # For each switch found in the JSON data ,
+            # assemble map for each device and store it in myDeviceMap
+            for switch in query_data["Switch"]:
+                deviceTemplate["deviceID"] = 'null'
+                deviceTemplate["deviceID"] = switch["Node_GUID"]
+                deviceTemplate["deviceName"] = "use CMC or node with -ib postfix"
+                deviceTemplate["type"] = "Infiniband Switch or Infiniband HCA"
+                deviceTemplate["location"] = "use CMC or node"
+                
+                # assemble sensor information for device 'switch'
+                for sensor in deviceTemplate["sensors"]:
+                    sensor["sensorUUID"] = 'null'
+                    # sensorID = guid-sensorname
+                    sensor["sensorID"] = switch["Node_GUID"] + "-" + sensor["sensorName"]          
+                
+                deviceMap["devices"].append(deviceTemplate)
+        
+        return deviceMap
+                
+    ################################################################################
+    # read seed files used as starting values for simulator and populate my seed hash map
+    def seed_simulator_map(self):
+        seedMap = {}
+        
+        # read JSON data describing switches in the IRU (c stands for CMC)
+        for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
+            seedMap[cmc] = {}
+            
+            with open(cmc, "r") as f:
+                query_data = json.load(f)
+
+            # For each switch device found in the JSON data ,
+            # add sensors and starting value
+            for switch in query_data["Switch"]:
+                guid = switch["Node_GUID"]
+                seedMap[cmc][guid] = {}
+
+                # Read in the old query output
+                output = self.seedOutputDir + "/" + guid + ".perfquery.json"
+                with open(output, "r") as infile:
+                    query_output = json.load(infile)
+                infile.close()
+
+                seedMap[cmc][guid] = query_output
+                seedMap[cmc][guid]["Name"] = self.myAgentName + ":" + str(self.myAgent_uid)
+
+        # done
+        return seedMap
+        
+    
+    # assemble and send simulated sensor data via MQTT
     def send_data(self, pubsubType):
+               
+        # counter for send message count
         i = 1
 
         if pubsubType == "mqtt":
@@ -250,9 +443,7 @@ class IBswitchSimulator:
             "PortXmitWait",
         ]"""
         
-        """ Sample data record for a timestamp
-        
-        new flat version:
+        """ Sample data record for a timestamp using the new flat version:
         record = {
             "uuid": str(self.myAgent_uuid),
             "timestamp": 1570135369000,
@@ -265,7 +456,9 @@ class IBswitchSimulator:
         # read JSON data describing switches in the IRU (c stands for CMC)
         device_uuid = {}
         sensor_uuid = {}
-                
+        
+        # assemble UUID map
+        # TODO: replace with device/sensor registration UUIDs from Framework Manager
         for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
             device_uuid[cmc] = {}
             sensor_uuid[cmc] = {}
@@ -277,98 +470,72 @@ class IBswitchSimulator:
             # generate sensor uuid from has of seed sensor uuids + cmc + guid
             # each is a device
             for switch in query_data["Switch"]:
-                guid = str(switch["Node_GUID"])
+                switch_guid = str(switch["Node_GUID"])
                 
                 #device UUID
-                device_uuid[cmc][guid] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + guid).encode()).hexdigest())
+                device_uuid[cmc][switch_guid] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + switch_guid).encode()).hexdigest())
                 
-                sensor_uuid[cmc][guid] = {}
+                sensor_uuid[cmc][switch_guid] = {}
 
                 for ibmetric in ibmetrics:
                     
                     #sensor UUIID
-                    sensor_uuid[cmc][guid][ibmetric] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + str(device_uuid) + ibmetric).encode()).hexdigest())
+                    sensor_uuid[cmc][switch_guid][ibmetric] = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + str(device_uuid[cmc][switch_guid]) + ibmetric).encode()).hexdigest())
                     if ibmetric in ["SymbolErrorCounter", "PortXmitData"]:
-                        print(ibmetric + ":" + str(sensor_uuid[cmc][guid][ibmetric]))
+                        print(ibmetric + ":" + str(sensor_uuid[cmc][switch_guid][ibmetric]))
+
+        switchSimulatorSeedMap = self.seed_simulator_map()
 
         # Infinite loop
         while True:
                              
-            # read JSON data describing switches in the IRU (c stands for CMC)
-            for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
-
-                with open(cmc, "r") as f:
-                    query_data = json.load(f)
-
-                # For each switch found in the JSON data ,
-                # generate perfquery with -a to summarize the ports
-                # This simulates a poor quality fabric in heavy use
-                # Using random numbers on 0,1 we update 3 error counters as
-                # SymbolErrorCounter increments fastest
-                # LinkedDownedCounter increments slower both fewer and less
-                # PortXmitDiscards increments slowest both fewer and less
-                # For data counters add randint[1000,4000]
-                # for packet counters add randint[100,400]
+            # read JSON data describing switches in the IRU
+            for cmc in switchSimulatorSeedMap:
 
                 # go through sensors for device
-                for switch in query_data["Switch"]:
+                for switchGUID in switchSimulatorSeedMap[cmc]:
                     
                     # reset record_list for each new switch
                     record_list = []
                     
-                    guid = str(switch["Node_GUID"])
-                    # Read in the old query output
-                    output = self.seedOutputDir + "/" + guid + ".perfquery.json"
-                    with open(output, "r") as infile:
-                        query_output = json.load(infile)
-                    infile.close()
-
                     # Set time to milliseconds since the epoch
                     timestamp = int(round(time.time() * 1000))
                     
-                    query_output["Name"] = self.myAgentName
-                    query_output["Timestamp"] = timestamp
-
                     x = random.random()
                     if x > 0.98:
-                        query_output["SymbolErrorCounter"] += 1000
+                        switchSimulatorSeedMap[cmc][switchGUID]["SymbolErrorCounter"] += 1000
                     elif x > 0.88:
-                        query_output["SymbolErrorCounter"] += 10
+                        switchSimulatorSeedMap[cmc][switchGUID]["SymbolErrorCounter"] += 10
                     elif x > 0.78:
-                        query_output["SymbolErrorCounter"] += 1
+                        switchSimulatorSeedMap[cmc][switchGUID]["SymbolErrorCounter"] += 1
 
                     x = random.random()
                     if x > 0.99:
-                        query_output["LinkDownedCounter"] += 100
+                        switchSimulatorSeedMap[cmc][switchGUID]["LinkDownedCounter"] += 100
                     elif x > 0.89:
-                        query_output["LinkDownedCounter"] += 5
+                        switchSimulatorSeedMap[cmc][switchGUID]["LinkDownedCounter"] += 5
                     elif x > 0.79:
-                        query_output["LinkDownedCounter"] += 1
+                        switchSimulatorSeedMap[cmc][switchGUID]["LinkDownedCounter"] += 1
 
                     x = random.random()
                     if x > 0.99:
-                        query_output["PortXmitDiscards"] += 10
+                        switchSimulatorSeedMap[cmc][switchGUID]["PortXmitDiscards"] += 10
                     elif x > 0.89:
-                        query_output["PortXmitDiscards"] += 5
+                        switchSimulatorSeedMap[cmc][switchGUID]["PortXmitDiscards"] += 5
                     elif x > 0.79:
-                        query_output["PortXmitDiscards"] += 2
-
-                    # Write output to the next input
-                    with open(output, "w") as outfile:
-                        json.dump(query_output, outfile)
-                    outfile.close()
+                        switchSimulatorSeedMap[cmc][switchGUID]["PortXmitDiscards"] += 2
 
                     # Assign the simulator values to the record to be serialized
                     for ibmetric in ibmetrics:
                         record = {}
                         record["agentUUID"] = self.myAgent_uuid
                         record["agentID"] = self.myAgent_uid
-                        record["sensorUUID"] = sensor_uuid[cmc][guid][ibmetric]
-                        record["sensorValue"] = query_output[ibmetric]
+                        record["sensorUUID"] = sensor_uuid[cmc][switchGUID][ibmetric]
+                        record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
                         record["timestamp"] = timestamp
-                        record["deviceUUID"] = device_uuid[cmc][guid]
+                        record["deviceUUID"] = device_uuid[cmc][switchGUID]
                         record["sensorName"] = ibmetric
-                        record["deviceID"] = guid
+                        record["deviceID"] = switchGUID
                         #print(record)
                         record_list.append(record)
 
@@ -377,7 +544,7 @@ class IBswitchSimulator:
                             #print(str(eachRecord))
                             print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
                             
-                            raw_bytes = self.send_time_series_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, eachRecord)
+                            raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, eachRecord)
                             client.publish(self.data_topic, raw_bytes)
                             i += 1
                     else:
@@ -385,6 +552,7 @@ class IBswitchSimulator:
                         sys.exit(-1)
 
             # Infinite loop
+            seed_initilaized = True
             time.sleep(self.sleepLoopTime)
 
     # main method of IBswitchSimulator
@@ -398,7 +566,7 @@ class IBswitchSimulator:
 
 
 # END IBswitchSimulator class
-
+################################################################################
 
 def main():
     usage = "usage: %s --mode=mqtt" % sys.argv[0]
