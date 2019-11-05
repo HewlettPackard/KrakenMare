@@ -290,8 +290,7 @@ class IBswitchSimulator:
                 print("re-sending registration payload")
                 self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
             '''
-        
-        '''
+
         # subscribe to registration response topic
         result = -1
         while result != mqtt.MQTT_ERR_SUCCESS:
@@ -321,7 +320,6 @@ class IBswitchSimulator:
             if not self.myDeviceRegistered:
                 print("re-sending device/sensor registration payload")
                 self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
-        '''
 
         self.registration_client.loop_stop()
         print(
