@@ -175,11 +175,15 @@ if [ "$build" == "1" ]; then
 fi
 
 if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
-     docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
+    docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
+    #wait until that the stack is stopped
+    until (( $(docker network ls | grep -c krakenmare) == 0 ))
+    do
+      sleep 3
+    done
 fi
 
 if [ "$deploy" == "1" ]; then
-						  
     cd ../km-security || exit 1
     #if all necessary secrets already exist in swarm, use them,
     #if not and they exist as files, push them
@@ -188,11 +192,6 @@ if [ "$deploy" == "1" ]; then
     ./km-secrets-tool.sh -wcgpd || exit 1
 
     cd ../playbooks || exit 1
-    #wait until that the stack is stopped
-    until (( $(docker network ls | grep -c krakenmare) == 0 ))
-    do
-      sleep 3
-    done
     docker stack deploy $compose_args $project_name || exit 1 
 
 fi
