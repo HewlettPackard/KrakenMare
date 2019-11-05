@@ -172,6 +172,7 @@ class FanIn:
             self.kafka_msg_counter += 1
             print(str(self.kafka_msg_counter) + ":published to Kafka")
             self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
+            self.kafka_producer.poll(0)
         else:
             print("Not ibswitch topic")
 
