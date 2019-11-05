@@ -194,13 +194,6 @@ if [ "$deploy" == "1" ]; then
     ./km-secrets-tool.sh -wcgpd || exit 1
 
     cd ../playbooks || exit 1
-    #wait until that the stack is stopped
-    echo "Check if prior krakenmare stack is completely gone"
-    until (( $(docker network ls | grep -c krakenmare) == 0 ))
-    do
-      sleep 3
-      echo -n "."
-    done
     docker stack deploy $compose_args $project_name || exit 1 
 
 fi
