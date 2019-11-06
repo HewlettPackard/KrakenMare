@@ -76,13 +76,13 @@ public class AgentRedisRepository implements Repository<Agent> {
 	public Agent create(Agent payload) {
 		long id = jedis.incr(counterKey);
 		UUID uuid = UUID.randomUUID();
-		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
-		return new Agent(id, payload.getUid(), uuid, payload.getName(), Collections.emptyList());
+		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getAgentUid(), uuid, payload.getAgentName());
+		return new Agent(id, payload.getAgentUid(), uuid, payload.getAgentName(), Collections.emptyList());
 	}
 
 	@Override
 	public boolean save(Agent agent) {
-		String agentKey = agentDataKey + ":" + agent.getUuid();
+		String agentKey = agentDataKey + ":" + agent.getAgentUuid();
 		return jedis.hset(agentsKey, agentKey, toJson(agent)) == 1;
 	}
 
@@ -94,7 +94,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public boolean delete(Agent agent) {
-		String agentKey = agentDataKey + ":" + agent.getUuid();
+		String agentKey = agentDataKey + ":" + agent.getAgentUuid();
 		return jedis.hdel(agentsKey, agentKey) == 1;
 	}
 

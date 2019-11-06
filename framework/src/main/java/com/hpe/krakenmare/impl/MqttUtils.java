@@ -20,12 +20,12 @@ public class MqttUtils {
 
 	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
 	public static String getRegistrationRequestTopic(Agent agent) {
-		return REGISTRATION_TOPIC + "/" + agent.getUid() + "/request";
+		return REGISTRATION_TOPIC + "/" + agent.getAgentUid() + "/request";
 	}
 
 	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
 	public static String getRegistrationResponseTopic(Agent agent) {
-		return getRegistrationResponseTopic(agent.getUid());
+		return getRegistrationResponseTopic(agent.getAgentUid());
 	}
 
 	// use "uid" here since the agent doesn't know yet its UUID so can't listen to it
@@ -40,11 +40,11 @@ public class MqttUtils {
 	}
 
 	public static String getSensorListRequestTopic(Agent agent) {
-		return SENSOR_LIST_TOPIC + "/" + agent.getUuid() + "/request";
+		return SENSOR_LIST_TOPIC + "/" + agent.getAgentUuid() + "/request";
 	}
 
 	public static String getSensorListResponseTopic(Agent agent) {
-		return getSensorListResponseTopic(agent.getUuid());
+		return getSensorListResponseTopic(agent.getAgentUuid());
 	}
 
 	public static String getSensorListResponseTopic(UUID uuid) {

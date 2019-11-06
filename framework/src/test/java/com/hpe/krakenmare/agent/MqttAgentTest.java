@@ -41,13 +41,13 @@ public class MqttAgentTest {
 		MqttAgent agent = new MqttAgent();
 		agent.register(broker);
 		// at the end of registration process, agent UUID must be set
-		assertNotNull(agent.getUuid());
+		assertNotNull(agent.getAgentUuid());
 
 		agent.registerDevices(broker);
 		for (Device device : agent.getDevices()) {
-			assertNotEquals(MqttUtils.EMPTY_UUID, device.getUuid());
+			assertNotEquals(MqttUtils.EMPTY_UUID, device.getDeviceUuid());
 			for (Sensor sensor : device.getSensors()) {
-				assertNotEquals(MqttUtils.EMPTY_UUID, sensor.getUuid());
+				assertNotEquals(MqttUtils.EMPTY_UUID, sensor.getSensorUuid());
 			}
 		}
 	}
