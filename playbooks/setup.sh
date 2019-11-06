@@ -175,11 +175,13 @@ if [ "$build" == "1" ]; then
 fi
 
 if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
+    echo "Check if prior krakenmare stack is completely gone"
     docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
     #wait until that the stack is stopped
     until (( $(docker network ls | grep -c krakenmare) == 0 ))
     do
       sleep 3
+      echo -n "."
     done
 fi
 
