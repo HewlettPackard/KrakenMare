@@ -8,11 +8,20 @@
       "type": "long"
     },
     {
-      "name": "agentUUID",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      }
+      "name": "agentUid",
+      "type": "string"
+    },
+    {
+      "name": "agentUuid",
+      "type": [
+        "null",
+        {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+      ],
+      "default": null,
+      "doc": "Uuid of the agent"
     },
     {
       "name": "agentName",
