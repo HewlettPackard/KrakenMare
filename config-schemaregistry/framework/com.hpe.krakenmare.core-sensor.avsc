@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.core",
   "fields": [
     {
-      "name": "sensorUUID",
+      "name": "sensorUuid",
       "type": [
         "null",
         {
@@ -13,15 +13,15 @@
         }
       ],
       "default": null,
-      "doc": "UUID of the sensor"
+      "doc": "Uuid of the sensor"
     },
     {
-      "name": "id",
+      "name": "sensorId",
       "type": "string",
       "doc": "Unique id as created by the Agent for the Sensor"
     },
     {
-      "name": "name",
+      "name": "sensorName",
       "type": "string",
       "doc": "Human readable name"
     },
