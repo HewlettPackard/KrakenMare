@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.message.agent",
   "fields": [
     {
-      "name": "agentUUID",
+      "name": "agentUuid",
       "type": {
         "type": "string",
         "logicalType": "uuid"
@@ -12,7 +12,7 @@
       "doc": "Unique framework identifier for agent"
     },
     {
-      "name": "agentID",
+      "name": "agentId",
       "type": {
         "type": "string"
       },
@@ -27,7 +27,7 @@
       "doc": "Timestamp of sensor value, milliseconds since the epoch"
     },
     {
-      "name": "sensorUUID",
+      "name": "sensorUuid",
       "type": {
         "type": "string",
         "logicalType": "uuid"
@@ -40,7 +40,7 @@
       "doc": "Sensor value"
     },
     {
-      "name": "deviceUUID",
+      "name": "deviceUuid",
       "type": {
         "type": "string",
         "logicalType": "uuid"
@@ -48,7 +48,7 @@
       "doc": "Unique device identifier"
     },
     {
-      "name": "deviceID",
+      "name": "deviceId",
       "type": {
         "type": "string"
       },
