@@ -13,15 +13,10 @@
     },
     {
       "name": "agentUuid",
-      "type": [
-        "null",
-        {
+      "type": {
           "type": "string",
           "logicalType": "uuid"
         }
-      ],
-      "default": null,
-      "doc": "Uuid of the agent"
     },
     {
       "name": "agentName",
