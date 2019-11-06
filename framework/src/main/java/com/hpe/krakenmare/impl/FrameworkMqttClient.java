@@ -1,11 +1,14 @@
 package com.hpe.krakenmare.impl;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +54,35 @@ public class FrameworkMqttClient {
 
 			MqttConnectOptions connOpts = new MqttConnectOptions();
 			connOpts.setAutomaticReconnect(true);
-			// connOpts.setCleanSession(true);
+			connOpts.setCleanSession(false);
+
+			client.setCallback(new MqttCallback() {
+				@Override
+				public void messageArrived(String topic, MqttMessage message) throws Exception {
+					LOG.debug("Message received on topic '" + topic + "': " + message);
+				}
+
+				@Override
+				public void deliveryComplete(IMqttDeliveryToken token) {
+					try {
+						LOG.debug("Delivery complete: " + token.getMessage() + " (QoS=" + token.getMessage().getQos() + ")");
+					} catch (MqttException e) {
+						// token.getMessage() interface throws, even though if the impl does not.
+						LOG.error("Unable to get message details", e);
+					}
+				}
+
+				@Override
+				public void connectionLost(Throwable cause) {
+					LOG.warn("Connection lost", cause);
+					try {
+						LOG.info("Reconnecting...");
+						client.reconnect();
+					} catch (MqttException e) {
+						LOG.error("Unable to reconnect", e);
+					}
+				}
+			});
 
 			LOG.info("Connecting to broker: " + broker + " ...");
 			// IMqttToken token = client.connect(connOpts);
@@ -59,7 +90,7 @@ public class FrameworkMqttClient {
 			client.connect(connOpts);
 			LOG.info("Connected to broker: " + broker);
 		} catch (MqttException me) {
-			LOG.error("Unable to connect to MQTT", me);
+			LOG.error("Unable to connect", me);
 		}
 	}
 
@@ -72,7 +103,7 @@ public class FrameworkMqttClient {
 				client = null;
 				LOG.info("Disconnected");
 			} catch (MqttException me) {
-				LOG.error("Unable to disconnect from MQTT", me);
+				LOG.error("Unable to disconnect", me);
 			}
 		}
 	}
