@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.message.agent",
   "fields": [
     {
-      "name": "agentID",
+      "name": "agentId",
       "type": "string",
       "doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
     },
@@ -14,7 +14,7 @@
       "doc": "Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, KME (Kraken Mare Embedded )Agent, KMN (Kraken Mare Node) Agent"
     },
     {
-      "name": "name",
+      "name": "agentName",
       "type": "string",
       "doc": "human readable agent name"
     },
