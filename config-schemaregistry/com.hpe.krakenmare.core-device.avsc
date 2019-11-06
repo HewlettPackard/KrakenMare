@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.core",
   "fields": [
     {
-      "name": "deviceUUID",
+      "name": "deviceUuid",
       "type": [
         "null",
         {
@@ -13,10 +13,10 @@
         }
       ],
       "default": null,
-      "doc": "UUID of the device"
+      "doc": "Uuid of the device"
     },
     {
-      "name": "deviceID",
+      "name": "deviceId",
       "type": "string",
       "doc": "Unique id as created by the Agent for the Device"
     },
@@ -40,11 +40,11 @@
       "type": {
         "type": "array",
         "items": {
-          "name": "Sensor",
           "type": "record",
+          "name": "Sensor",
           "fields": [
             {
-              "name": "sensorUUID",
+              "name": "sensorUuid",
               "type": [
                 "null",
                 {
@@ -53,10 +53,10 @@
                 }
               ],
               "default": null,
-              "doc": "UUID of the sensor"
+              "doc": "Uuid of the sensor"
             },
             {
-              "name": "sensorID",
+              "name": "sensorId",
               "type": "string",
               "doc": "Unique id as created by the Agent for the Sensor"
             },
