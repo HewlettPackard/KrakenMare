@@ -254,9 +254,9 @@ class IBswitchSimulator:
         
         # assemble my agent registration data
         RegistrationData = {
-            "agentID": self.myAgent_uid,
+            "agentId": self.myAgent_uid,
             "type": "simulatorAgent",
-            "name": "IBswitchSimulator",
+            "agentName": "IBswitchSimulator",
             "description": "This is a fine description",
             "useSensorTemplate": False,
         }
@@ -448,9 +448,9 @@ class IBswitchSimulator:
         record = {
             "uuid": str(self.myAgent_uuid),
             "timestamp": 1570135369000,
-            "sensorUUID": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
+            "sensorUuid": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
             "sensorValue": 0.0,
-            "deviceUUID" : "afbfd80d-cd9d-487a-841c-6da12b10c6d0",
+            "deviceUuid" : "afbfd80d-cd9d-487a-841c-6da12b10c6d0",
         }
         """
         
@@ -529,14 +529,14 @@ class IBswitchSimulator:
                     # Assign the simulator values to the record to be serialized
                     for ibmetric in ibmetrics:
                         record = {}
-                        record["agentUUID"] = self.myAgent_uuid
-                        record["agentID"] = self.myAgent_uid
-                        record["sensorUUID"] = sensor_uuid[cmc][switchGUID][ibmetric]
+                        record["agentUuid"] = self.myAgent_uuid
+                        record["agentId"] = self.myAgent_uid
+                        record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
                         record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
                         record["timestamp"] = timestamp
-                        record["deviceUUID"] = device_uuid[cmc][switchGUID]
+                        record["deviceUuid"] = device_uuid[cmc][switchGUID]
                         record["sensorName"] = ibmetric
-                        record["deviceID"] = switchGUID
+                        record["deviceId"] = switchGUID
                         #print(record)
                         record_list.append(record)
 
