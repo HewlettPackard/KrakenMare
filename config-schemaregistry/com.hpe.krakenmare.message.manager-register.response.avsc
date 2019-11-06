@@ -4,7 +4,7 @@
   "namespace": "com.hpe.krakenmare.message.manager",
   "fields": [
     {
-      "name": "agentID",
+      "name": "agentId",
       "type": "string",
       "doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
     },
@@ -19,17 +19,20 @@
       "doc": "Status message"
     },
     {
-      "name": "agentUUID",
+      "name": "agentUuid",
       "type": {
         "type": "string",
         "logicalType": "uuid"
       },
-      "doc": "Agent unique identifier for all other communication"
+      "doc": "Framework unique identifier for all other communication"
     },
     {
-      "name": "topic",
-      "type": "string",
-      "doc": "Topic to be used for sending data"
+      "name": "topics",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "doc": "Topics to be used for sending data"
     }
   ]
 }

@@ -1,35 +1,38 @@
 {
-"type": "record",
-"name": "RegisterResponse",
-"namespace": "com.hpe.krakenmare.message.manager",
-"fields": [
-	{
-		"name": "agentID",
-		"type": "string",
-		"doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
-	},
-	{
-		"name": "status",
-		"type": "boolean",
-		"doc": "True == success, False == error"
-	},
-	{
-		"name": "message",
-		"type": "string",
-		"doc": "Status message"
-	},
-	{
-		"name": "uuid",
-		"type": {"type": "string", "logicalType":"uuid"},
-		"doc": "Framework unique identifier for all other communication"
-	},
-	{
-		"name": "topics",
-		"type": {
-			"type":"map",
-			"values": "string"
-			},
-		"doc": "Topics to be used for sending data"
-	}
-]
+  "type": "record",
+  "name": "RegisterResponse",
+  "namespace": "com.hpe.krakenmare.message.manager",
+  "fields": [
+    {
+      "name": "agentId",
+      "type": "string",
+      "doc": "Unique identifier agent (MAC for system internal agents, Certificate for external)"
+    },
+    {
+      "name": "status",
+      "type": "boolean",
+      "doc": "True == success, False == error"
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Status message"
+    },
+    {
+      "name": "agentUuid",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      },
+      "doc": "Framework unique identifier for all other communication"
+    },
+    {
+      "name": "topics",
+      "type": {
+        "type": "map",
+        "values": "string"
+      },
+      "doc": "Topics to be used for sending data"
+    }
+  ]
 }
