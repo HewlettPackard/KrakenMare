@@ -30,7 +30,7 @@ public class AgentAvroTest {
 
 	static final UUID THE_UUID = UUID.fromString("12345678-abcd-dcba-1234-000000000000");
 	static final Agent THE_AGENT = new Agent(42l, new Utf8("agent-42"), THE_UUID, new Utf8("myAgent"), Collections.emptyList());
-	static final String THE_JSON = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":\"12345678-abcd-dcba-1234-000000000000\",\"name\":\"myAgent\",\"devices\":[]}";
+	static final String THE_JSON = "{\"agentId\":42,\"agentUid\":\"agent-42\",\"agentUuid\":\"12345678-abcd-dcba-1234-000000000000\",\"agentName\":\"myAgent\",\"devices\":[]}";
 
 	@Test
 	void testJSonSer() throws IOException {
