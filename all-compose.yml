@@ -6,7 +6,6 @@
 #  simulator
 #  druid
 #  grafana
-#  kafka connect
 #  schema registry
 #  framework
 #  redis
@@ -72,7 +71,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
-      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:ANONYMOUS
       KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-1.keystore.pfx
@@ -136,7 +135,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
-      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:ANONYMOUS
       KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-2.keystore.pfx
@@ -200,7 +199,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_SSL:SASL_SSL,SSL:SSL,SASL_SSL_HOST:SASL_SSL,PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: SASL_SSL
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
-      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:connect;User:ANONYMOUS
+      KAFKA_SUPER_USERS: User:client;User:schemaregistry;User:broker;User:ANONYMOUS
       KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
       KAFKA_SSL_KEYSTORE_FILENAME: kafka.broker-3.keystore.pfx
@@ -260,7 +259,7 @@ services:
     environment:
       MOSQUITTO_IP: mosquitto
       KAFKA_BROKER_IP: broker-1
-      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/run/secrets/kafka.connect.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.connect.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
       SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
     <<: *deploy
     secrets:
@@ -284,17 +283,13 @@ services:
       - broker-3_truststore_creds
       - kafka.schemaregistry.truststore.pfx
       - kafka.schemaregistry.keystore.pfx
-      - kafka.connect.truststore.pfx
-      - kafka.connect.keystore.pfx
       - kafka.client.truststore.pfx
       - kafka.client.keystore.pfx
-      - connect.certificate.pem
       - broker-1.certificate.pem
       - broker-2.certificate.pem
       - broker-3.certificate.pem
       - client.certificate.pem
       - schemaregistry.certificate.pem
-      - connect.key
       - broker-1.key
       - broker-2.key
       - broker-3.key
@@ -575,7 +570,7 @@ services:
       - zookeeper_kafka
 
 networks:
-# zookeeper_kafka is zookeeper and kafka components (brokers, connect, schema registry) plus druid (needs zk)
+# zookeeper_kafka is zookeeper and kafka components (brokers, schema registry) plus druid (needs zk)
 # it is not attachable to prevent other containers from connecting
 # it is encrypted because zk does not support TLS natively
   zookeeper_kafka:
