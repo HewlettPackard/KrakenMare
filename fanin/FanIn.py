@@ -188,8 +188,16 @@ class FanIn:
             
             if self.kafka_msg_counter%1000 == 0:
                 print(str(self.kafka_msg_counter) + " messages published to Kafka")
-                
-            self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
+            
+            try:
+                self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
+            except BufferError:
+                print('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %len(self.kafka_producer))
+            
+            # Serve delivery callback queue.
+            # NOTE: Since produce() is an asynchronous API this poll() call
+            #       will most likely not serve the delivery callback for the
+            #       last produce()d message.
             self.kafka_producer.poll(0)
         else:
             if self.myFanInGateway_debug == True:
@@ -207,8 +215,12 @@ class FanIn:
         print("error_cb", err)
 
     def kafka_producer_on_delivery(self, err, msg):
-        if self.myFanInGateway_debug == True:
-            print("message.offset={}".format(msg.offset()))
+        if err:
+            if self.myFanInGateway_debug == True:
+                print('%% Message failed delivery: %s\n' % err)
+        else:
+            if self.myFanInGateway_debug == True:
+                print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
     
     # connect to Kafka broker as producer to check topic 'myTopic'
     def kafka_check_topic(self, myTopic):
