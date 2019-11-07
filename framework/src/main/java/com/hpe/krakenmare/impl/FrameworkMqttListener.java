@@ -53,7 +53,7 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 			String topic = asyncActionToken.getTopics()[0];
 			int messageId = asyncActionToken.getMessageId();
 			Object message = asyncActionToken.getUserContext();
-			LOG.info("Message successfully sent to topic '" + topic + "': " + message + "(id: " + messageId + ")");
+			LOG.info("Message successfully sent to topic '" + topic + "': " + message + " (id=" + messageId + ")");
 		}
 
 		@Override
@@ -61,7 +61,7 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 			String topic = asyncActionToken.getTopics()[0];
 			int messageId = asyncActionToken.getMessageId();
 			Object message = asyncActionToken.getUserContext();
-			LOG.error("Failed to send message to topic '" + topic + "': " + message + "(id: " + messageId + ")", exception);
+			LOG.error("Failed to send message to topic '" + topic + "': " + message + " (id=" + messageId + ")", exception);
 		}
 
 	}

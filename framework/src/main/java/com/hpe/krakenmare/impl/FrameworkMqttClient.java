@@ -47,6 +47,7 @@ public class FrameworkMqttClient {
 			public void onSuccess(IMqttToken asyncActionToken) {
 				LOG.info("New subscriber for topic '" + topicFilter + "': " + messageListener);
 			}
+
 			@Override
 			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
 				LOG.error("Error while subscribing to topic '" + topicFilter + "': " + messageListener, exception);
@@ -75,13 +76,9 @@ public class FrameworkMqttClient {
 
 				@Override
 				public void deliveryComplete(IMqttDeliveryToken token) {
-					try {
-						MqttMessage message = token.getMessage();
-						LOG.debug("Delivery complete: " + message + " (QoS=" + message.getQos() + ")");
-					} catch (MqttException e) {
-						// token.getMessage() interface throws, even though if the impl does not.
-						LOG.error("Unable to get message details", e);
-					}
+					// token.getMessage() : "Once the message has been delivered null will be returned"
+					// not very useful log then...
+					// LOG.debug("Delivery complete for token: " + token);
 				}
 
 				@Override
