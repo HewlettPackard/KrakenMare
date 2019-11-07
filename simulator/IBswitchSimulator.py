@@ -37,7 +37,7 @@ class IBswitchSimulator:
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, mode):
+    def __init__(self, configFile, mode, debug):
         """
             Class init
             
@@ -50,6 +50,7 @@ class IBswitchSimulator:
         )
 
         self.myAgentName = "IBSwitchSimulator"
+        self.myAgent_debug = debug
         
         # Agent uid as provided by the discovery mechanism.
         # for now use the hostname and random number to insure we are always unique
@@ -181,7 +182,8 @@ class IBswitchSimulator:
     ###########################################################################################
     # MQTT agent methods
     def mqtt_on_log(self, client, userdata, level, buf):
-        print("on_log: %s" % buf)
+        if self.myAgent_debug == True:
+            print("on_log: %s" % buf)
 
     def mqtt_on_subscribe(self, client, userdata, mid, granted_qos):
         print("on_subscribe: Subscribed with message id (mid): " + str(mid))
@@ -189,10 +191,11 @@ class IBswitchSimulator:
     # The callback for when the client receives a CONNACK response from the server.
     def mqtt_on_connect(self, client, userdata, flags, rc):
         
-        if (rc != 0):
-            print("on_connect: Connection error: " + mqtt.connack_string(rc))
-        else:
-            print("on_connect: Connected with result code: " + mqtt.connack_string(rc))
+        if self.myAgent_debug == True:
+            if (rc != 0):
+                print("on_connect: Connection error: " + mqtt.connack_string(rc))
+            else:
+                print("on_connect: Connected with result code: " + mqtt.connack_string(rc))
 
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
@@ -203,10 +206,12 @@ class IBswitchSimulator:
             self.registration_client.subscribe(self.myDevice_registration_response_topic)
 
     def mqtt_on_disconnect(self, client, userdata, rc):
-        print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
+        if self.myAgent_debug == True:
+            print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
     
     def mqtt_on_publish(self, client, userdata, mid):
-        print("on_publish: Published message with mid: " + str(mid))
+        if self.myAgent_debug == True:
+            print("on_publish: Published message with mid: " + str(mid))
 
     # defines self.myMQTTregistered and self.myAgent_uuid
     def mqtt_on_message(self, client, userdata, message):
@@ -538,7 +543,11 @@ class IBswitchSimulator:
                     if pubsubType == "mqtt":
                         for eachRecord in record_list:
                             #print(str(eachRecord))
-                            print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                            if self.myAgent_debug == True:
+                                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                            
+                            if i%1000 == 0:
+                                print(str(i) + " messages published via mqtt (topic:%s)" % self.data_topic)
                             
                             raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, eachRecord)
                             client.publish(self.data_topic, raw_bytes)
@@ -552,7 +561,7 @@ class IBswitchSimulator:
             time.sleep(self.sleepLoopTime)
 
     # main method of IBswitchSimulator
-    def run(self, mode, local, debug):
+    def run(self, mode, local):
         # local and debug flag are not used from here at the moment
 
         if mode == "mqtt":
@@ -601,15 +610,15 @@ def main():
     if options.local is True:
         # load development config to run outside of container
         myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator_dev.cfg", "local")
+            "IBswitchSimulator_dev.cfg", "local", debug=option_dict["debug"])
     else:
         # load container config
         myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator.cfg", "container")
+            "IBswitchSimulator.cfg", "container", debug=option_dict["debug"])
 
     if options.modename == "mqtt":
         myIBswitchSimulator.run(
-            "mqtt", local=option_dict["local"], debug=option_dict["debug"]
+            "mqtt", local=option_dict["local"]
         )
 
     else:
