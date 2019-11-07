@@ -7,9 +7,6 @@ x-proxy: &proxy
       ftp_proxy: http://web-proxy.bbn.hpecorp.net:8080
 
 services:
-  connect:
-    <<: *proxy
-
   broker-1:
     <<: *proxy
 
