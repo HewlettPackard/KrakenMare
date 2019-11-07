@@ -216,8 +216,7 @@ class FanIn:
 
     def kafka_producer_on_delivery(self, err, msg):
         if err:
-            if self.myFanInGateway_debug == True:
-                print('%% Message failed delivery: %s\n' % err)
+            print('%% Message failed delivery: %s - to %s [%d] @ %d\n' % (err, msg.topic(), msg.partition(), msg.offset()))
         else:
             if self.myFanInGateway_debug == True:
                 print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
