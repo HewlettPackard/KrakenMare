@@ -221,9 +221,9 @@ class IBswitchSimulator:
             
             r_bytes = io.BytesIO(message.payload)
             data = schemaless_reader(r_bytes, self.agent_register_response_schema)
-            print("registration-result with KrakenMare UUID: %s" % data["uuid"])
+            print("registration-result with KrakenMare UUID: %s" % data["agentUuid"])
             self.myMQTTregistered = True
-            self.myAgent_uuid = data["uuid"]
+            self.myAgent_uuid = data["agentUuid"]
             self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid)
         
         if message.topic == self.myDevice_registration_response_topic:
@@ -341,7 +341,7 @@ class IBswitchSimulator:
         with open(self.device_json_dir + "/InfinibandDevice.json", "r") as f:
                 deviceTemplate = json.load(f)
            
-        deviceMap["uuid"] = str(self.myAgent_uuid)
+        deviceMap["agentUuid"] = str(self.myAgent_uuid)
         deviceMap["devices"] = []
         
         # set my informations in device/sensor map
