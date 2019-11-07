@@ -20,6 +20,7 @@ from random import *
 from multiprocessing import Process, Lock
 import socket
 import inspect
+import threading
 
 # import special classes
 import uuid
@@ -38,7 +39,7 @@ class FanIn:
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, mode):
+    def __init__(self, configFile, mode, debug):
         """
                 Class init
         """
@@ -65,9 +66,14 @@ class FanIn:
         self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 
         # Register to the framework
-        self.myAgent_id = -1
-        self.myAgent_uuid = str(uuid.uuid4())
-        self.myAgentName = "FanIn-test1"
+        self.myFanInGateway_id = -1
+        self.myFanInGateway_debug = debug
+        self.myFanInGateway_uuid = str(uuid.uuid4())
+        self.myFanInGatewayName = "FanIn-test1"
+        
+        # for thread safe counter
+        self.myFanInGateway_threadLock = threading.Lock()
+        
         self.myMQTTregistered = False
         self.kafka_producer = None
         self.kafka_consumer = None
@@ -151,30 +157,43 @@ class FanIn:
 
     # The callback for when the client receives LOG response
     def mqtt_on_log(self, client, userdata, level, buf):
-        print("log: %s" % buf)
+        if self.myFanInGateway_debug == True:
+            print("log: %s" % buf)
 
     # The callback for when the client receives a CONNACK response from the server.
     def mqtt_on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code " + str(rc))
+        
+        if self.myFanInGateway_debug == True:
+            print("Connected with result code " + str(rc))
 
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         self.client.subscribe(self.myMQTTtopic)
 
     def mqtt_on_disconnect(self, client, userdata, rc=0):
-        print("DisConnected result code " + str(rc))
+        if self.myFanInGateway_debug == True:
+            print("DisConnected result code " + str(rc))
 
     # converts message to AVRO and sends message to Kafka (in batches)
     # TODO: do we need multiple threads here?
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
     def mqtt_on_agent_message(self, client, userdata, message):
         if message.topic == "ibswitch":
-            self.kafka_msg_counter += 1
-            print(str(self.kafka_msg_counter) + ":published to Kafka")
+            
+            with self.myFanInGateway_threadLock:
+                self.kafka_msg_counter += 1
+                
+            if self.myFanInGateway_debug == True:
+                print(str(self.kafka_msg_counter) + ":published to Kafka")
+            
+            if self.kafka_msg_counter%1000 == 0:
+                print(str(self.kafka_msg_counter) + " messages published to Kafka")
+                
             self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
             self.kafka_producer.poll(0)
         else:
-            print("Not ibswitch topic")
+            if self.myFanInGateway_debug == True:
+                print("Not ibswitch topic")
 
     # END MQTT agent methods
     #######################################################################################
@@ -188,11 +207,11 @@ class FanIn:
         print("error_cb", err)
 
     def kafka_producer_on_delivery(self, err, msg):
-        print("message.offset={}".format(msg.offset()))
+        if self.myFanInGateway_debug == True:
+            print("message.offset={}".format(msg.offset()))
     
     # connect to Kafka broker as producer to check topic 'myTopic'
     def kafka_check_topic(self, myTopic):
-
         print("Connecting as kafka consumer to check for topic: " + myTopic)
         test = False
 
@@ -252,7 +271,7 @@ class FanIn:
     #######################################################################################
 
     # main method of FanIn
-    def run(self, debug):
+    def run(self):
         # local and debug flag are not used from here at the moment
 
         # self.kafka_check_topic("registration-result")
@@ -303,15 +322,15 @@ def main():
 
     if options.local == True:
         # load development config to run outside of container
-        myFanIn = FanIn("FanIn_dev.cfg", "local")
+        myFanIn = FanIn("FanIn_dev.cfg", "local", debug=option_dict["debug"])
     else:
         # load container config
-        myFanIn = FanIn("FanIn.cfg", "container")
+        myFanIn = FanIn("FanIn.cfg", "container", debug=option_dict["debug"])
 
     if options.logLevel:
         myFanIn.resetLogLevel(options.logLevel)
 
-    myFanIn.run(debug=option_dict["debug"])
+    myFanIn.run()
 
 
 if __name__ == "__main__":
