@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.avro.specific.SpecificRecordBase;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,5 +44,26 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	abstract R process(P payload);
 
 	abstract void afterProcess(P payload, R response) throws Exception;
+
+	// uses the userContext to carry the MqttMessage sent
+	static class PublishCallback implements IMqttActionListener {
+
+		@Override
+		public void onSuccess(IMqttToken asyncActionToken) {
+			String topic = asyncActionToken.getTopics()[0];
+			int messageId = asyncActionToken.getMessageId();
+			Object message = asyncActionToken.getUserContext();
+			LOG.info("Message successfully sent to topic '" + topic + "': " + message + "(id: " + messageId + ")");
+		}
+
+		@Override
+		public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+			String topic = asyncActionToken.getTopics()[0];
+			int messageId = asyncActionToken.getMessageId();
+			Object message = asyncActionToken.getUserContext();
+			LOG.error("Failed to send message to topic '" + topic + "': " + message + "(id: " + messageId + ")", exception);
+		}
+
+	}
 
 }

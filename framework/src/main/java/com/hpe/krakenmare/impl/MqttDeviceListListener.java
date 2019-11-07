@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.avro.util.Utf8;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
@@ -77,17 +75,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		String respTopic = MqttUtils.getSensorListResponseTopic(response.getUuid());
 
 		LOG.debug("Sending message to topic '" + respTopic + "': " + mqttResponse);
-		mqtt.publish(respTopic, mqttResponse, null, new IMqttActionListener() {
-			@Override
-			public void onSuccess(IMqttToken asyncActionToken) {
-				LOG.info("Message successfully sent to topic '" + respTopic + "': " + mqttResponse);
-			}
-
-			@Override
-			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-				LOG.error("Failed to send message to topic '" + respTopic + "': " + mqttResponse, exception);
-			}
-		});
+		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 	}
 
 }
