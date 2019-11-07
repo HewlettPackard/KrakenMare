@@ -85,7 +85,7 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceUUID",
+          "dimension": "deviceUuid",
           "druidDS": "perfquery",
           "druidMetric": "sensorValue",
           "errors": {
@@ -103,7 +103,7 @@
           "queryType": "topN",
           "refId": "A",
           "selectDimensions": [
-            "deviceID"
+            "deviceId"
           ],
           "selectMetrics": [
             "Counter"
@@ -221,7 +221,7 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceUUID",
+          "dimension": "deviceUuid",
           "druidDS": "perfquery",
           "druidMetric": "sensorValue",
           "errors": {
@@ -239,7 +239,7 @@
           "queryType": "topN",
           "refId": "A",
           "selectDimensions": [
-            "deviceID"
+            "deviceId"
           ],
           "selectMetrics": [
             "Counter"
