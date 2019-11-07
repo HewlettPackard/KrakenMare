@@ -4,7 +4,7 @@
 
 # wait for supervisor rest API to be up
 until curl -s druid:8090/druid/indexer/v1/supervisor; do
-  sleep 5
+  sleep 1
 done
 
 echo "Load the indexer for simulator data"
