@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.avro.specific.SpecificRecordBase;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -18,9 +18,9 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttListener.class);
 
 	protected final Repository<Agent> repository;
-	protected final IMqttClient mqtt;
+	protected final IMqttAsyncClient mqtt;
 
-	public FrameworkMqttListener(Repository<Agent> repository, IMqttClient mqtt) {
+	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt) {
 		this.repository = repository;
 		this.mqtt = mqtt;
 	}

@@ -1,10 +1,12 @@
 package com.hpe.krakenmare.impl;
 
-import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -21,18 +23,18 @@ public class FrameworkMqttClient {
 
 	final static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
 	final static String clientId = FrameworkMqttClient.class.getSimpleName();
+	final static int qos = 2;
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
-	// TODO: make client async
-	IMqttClient client;
+	IMqttAsyncClient client;
 
 	public FrameworkMqttClient() {
 		// properly release MQTT connection on shutdown
 		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 	}
 
-	public IMqttClient getClient() {
+	public IMqttAsyncClient getClient() {
 		return client;
 	}
 
@@ -40,8 +42,17 @@ public class FrameworkMqttClient {
 		if (client == null) {
 			throw new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED);
 		}
-		client.subscribe(topicFilter, messageListener);
-		LOG.info("New subscriber for topic '" + topicFilter + "': " + messageListener);
+		IMqttActionListener callback = new IMqttActionListener() {
+			@Override
+			public void onSuccess(IMqttToken asyncActionToken) {
+				LOG.info("New subscriber for topic '" + topicFilter + "': " + messageListener);
+			}
+			@Override
+			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+				LOG.error("Error while subscribing to topic '" + topicFilter + "': " + messageListener, exception);
+			}
+		};
+		client.subscribe(topicFilter, qos, null, callback, messageListener);
 	}
 
 	public synchronized void start() {
@@ -50,7 +61,7 @@ public class FrameworkMqttClient {
 			return;
 		}
 		try {
-			client = new MqttClient(broker, clientId, persistence);
+			client = new MqttAsyncClient(broker, clientId, persistence);
 
 			MqttConnectOptions connOpts = new MqttConnectOptions();
 			connOpts.setAutomaticReconnect(true);
@@ -65,7 +76,8 @@ public class FrameworkMqttClient {
 				@Override
 				public void deliveryComplete(IMqttDeliveryToken token) {
 					try {
-						LOG.debug("Delivery complete: " + token.getMessage() + " (QoS=" + token.getMessage().getQos() + ")");
+						MqttMessage message = token.getMessage();
+						LOG.debug("Delivery complete: " + message + " (QoS=" + message.getQos() + ")");
 					} catch (MqttException e) {
 						// token.getMessage() interface throws, even though if the impl does not.
 						LOG.error("Unable to get message details", e);
@@ -85,9 +97,7 @@ public class FrameworkMqttClient {
 			});
 
 			LOG.info("Connecting to broker: " + broker + " ...");
-			// IMqttToken token = client.connect(connOpts);
-			// token.waitForCompletion();
-			client.connect(connOpts);
+			client.connect(connOpts).waitForCompletion();
 			LOG.info("Connected to broker: " + broker);
 		} catch (MqttException me) {
 			LOG.error("Unable to connect", me);
@@ -98,7 +108,7 @@ public class FrameworkMqttClient {
 		if (client != null) {
 			try {
 				LOG.info("Disconnecting...");
-				client.disconnect();
+				client.disconnect().waitForCompletion();
 				client.close();
 				client = null;
 				LOG.info("Disconnected");
