@@ -29,7 +29,6 @@ cat > /tmp/druid_perfquery.json <<EOF
 EOF
 
 
-run_me kafka-connect  curl -s http://connect:8083/connectors      || exit 1
 run_me broker-1       kafkacat -b broker-1 -L                     || exit 1
 run_me broker-2       kafkacat -b broker-2:9093 -L                || exit 1
 run_me broker-3       kafkacat -b broker-3:9094 -L                || exit 1
