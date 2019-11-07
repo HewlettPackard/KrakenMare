@@ -73,7 +73,6 @@ class IBswitchSimulator:
         self.myAgent_registration_response_topic = "registration/" + self.myAgent_uid + "/response"
         self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
         self.myDevice_registration_response_topic = False
-        self.myDevice_registration_request_topic = "device-registration/"
         
         # schemas and schema registry setup
         conf = {
@@ -91,7 +90,7 @@ class IBswitchSimulator:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(5)
+            time.sleep(1)
         self.agent_register_request_schema = cg.schema.schema
         self.agent_register_request_schema_id = cg.schema_id
 
@@ -100,7 +99,7 @@ class IBswitchSimulator:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(5)
+            time.sleep(1)
         self.agent_register_response_schema = cg.schema.schema
         self.agent_register_response_schema_id = cg.schema_id
 
@@ -109,7 +108,7 @@ class IBswitchSimulator:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(5)
+            time.sleep(1)
         self.send_time_series_schema = cg.schema.schema
         self.send_time_series_schema_id = cg.schema_id
         
@@ -118,7 +117,7 @@ class IBswitchSimulator:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(5)
+            time.sleep(1)
         self.device_register_request_schema = cg.schema.schema
         self.device_register_request_schema_id = cg.schema_id
         
@@ -127,7 +126,7 @@ class IBswitchSimulator:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(5)
+            time.sleep(1)
         self.device_register_response_schema = cg.schema.schema
         self.device_register_response_schema_id = cg.schema_id
         
@@ -224,7 +223,8 @@ class IBswitchSimulator:
             print("registration-result with KrakenMare UUID: %s" % data["agentUuid"])
             self.myMQTTregistered = True
             self.myAgent_uuid = data["agentUuid"]
-            self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid)
+            self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid) + "/response"
+            self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
         
         if message.topic == self.myDevice_registration_response_topic:
             print("message received: %s " % message.payload)
@@ -284,7 +284,7 @@ class IBswitchSimulator:
 
         while not self.myMQTTregistered:
             print("waiting for agent registration result...")
-            time.sleep(5)
+            time.sleep(1)
             '''
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
@@ -316,7 +316,7 @@ class IBswitchSimulator:
 
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")
-            time.sleep(10)
+            time.sleep(1)
             if not self.myDeviceRegistered:
                 print("re-sending device/sensor registration payload")
                 self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
@@ -345,7 +345,7 @@ class IBswitchSimulator:
         deviceMap["devices"] = []
         
         # set my informations in device/sensor map
-        # go through high level devices and add each switch as device (deviceUID = myAgentUUID + device guid
+        # go through high level devices and add each switch as device (deviceUid = myAgentUuid + device guid
         for cmc in ["r1i0c-ibswitch", "r1i1c-ibswitch"]:
             
             with open(cmc, "r") as f:
@@ -354,17 +354,14 @@ class IBswitchSimulator:
             # For each switch found in the JSON data ,
             # assemble map for each device and store it in myDeviceMap
             for switch in query_data["Switch"]:
-                deviceTemplate["deviceID"] = 'null'
-                deviceTemplate["deviceID"] = switch["Node_GUID"]
-                deviceTemplate["deviceName"] = "use CMC or node with -ib postfix"
-                deviceTemplate["type"] = "Infiniband Switch or Infiniband HCA"
-                deviceTemplate["location"] = "use CMC or node"
+                deviceTemplate["deviceId"] = switch["Node_GUID"]
+                deviceTemplate["deviceName"] = cmc + "-ib"
+                deviceTemplate["type"] = "Infiniband Switch"
+                deviceTemplate["location"] = cmc
                 
                 # assemble sensor information for device 'switch'
                 for sensor in deviceTemplate["sensors"]:
-                    sensor["sensorUUID"] = 'null'
-                    # sensorID = guid-sensorname
-                    sensor["sensorID"] = switch["Node_GUID"] + "-" + sensor["sensorName"]          
+                    sensor["sensorId"] = switch["Node_GUID"] + "-" + sensor["sensorName"]
                 
                 deviceMap["devices"].append(deviceTemplate)
         
