@@ -1,0 +1,30 @@
+@namespace("com.hpe.krakenmare.core")
+protocol MyProtocol {
+
+	record Agent {
+		long id;
+		string uid;
+		@logicalType("uuid")
+		string uuid;
+		string name;
+		array<Device> devices;
+	}
+
+	record Device {
+		@logicalType("uuid")
+		string uuid;
+		string id;
+		string name;
+		string type;
+		string location;
+		array<Sensor> sensors;
+	}
+	
+	record Sensor {
+		@logicalType("uuid")
+		string uuid;
+		string id;
+		string name;
+	}
+
+}
