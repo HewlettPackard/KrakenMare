@@ -23,6 +23,5 @@ RUN cd /tmp/ && curl -L -O https://github.com/rkluszczynski/avro-cli/releases/do
 COPY --from=configbase /tmp/wait-for /tmp/wait-for
 
 COPY *.avsc register_schema.py entrypoint.sh /tmp/
-COPY framework /tmp/framework
 
 CMD ["/tmp/entrypoint.sh"]
