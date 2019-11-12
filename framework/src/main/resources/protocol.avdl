@@ -39,7 +39,7 @@ protocol MyProtocol {
 		/** List of sensors in this device */
 		array<Sensor> sensors;
 	}
-	
+
 	record Sensor {
 		/** UUID of the device */
 		@logicalType("uuid")
@@ -83,6 +83,73 @@ protocol MyProtocol {
 
 		/** How many weeks to store this sensor's values. null means forever */
 		union { null, int } storageTime;
+	}
+
+	@namespace("com.hpe.krakenmare.message.agent")
+	record DeviceList {
+		/** Agent UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** List of devices */
+		array<com.hpe.krakenmare.core.Device> devices;
+	}
+
+	@namespace("com.hpe.krakenmare.message.manager")
+	record DeviceListResponse {
+		/** Agent unique framework identifier */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Devices and sensors unique framework identifiers */
+		map<com.hpe.krakenmare.message.manager.SensorUuids> deviceUuids;
+	}
+
+	@namespace("com.hpe.krakenmare.message.manager")
+	record SensorUuids {
+		/** Device unique framework identifier */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Sensors unique framework identifiers */
+		map<@logicalType("uuid") string> sensorUuids;
+	}
+
+	@namespace("com.hpe.krakenmare.message.agent")
+	record RegisterRequest {
+		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
+		string agentID;
+
+		/** Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, KME (Kraken Mare Embedded )Agent, KMN (Kraken Mare Node) Agent */
+		string type;
+
+		/** Human readable agent name */
+		string name;
+
+		/** Human readable agent description */
+		string description;
+
+		/** If true, framework will provide device/sensor list */
+		boolean useSensorTemplate;
+	}
+
+	@namespace("com.hpe.krakenmare.message.manager")
+	record RegisterResponse {
+		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
+		string agentID;
+
+		/** True == success, False == error */
+		boolean status;
+
+		/** Status message */
+		string message;
+
+		/** Framework unique identifier for all other communication */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Topics to be used for sending data */
+		map<string> topics;
 	}
 
 }
