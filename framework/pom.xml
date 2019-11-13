@@ -139,7 +139,7 @@
 							<goal>idl-protocol</goal>
 						</goals>
 						<configuration>
-							<sourceDirectory>${project.basedir}/src/main/resources</sourceDirectory>
+							<sourceDirectory>${project.basedir}/../config-schemaregistry/</sourceDirectory>
 							<outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
 
 							<stringType>Utf8</stringType>

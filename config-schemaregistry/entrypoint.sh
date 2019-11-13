@@ -3,6 +3,8 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /tmp
+java -jar avro-tools-1.9.1.jar idl2schemata protocol.avdl 
+
 for schema in *.avsc
 do
   topic=$(echo $schema | awk -F "." '{$NF=""; print $0}' | sed "s/ /-/g" | sed 's/.$//')

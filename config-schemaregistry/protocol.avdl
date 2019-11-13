@@ -1,5 +1,5 @@
 @namespace("com.hpe.krakenmare.core")
-protocol MyProtocol {
+protocol Protocol {
 
 	record Agent {
 		/** Incremental id as created by the framework manager */
