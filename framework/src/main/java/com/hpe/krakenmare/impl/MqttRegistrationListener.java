@@ -32,7 +32,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 	private Agent registerNewAgent(Agent agent) {
 		agent = repository.create(agent);
 		repository.save(agent);
-		LOG.info("New agent registered: '" + agent.getAgentName() + "', '" + agent.getAgentUuid() + "'");
+		LOG.info("New agent registered: '" + agent.getName() + "', '" + agent.getUuid() + "'");
 		return agent;
 	}
 
@@ -43,11 +43,11 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 
 	@Override
 	RegisterResponse process(RegisterRequest payload) {
-		String name = payload.getAgentName().toString();
-		String uid = payload.getAgentId().toString();
+		String name = payload.getName().toString();
+		String uid = payload.getAgentID().toString();
 		Agent agent = new Agent(-1l, new Utf8(uid), null, new Utf8(name), Collections.emptyList());
 		agent = registerNewAgent(agent);
-		UUID uuid = agent.getAgentUuid();
+		UUID uuid = agent.getUuid();
 		return new RegisterResponse(new Utf8(uid), true, new Utf8("Registration succeed"), uuid, Collections.emptyMap());
 	}
 
@@ -56,7 +56,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = response.toByteBuffer().array();
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
-		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getAgentId());
+		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getAgentID());
 
 		LOG.debug("Sending message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());

@@ -47,7 +47,7 @@ public class MqttAgent extends Agent {
 		String myAgentTopic = MqttUtils.getRegistrationRequestTopic(this);
 		String myManagerTopic = MqttUtils.getRegistrationResponseTopic(this);
 
-		try (MqttClient mqtt = new MqttClient(broker, getAgentUid().toString(), new MemoryPersistence())) {
+		try (MqttClient mqtt = new MqttClient(broker, getUid().toString(), new MemoryPersistence())) {
 			MqttConnectOptions connOpts = new MqttConnectOptions();
 			LOG.info("Connecting to broker: " + broker);
 			mqtt.connect(connOpts);
@@ -57,13 +57,13 @@ public class MqttAgent extends Agent {
 			mqtt.subscribe(myManagerTopic, (topic, message) -> {
 				LOG.info("Message received on topic '" + topic + "': " + message);
 				RegisterResponse response = RegisterResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
-				UUID uuid = response.getAgentUuid();
-				setAgentUuid(uuid);
+				UUID uuid = response.getUuid();
+				setUuid(uuid);
 				LOG.info("UUID received from manager: " + uuid);
 				registrationLatch.countDown();
 			});
 
-			RegisterRequest req = new RegisterRequest(getAgentUid(), new Utf8("test-agent"), getAgentName(), new Utf8("A Java based test agent"), false);
+			RegisterRequest req = new RegisterRequest(getUid(), new Utf8("test-agent"), getName(), new Utf8("A Java based test agent"), false);
 			byte[] payload = req.toByteBuffer().array();
 
 			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");
@@ -87,7 +87,7 @@ public class MqttAgent extends Agent {
 		String myAgentTopic = MqttUtils.getSensorListRequestTopic(this);
 		String myManagerTopic = MqttUtils.getSensorListResponseTopic(this);
 
-		try (MqttClient mqtt = new MqttClient(broker, getAgentUid().toString(), new MemoryPersistence())) {
+		try (MqttClient mqtt = new MqttClient(broker, getUid().toString(), new MemoryPersistence())) {
 			MqttConnectOptions connOpts = new MqttConnectOptions();
 			LOG.info("Connecting to broker: " + broker);
 			mqtt.connect(connOpts);
@@ -101,10 +101,10 @@ public class MqttAgent extends Agent {
 
 				try {
 					for (Device device : getDevices()) {
-						SensorUuids uuids = response.getDeviceUuids().get(device.getDeviceId());
-						device.setDeviceUuid(uuids.getUuid());
+						SensorUuids uuids = response.getDeviceUuids().get(device.getId());
+						device.setUuid(uuids.getUuid());
 						for (Sensor sensor : device.getSensors()) {
-							sensor.setSensorUuid(uuids.getSensorUuids().get(sensor.getSensorId()));
+							sensor.setUuid(uuids.getSensorUuids().get(sensor.getId()));
 						}
 					}
 				} catch (Exception e) {
@@ -141,7 +141,7 @@ public class MqttAgent extends Agent {
 			devices.add(device);
 			setDevices(devices);
 
-			DeviceList req = new DeviceList(getAgentUuid(), getDevices());
+			DeviceList req = new DeviceList(getUuid(), getDevices());
 			byte[] payload = req.toByteBuffer().array();
 
 			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");

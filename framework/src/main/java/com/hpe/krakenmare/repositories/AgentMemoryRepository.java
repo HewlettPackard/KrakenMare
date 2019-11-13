@@ -29,8 +29,8 @@ public class AgentMemoryRepository implements Repository<Agent> {
 	public Agent create(Agent payload) {
 		long id = index.getAndIncrement();
 		UUID uuid = UUID.randomUUID();
-		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getAgentUid(), uuid, payload.getAgentName());
-		return new Agent(id, payload.getAgentUid(), uuid, payload.getAgentName(), Collections.emptyList());
+		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
+		return new Agent(id, payload.getUid(), uuid, payload.getName(), Collections.emptyList());
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class AgentMemoryRepository implements Repository<Agent> {
 
 	@Override
 	public Agent get(UUID uuid) {
-		return agents.stream().filter(a -> a.getAgentUuid().equals(uuid)).findFirst().get();
+		return agents.stream().filter(a -> a.getUuid().equals(uuid)).findFirst().get();
 	}
 
 }

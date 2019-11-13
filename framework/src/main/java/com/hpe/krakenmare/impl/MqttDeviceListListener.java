@@ -42,13 +42,13 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 
 	@Override
 	DeviceListResponse process(DeviceList sensorList) {
-		UUID agentUuid = sensorList.getAgentUuid();
+		UUID agentUuid = sensorList.getUuid();
 		List<Device> devices = sensorList.getDevices();
 
 		for (Device device : devices) {
-			device.setDeviceUuid(UUID.randomUUID());
+			device.setUuid(UUID.randomUUID());
 			for (Sensor sensor : device.getSensors()) {
-				sensor.setSensorUuid(UUID.randomUUID());
+				sensor.setUuid(UUID.randomUUID());
 			}
 		}
 
@@ -59,9 +59,9 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		Map<Utf8, SensorUuids> uuids = new HashMap<>();
 		devices.forEach(d -> {
 			Map<Utf8, UUID> sensorUuidsMap = new HashMap<>();
-			d.getSensors().forEach(s -> sensorUuidsMap.put(s.getSensorId(), s.getSensorUuid()));
-			SensorUuids sensorUuids = new SensorUuids(d.getDeviceUuid(), sensorUuidsMap);
-			uuids.put(d.getDeviceId(), sensorUuids);
+			d.getSensors().forEach(s -> sensorUuidsMap.put(s.getId(), s.getUuid()));
+			SensorUuids sensorUuids = new SensorUuids(d.getUuid(), sensorUuidsMap);
+			uuids.put(d.getId(), sensorUuids);
 		});
 
 		return new DeviceListResponse(agentUuid, uuids);
@@ -72,7 +72,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = response.toByteBuffer().array();
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
-		String respTopic = MqttUtils.getSensorListResponseTopic(response.getAgentUuid());
+		String respTopic = MqttUtils.getSensorListResponseTopic(response.getUuid());
 
 		LOG.debug("Sending message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
