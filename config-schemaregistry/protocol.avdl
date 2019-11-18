@@ -79,10 +79,10 @@ protocol Protocol {
 		union { null, float } changeFrequency;
 
 		/** Current collection frequency is HZ */
-		union { null, float } currentCollectionFrequency = 1;
+		union { float, null } currentCollectionFrequency = 1;
 
 		/** How many weeks to store this sensor's values. null means forever */
-		union { null, int } storageTime = 1;
+		union { int, null } storageTime = 1;
 	}
 
 	@namespace("com.hpe.krakenmare.message.agent")
