@@ -225,9 +225,9 @@ class IBswitchSimulator:
             
             r_bytes = io.BytesIO(message.payload)
             data = schemaless_reader(r_bytes, self.agent_register_response_schema)
-            print("registration-result with KrakenMare UUID: %s" % data["agentUuid"])
+            print("registration-result with KrakenMare UUID: %s" % data["uuid"])
             self.myMQTTregistered = True
-            self.myAgent_uuid = data["agentUuid"]
+            self.myAgent_uuid = data["uuid"]
             self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid) + "/response"
             self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
         
@@ -259,9 +259,9 @@ class IBswitchSimulator:
         
         # assemble my agent registration data
         RegistrationData = {
-            "agentId": self.myAgent_uid,
+            "uid": self.myAgent_uid,
             "type": "simulatorAgent",
-            "agentName": "IBswitchSimulator",
+            "name": "IBswitchSimulator",
             "description": "This is a fine description",
             "useSensorTemplate": False,
         }
@@ -346,7 +346,7 @@ class IBswitchSimulator:
         with open(self.device_json_dir + "/InfinibandDevice.json", "r") as f:
                 deviceTemplate = json.load(f)
            
-        deviceMap["agentUuid"] = str(self.myAgent_uuid)
+        deviceMap["uuid"] = str(self.myAgent_uuid)
         deviceMap["devices"] = []
         
         # set my informations in device/sensor map
@@ -359,14 +359,14 @@ class IBswitchSimulator:
             # For each switch found in the JSON data ,
             # assemble map for each device and store it in myDeviceMap
             for switch in query_data["Switch"]:
-                deviceTemplate["deviceId"] = switch["Node_GUID"]
-                deviceTemplate["deviceName"] = cmc + "-ib"
+                deviceTemplate["id"] = switch["Node_GUID"]
+                deviceTemplate["name"] = cmc + "-ib"
                 deviceTemplate["type"] = "Infiniband Switch"
                 deviceTemplate["location"] = cmc
                 
                 # assemble sensor information for device 'switch'
                 for sensor in deviceTemplate["sensors"]:
-                    sensor["sensorId"] = switch["Node_GUID"] + "-" + sensor["sensorName"]
+                    sensor["id"] = switch["Node_GUID"] + "-" + sensor["name"]
                 
                 deviceMap["devices"].append(deviceTemplate)
         

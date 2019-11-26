@@ -44,7 +44,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 	@Override
 	RegisterResponse process(RegisterRequest payload) {
 		String name = payload.getName().toString();
-		String uid = payload.getAgentID().toString();
+		String uid = payload.getUid().toString();
 		Agent agent = new Agent(-1l, new Utf8(uid), null, new Utf8(name), Collections.emptyList());
 		agent = registerNewAgent(agent);
 		UUID uuid = agent.getUuid();
@@ -56,7 +56,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = response.toByteBuffer().array();
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
-		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getAgentID());
+		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getUid());
 
 		LOG.debug("Sending message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());

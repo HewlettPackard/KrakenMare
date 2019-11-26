@@ -118,7 +118,7 @@ protocol Protocol {
 	@namespace("com.hpe.krakenmare.message.agent")
 	record RegisterRequest {
 		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
-		string agentID;
+		string uid;
 
 		/** Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, KME (Kraken Mare Embedded )Agent, KMN (Kraken Mare Node) Agent */
 		string type;
@@ -136,7 +136,7 @@ protocol Protocol {
 	@namespace("com.hpe.krakenmare.message.manager")
 	record RegisterResponse {
 		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
-		string agentID;
+		string uid;
 
 		/** True == success, False == error */
 		boolean status;

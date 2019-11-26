@@ -1,7 +1,7 @@
 {
-  "sensorUUID": null,
-  "sensorID": "guid+metricname",
-  "sensorName": "PortSelect",
+  "uuid": null,
+  "id": "guid+metricname",
+  "name": "PortSelect",
   "type": "Counter",
   "valueRangeMin": 0,
   "valueRangeMax": 255,
