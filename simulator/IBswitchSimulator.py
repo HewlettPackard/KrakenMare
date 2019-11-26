@@ -86,7 +86,7 @@ class IBswitchSimulator:
         client = SchemaRegistryClient(conf)
         self.msg_serializer = MessageSerializer(client)
         
-        subject = "com-hpe-krakenmare-message-agent-register-request"
+        subject = "com-hpe-krakenmare-message-agent-RegisterRequest"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -95,7 +95,7 @@ class IBswitchSimulator:
         self.agent_register_request_schema = cg.schema.schema
         self.agent_register_request_schema_id = cg.schema_id
 
-        subject = "com-hpe-krakenmare-message-manager-register-response"
+        subject = "com-hpe-krakenmare-message-manager-RegisterResponse"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -104,7 +104,7 @@ class IBswitchSimulator:
         self.agent_register_response_schema = cg.schema.schema
         self.agent_register_response_schema_id = cg.schema_id
 
-        subject = "com-hpe-krakenmare-message-agent-send-time-series-druid"
+        subject = "com-hpe-krakenmare-message-agent-SendTimeSeriesDruid"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -113,7 +113,7 @@ class IBswitchSimulator:
         self.send_time_series_schema = cg.schema.schema
         self.send_time_series_schema_id = cg.schema_id
         
-        subject = "com-hpe-krakenmare-message-agent-device-list"
+        subject = "com-hpe-krakenmare-message-agent-DeviceList"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -122,7 +122,7 @@ class IBswitchSimulator:
         self.device_register_request_schema = cg.schema.schema
         self.device_register_request_schema_id = cg.schema_id
         
-        subject = "com-hpe-krakenmare-message-manager-device-list-response"
+        subject = "com-hpe-krakenmare-message-manager-DeviceListResponse"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)

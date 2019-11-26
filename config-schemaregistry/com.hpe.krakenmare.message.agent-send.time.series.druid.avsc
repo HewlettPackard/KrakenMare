@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "SendTimeSeries",
+  "name": "SendTimeSeriesDruid",
   "namespace": "com.hpe.krakenmare.message.agent",
   "fields": [
     {
