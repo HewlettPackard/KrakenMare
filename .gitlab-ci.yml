@@ -30,7 +30,7 @@ test-framework:
   only:
     changes:
      - "framework/**/*"
-     - "config-schemaregistry/*.avsc"
+     - "config-schemaregistry/*.avdl"
   artifacts:
     paths:
       - coverage/
