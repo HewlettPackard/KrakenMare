@@ -31,8 +31,10 @@ public class AgentAvroTest {
 	static final UUID THE_UUID = UUID.fromString("12345678-abcd-dcba-1234-000000000000");
 	static final Agent THE_AGENT = new Agent(42l, new Utf8("agent-42"), THE_UUID, new Utf8("myAgent"), Collections.emptyList());
 	static final String THE_JSON = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":\"12345678-abcd-dcba-1234-000000000000\",\"name\":\"myAgent\",\"devices\":[]}";
+	static final String THE_JSON_AVRO_1582 = "{\"id\":42,\"uid\":\"agent-42\",\"uuid\":{\"string\":\"12345678-abcd-dcba-1234-000000000000\"},\"name\":\"myAgent\",\"devices\":[]}";
 
 	@Test
+	@Disabled("See testJSonSer_AVRO_1582()")
 	void testJSonSer() throws IOException {
 		DatumWriter<Agent> writer = new SpecificDatumWriter<>(Agent.class);
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -42,6 +44,19 @@ public class AgentAvroTest {
 		byte[] data = stream.toByteArray();
 
 		assertEquals(THE_JSON, new String(data));
+	}
+
+	// https://issues.apache.org/jira/browse/AVRO-1582
+	@Test
+	void testJSonSer_AVRO_1582() throws IOException {
+		DatumWriter<Agent> writer = new SpecificDatumWriter<>(Agent.class);
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		Encoder encoder = EncoderFactory.get().jsonEncoder(Agent.getClassSchema(), stream, /* pretty */false);
+		writer.write(THE_AGENT, encoder);
+		encoder.flush();
+		byte[] data = stream.toByteArray();
+
+		assertEquals(THE_JSON_AVRO_1582, new String(data));
 	}
 
 	@Test
