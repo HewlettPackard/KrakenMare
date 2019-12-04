@@ -19,11 +19,11 @@
           { "name": "agentUuid", "type": "string" },
           { "name": "agentId", "type": "string" },
           { "name": "timestamp", "type": "long" },
-	      { "name": "sensorUuid", "type": "string" },
-	      { "name": "sensorValue", "type": "float" },
-	      { "name": "deviceUuid", "type": "string" },
-	      { "name": "deviceId", "type": "string" },
-	      { "name": "sensorName", "type": "string" }
+          { "name": "sensorUuid", "type": "string" },
+          { "name": "sensorValue", "type": "float" },
+          { "name": "deviceUuid", "type": "string" },
+          { "name": "deviceId", "type": "string" },
+          { "name": "sensorName", "type": "string" }
           ]
         }
       }
