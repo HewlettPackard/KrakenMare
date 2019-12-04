@@ -24,6 +24,6 @@ RUN cd /tmp/ && curl -L -O https://github.com/rkluszczynski/avro-cli/releases/do
 RUN cd /tmp/ && curl -L -O https://repo1.maven.org/maven2/org/apache/avro/avro-tools/1.9.1/avro-tools-1.9.1.jar
 COPY --from=configbase /tmp/wait-for /tmp/wait-for
 
-COPY protocol.avdl *.avsc register_schema.py entrypoint.sh /tmp/
+COPY *.avdl *.avsc register_schema.py entrypoint.sh /tmp/
 
 CMD ["/tmp/entrypoint.sh"]

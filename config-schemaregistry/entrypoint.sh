@@ -3,7 +3,10 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /tmp
-java -jar avro-tools-1.9.1.jar idl2schemata protocol.avdl 
+for protocol in *.avdl
+do
+  java -jar avro-tools-1.9.1.jar idl2schemata $protocol
+done
 
 for schema in *.avsc
 do

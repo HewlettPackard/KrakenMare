@@ -1,0 +1,40 @@
+@namespace("com.hpe.krakenmare.message.manager")
+protocol Protocol {
+
+	record SensorUuids {
+		/** Device unique framework identifier */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Sensors unique framework identifiers */
+		map<@logicalType("uuid") string> sensorUuids;
+	}
+
+	record DeviceListResponse {
+		/** Agent unique framework identifier */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Devices and sensors unique framework identifiers */
+		map<com.hpe.krakenmare.message.manager.SensorUuids> deviceUuids;
+	}
+
+	record RegisterResponse {
+		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
+		string uid;
+
+		/** True == success, False == error */
+		boolean status;
+
+		/** Status message */
+		string message;
+
+		/** Framework unique identifier for all other communication */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Topics to be used for sending data */
+		map<string> topics;
+	}
+
+}
