@@ -159,7 +159,20 @@ if [  "$ansible" == "1"  ]; then
      docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml  --forks 100
 
      if [ "$setupRegistry" == "1"  ]; then
-          docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $KM_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100 
+
+         #TO BE REMOVED
+         #stopping the mirror registries is necessary to stabilize our build systems
+         #see #384 for details.
+         #assuming we have the two registries like:
+         #[root@o184i108 ~]# docker ps 
+         #CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+         #f527a4303e4f        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
+         #d925eb8ce317        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
+
+         docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
+
+         
+         docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $KM_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100 
      fi
      
 fi
