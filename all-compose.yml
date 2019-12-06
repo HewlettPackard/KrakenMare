@@ -315,6 +315,8 @@ services:
     secrets:
       - schemaregistry.certificate.pem
       - schemaregistry.key
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
       - km-ca-1.crt
       
   fanin:
@@ -326,6 +328,10 @@ services:
     volumes:
       - ./agent-python-module/agentcommon.py:/fanin/agentcommon.py
     <<: *deploy
+    secrets:
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
+      - km-ca-1.crt
     networks:
       - krakenmare
     secrets:
@@ -445,6 +451,10 @@ services:
       MQTT_SERVER: "mosquitto:1883"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
     <<: *deploy
+    secrets:
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
+      - km-ca-1.crt
     networks:
       - krakenmare
 
