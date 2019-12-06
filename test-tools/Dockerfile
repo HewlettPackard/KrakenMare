@@ -51,13 +51,17 @@ RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro c
 RUN apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
 RUN apt-get update && apt-get install -y mosquitto-clients
 
-# mqtt-bench which is a go application
+# mqtt-bench which is a go application, https://www.npmjs.com/package/mqtt-benchmark
 RUN apt-get update && apt-get install -y golang unzip
 RUN wget https://github.com/takanorig/mqtt-bench/releases/download/v0.3.0/mqtt-bench_linux_amd64-0.3.0.zip
 RUN unzip mqtt-bench_linux_amd64-0.3.0.zip
 RUN mv linux_amd64/mqtt-bench /tmp/
 
-COPY ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh /tmp/
+# mqtt-benchmark is a node js tool, https://www.npmjs.com/package/mqtt-benchmark
+RUN apt-get update && apt-get install -y npm
+RUN npm install mqtt-benchmark -g
+
+COPY ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh ./mqtt-bench.sh /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
