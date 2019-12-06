@@ -295,6 +295,8 @@ services:
       - km-ca-1.crt
       - km-ca-1.key
       - km-ca-1.srl
+      - mosquittosecu.key
+      - mosquittosecu.certificate.pem
     networks:
       - zookeeper_kafka
       - krakenmare
@@ -583,6 +585,22 @@ services:
       - kafka.client.truststore.pfx
     networks:
       - zookeeper_kafka
+
+  mosquittosecu:
+    image: eclipse-mosquitto:latest
+    hostname: mosquittosecu
+    ports:
+      - "8883:8883"
+      - "19001:9001"
+    volumes:
+      - ./mosquittosecu/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    <<: *deploy
+    secrets:
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
+      - km-ca-1.crt
+    networks:
+      - krakenmare
 
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, schema registry) plus druid (needs zk)
