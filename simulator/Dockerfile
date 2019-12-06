@@ -7,7 +7,7 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 RUN apt update && apt install -y python3 python3-pip
 RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro
 
-COPY IBswitchSimulator.py version.py IBswitchSimulator.cfg r1i0c-ibswitch r1i1c-ibswitch entrypoint.sh /simulator/
+COPY IBswitchSimulator.py agentcommon.py version.py IBswitchSimulator.cfg r1i0c-ibswitch r1i1c-ibswitch entrypoint.sh /simulator/
 COPY seed/* /tmp/
 COPY SensorDescriptors/*.json /simulator/
 

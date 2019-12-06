@@ -6,5 +6,5 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /simulator
-python3 IBswitchSimulator.py --mode=mqtt
+python3 IBswitchSimulator.py
 sleep 1000000000

@@ -15,38 +15,37 @@ import sys
 import configparser
 import random
 import platform
+import io
+import uuid
+import hashlib
 
 # import special classes
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
 from fastavro import schemaless_writer, schemaless_reader
-
-import io
-import uuid
-import hashlib
-
-# project imports
-from version import __version__
-
 from schema_registry.client import SchemaRegistryClient
 from schema_registry.serializers import MessageSerializer
 
+# project imports
+from version import __version__
+from agentcommon import AgentCommon
 
 # START IBswitchSimulator class
-class IBswitchSimulator:
+class IBswitchSimulator(AgentCommon):
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, mode, debug):
+    def __init__(self, configFile, debug):
         """
             Class init
             
         """
 
         self.loggerName = "simulator.agent." + __version__ + ".log"
-
+        
+        # AgentCommon class method
         self.config = self.checkConfigurationFile(
-            configFile, ["Daemon", "Logger", "MQTT"]
+            configFile, ["Others"]
         )
 
         self.myAgentName = "IBSwitchSimulator"
@@ -60,158 +59,28 @@ class IBswitchSimulator:
         # uuid comes from the central framework manager
         self.myAgent_uuid = -1
 
+        # assemble my agent registration data
+        self.myRegistrationData = {
+            "uid": self.myAgent_uid,
+            "name": self.myAgentName,
+            "type": "simulatorAgent",
+            "description": "This is a fine description",
+            "useSensorTemplate": False,
+        }
+
         self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
         self.myDeviceMap = {}
         
         # MQTT setup
-        self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
-        self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         self.data_topic = "ibswitch"
-        self.myMQTTregistered = False
-        self.myDeviceRegistered = False
         self.myAgent_registration_response_topic = "registration/" + self.myAgent_uid + "/response"
         self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
         self.myDevice_registration_response_topic = False
         
-        # schemas and schema registry setup
-        conf = {
-            "url": "https://schemaregistry:8081",
-            "ssl.ca.location": "/run/secrets/km-ca-1.crt",
-            "ssl.certificate.location": "/run/secrets/schemaregistry.certificate.pem",
-            "ssl.key.location": "/run/secrets/schemaregistry.key",
-        }
-
-        client = SchemaRegistryClient(conf)
-        self.msg_serializer = MessageSerializer(client)
+        super().__init__(configFile, debug)
         
-        subject = "com-hpe-krakenmare-message-agent-RegisterRequest"
-        cg = None
-        while cg is None:
-            cg = client.get_schema(subject)
-            print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-        self.agent_register_request_schema = cg.schema.schema
-        self.agent_register_request_schema_id = cg.schema_id
-
-        subject = "com-hpe-krakenmare-message-manager-RegisterResponse"
-        cg = None
-        while cg is None:
-            cg = client.get_schema(subject)
-            print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-        self.agent_register_response_schema = cg.schema.schema
-        self.agent_register_response_schema_id = cg.schema_id
-
-        subject = "com-hpe-krakenmare-message-agent-SendTimeSeriesDruid"
-        cg = None
-        while cg is None:
-            cg = client.get_schema(subject)
-            print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-        self.send_time_series_schema = cg.schema.schema
-        self.send_time_series_schema_id = cg.schema_id
-        
-        subject = "com-hpe-krakenmare-message-agent-DeviceList"
-        cg = None
-        while cg is None:
-            cg = client.get_schema(subject)
-            print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-        self.device_register_request_schema = cg.schema.schema
-        self.device_register_request_schema_id = cg.schema_id
-        
-        subject = "com-hpe-krakenmare-message-manager-DeviceListResponse"
-        cg = None
-        while cg is None:
-            cg = client.get_schema(subject)
-            print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
-        self.device_register_response_schema = cg.schema.schema
-        self.device_register_response_schema_id = cg.schema_id
-        
-
-    def checkConfigurationFile(
-        self, configurationFileFullPath, sectionsToCheck, **options
-    ):
-        """
-        Checks if the submitted.cfg configuration file is found
-        and contains required sections
-        configurationFileFullPath:
-        full path to the configuration file (e.g. /home/agent/myConf.cfg)
-        sectionsToCheck:
-        list of sections in the configuration to be checked for existence
-        """
-
-        config = configparser.SafeConfigParser()
-
-        if os.path.isfile(configurationFileFullPath) is False:
-            print(
-                "ERROR: the configuration file "
-                + configurationFileFullPath
-                + " is not found"
-            )
-            print("Terminating ...")
-            sys.exit(2)
-
-        try:
-            config.read(configurationFileFullPath)
-        except Exception as e:
-            print(
-                "ERROR: Could not read the configuration file "
-                + configurationFileFullPath
-            )
-            print("Detailed error description: "), e
-            print("Terminating ...")
-            sys.exit(2)
-
-        if sectionsToCheck is not None:
-            for section in sectionsToCheck:
-                if not config.has_section(section):
-                    print(
-                        "ERROR: the configuration file is not correctly set \
-                        - it does not contain required section: "
-                        + section
-                    )
-                    print("Terminating ...")
-                    sys.exit(2)
-
-        return config
-
-    ###########################################################################################
-    # MQTT agent methods
-    def mqtt_on_log(self, client, userdata, level, buf):
-        if self.myAgent_debug == True:
-            print("on_log: %s" % buf)
-
-    def mqtt_on_subscribe(self, client, userdata, mid, granted_qos):
-        print("on_subscribe: Subscribed with message id (mid): " + str(mid))
-        
-    # The callback for when the client receives a CONNACK response from the server.
-    def mqtt_on_connect(self, client, userdata, flags, rc):
-        
-        if self.myAgent_debug == True:
-            if (rc != 0):
-                print("on_connect: Connection error: " + mqtt.connack_string(rc))
-            else:
-                print("on_connect: Connected with result code: " + mqtt.connack_string(rc))
-
-        # Subscribing in on_connect() means that if we lose the connection and
-        # reconnect then subscriptions will be renewed.
-        if self.myAgent_registration_response_topic != False:
-            self.registration_client.subscribe(self.myAgent_registration_response_topic)
-        
-        if self.myDevice_registration_response_topic != False:
-            self.registration_client.subscribe(self.myDevice_registration_response_topic)
-
-    def mqtt_on_disconnect(self, client, userdata, rc):
-        if self.myAgent_debug == True:
-            print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
-    
-    def mqtt_on_publish(self, client, userdata, mid):
-        if self.myAgent_debug == True:
-            print("on_publish: Published message with mid: " + str(mid))
 
     # defines self.myMQTTregistered and self.myAgent_uuid
     def mqtt_on_message(self, client, userdata, message):
@@ -231,109 +100,14 @@ class IBswitchSimulator:
             self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid) + "/response"
             self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
         
+            #TO-DO: not sure id this persists, its a hack to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
+            userdata.append(self.myDevice_registration_response_topic)
+        
         if message.topic == self.myDevice_registration_response_topic:
             print("message received: %s " % message.payload)
             r_bytes = io.BytesIO(message.payload)
             data = schemaless_reader(r_bytes, self.device_register_response_schema)
             self.myDeviceRegistered = True
-            
-    # this method takes care of Agent registration and device/sensor registration
-    def mqtt_registration(self):
-        self.registration_client = mqtt.Client("RegistrationClient-" + str(self.myAgent_uid))
-        self.registration_client.on_log = self.mqtt_on_log
-        self.registration_client.on_message = self.mqtt_on_message
-        self.registration_client.on_subscribe = self.mqtt_on_subscribe
-        self.registration_client.on_disconnect = self.mqtt_on_disconnect
-        self.registration_client.on_connect = self.mqtt_on_connect
-        self.registration_client.on_publish = self.mqtt_on_publish
-        print("connecting to mqtt broker:" + self.mqtt_broker)
-        self.registration_client.connect(self.mqtt_broker)
-        
-        # start listening loop
-        self.registration_client.loop_start()
-
-        # subscribe to registration response topic
-        result = -1
-        while result != mqtt.MQTT_ERR_SUCCESS:
-            (result, mid) = self.registration_client.subscribe(self.myAgent_registration_response_topic)      
-        
-        # assemble my agent registration data
-        RegistrationData = {
-            "uid": self.myAgent_uid,
-            "type": "simulatorAgent",
-            "name": "IBswitchSimulator",
-            "description": "This is a fine description",
-            "useSensorTemplate": False,
-        }
-        
-        # publish registration data
-        w_bytes = io.BytesIO()
-
-        schemaless_writer(
-            w_bytes, self.agent_register_request_schema, RegistrationData)
-
-        raw_bytes = w_bytes.getvalue()
-
-        # TO-DO: change to magic byte in Avro message on FM site
-        #raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.agent_register_request_schema_id, RegistrationData)
-
-        # use highest QoS for now
-        print("sending registration payload: --%s--" % raw_bytes)
-        MQTTMessageInfo = self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
-        print("mqtt published with publishing code: " + mqtt.connack_string(MQTTMessageInfo.rc))
-        if MQTTMessageInfo.is_published() == False:
-            print("Waiting for message to be published.")
-            MQTTMessageInfo.wait_for_publish()
-            
-        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
-
-        while not self.myMQTTregistered:
-            print("waiting for agent registration result...")
-            time.sleep(1)
-            '''
-            if not self.myMQTTregistered:
-                print("re-sending registration payload")
-                self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
-            '''
-
-        # subscribe to registration response topic
-        result = -1
-        while result != mqtt.MQTT_ERR_SUCCESS:
-            (result, mid) = self.registration_client.subscribe(self.myDevice_registration_response_topic)   
-        
-        # register devices/sensors
-        self.myDeviceMap = self.create_my_device_map()
-        
-        #print(self.myDeviceMap)
-        
-        # publish registration data
-        w_bytes = io.BytesIO()
-
-        schemaless_writer(
-            w_bytes, self.device_register_request_schema, self.myDeviceMap)
-
-        raw_bytes = w_bytes.getvalue()
-        
-        # use highest QoS for now
-        print("sending device/sensor registration payload: --%s--" % raw_bytes)
-        self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
-        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
-
-        while not self.myDeviceRegistered:
-            print("waiting for device registration result...")
-            time.sleep(1)
-            if not self.myDeviceRegistered:
-                print("re-sending device/sensor registration payload")
-                self.registration_client.publish(self.myDevice_registration_request_topic, raw_bytes, 2, True)
-
-        self.registration_client.loop_stop()
-        print(
-            "registered with uid '%s' and km-uuid '%s'"
-            % (self.myAgent_uid, self.myAgent_uuid)
-        )
-
-    # END MQTT agent methods
-    ################################################################################
 
     ################################################################################
     # create my device and sensor map
@@ -404,18 +178,10 @@ class IBswitchSimulator:
         
     
     # assemble and send simulated sensor data via MQTT
-    def send_data(self, pubsubType):
+    def send_data(self):
                
         # counter for send message count
         i = 1
-
-        if pubsubType == "mqtt":
-            client = mqtt.Client(self.myAgent_uid)
-            print("connecting to mqtt broker")
-            client.connect(self.mqtt_broker, self.mqtt_port)
-        else:
-            print("Unknown Pub/Sub type selected: " + pubsubType)
-            sys.exit(-1)
 
         # Create a dictionary of the 18 IB metrics names
         ibmetrics = [
@@ -540,34 +306,43 @@ class IBswitchSimulator:
                         #print(record)
                         record_list.append(record)
 
-                    if pubsubType == "mqtt":
-                        for eachRecord in record_list:
-                            #print(str(eachRecord))
-                            if self.myAgent_debug == True:
-                                print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
-                            
-                            if i%1000 == 0:
-                                print(str(i) + " messages published via mqtt (topic:%s)" % self.data_topic)
-                            
-                            raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, eachRecord)
-                            client.publish(self.data_topic, raw_bytes)
-                            i += 1
-                    else:
-                        print("error: shouldn't be here")
-                        sys.exit(-1)
+                    for eachRecord in record_list:
+                        #print(str(eachRecord))
+                        if self.myAgent_debug == True:
+                            print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                        
+                        if i%1000 == 0:
+                            print(str(i) + " messages published via mqtt (topic:%s)" % self.data_topic)
+                        
+                        self.mqtt_send_single_avro_ts_msg(self.data_topic, eachRecord)
+                        
+                        i += 1
+
 
             # Infinite loop
             seed_initilaized = True
             time.sleep(self.sleepLoopTime)
 
     # main method of IBswitchSimulator
-    def run(self, mode, local):
-        # local and debug flag are not used from here at the moment
+    def run(self):
 
-        if mode == "mqtt":
-            print("mqtt mode")
-            self.mqtt_registration()
-            self.send_data("mqtt")
+        # generate list of mqtt topics to subscribe, used in initial connection and to re-subscribe on re-connect
+        subscriptionTopics=[]
+        if self.myAgent_registration_response_topic != False: subscriptionTopics.append(self.myAgent_registration_response_topic)
+        if self.myDevice_registration_response_topic != False: subscriptionTopics.append(self.myDevice_registration_response_topic)
+        
+        # start mqtt client
+        self.mqtt_init(self.myAgent_uid, subscriptionTopics)
+        
+        # register myself
+        self.mqtt_registration(self.myAgent_registration_request_topic, self.myRegistrationData)
+        
+        # register my devices/sensors
+        self.myDeviceMap = self.create_my_device_map()
+        self.mqtt_device_registration(self.myDevice_registration_request_topic, self.myDevice_registration_response_topic, self.myDeviceMap)
+        
+        # start sending data
+        self.send_data()
 
 
 # END IBswitchSimulator class
@@ -577,14 +352,6 @@ def main():
     usage = "usage: %s --mode=mqtt" % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
-    parser.add_option("--mode", dest="modename", help="specify mode: mqtt")
-    parser.add_option(
-        "--local",
-        action="store_true",
-        default=False,
-        dest="local",
-        help="specify this option in order to run in local mode",
-    )
     parser.add_option(
         "--debug",
         action="store_true",
@@ -602,28 +369,9 @@ def main():
 
     option_dict = vars(options)
 
-    if option_dict["modename"] is None:
-        print("Incorrect usage")
-        parser.print_help()
-        sys.exit(0)
-
-    if options.local is True:
-        # load development config to run outside of container
-        myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator_dev.cfg", "local", debug=option_dict["debug"])
-    else:
-        # load container config
-        myIBswitchSimulator = IBswitchSimulator(
-            "IBswitchSimulator.cfg", "container", debug=option_dict["debug"])
-
-    if options.modename == "mqtt":
-        myIBswitchSimulator.run(
-            "mqtt", local=option_dict["local"]
-        )
-
-    else:
-        print("ERROR: Unknown action command.")
-        sys.exit(2)
+    # load container config
+    myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", debug=option_dict["debug"])
+    myIBswitchSimulator.run()
 
 
 if __name__ == "__main__":
