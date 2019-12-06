@@ -177,14 +177,14 @@ if [  "$ansible" == "1"  ]; then
      
 fi
 
-if [ "$pull" == "1" ]; then
-     # to only pull registry's content
-     docker-compose pull || exit 1
-fi
-
 if [ "$build" == "1" ]; then
     docker-compose build $dockerpull || exit 1
     docker-compose push || exit 1
+fi
+
+if [ "$pull" == "1" ]; then
+     # to only pull registry's content
+     docker-compose pull || exit 1
 fi
 
 if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
