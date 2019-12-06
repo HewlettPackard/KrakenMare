@@ -256,8 +256,6 @@ services:
       dockerfile: Dockerfile
     hostname: test
     environment:
-      MOSQUITTO_IP: mosquitto
-      KAFKA_BROKER_IP: broker-1
       KAFKA_OPTS: "-Djava.security.auth.login.config=/run/secrets/broker_jaas.conf -Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
       SCHEMA_REGISTRY_OPTS: "-Djavax.net.ssl.trustStore=/run/secrets/kafka.client.truststore.pfx -Djavax.net.ssl.trustStorePassword=krakenmare -Djavax.net.ssl.keyStore=/run/secrets/kafka.client.keystore.pfx -Djavax.net.ssl.keyStorePassword=krakenmare"
     <<: *deploy
