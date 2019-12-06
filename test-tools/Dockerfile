@@ -52,6 +52,7 @@ RUN apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
 RUN apt-get update && apt-get install -y mosquitto-clients
 
 # mqtt-bench which is a go application, https://www.npmjs.com/package/mqtt-benchmark
+
 RUN apt-get update && apt-get install -y golang unzip
 RUN wget https://github.com/takanorig/mqtt-bench/releases/download/v0.3.0/mqtt-bench_linux_amd64-0.3.0.zip
 RUN unzip mqtt-bench_linux_amd64-0.3.0.zip
