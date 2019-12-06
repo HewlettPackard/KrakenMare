@@ -130,7 +130,7 @@ function push_to_swarm ()
 
 #list of secrets
 file_list="km-ca-1.key km-ca-1.crt km-ca-1.srl broker_jaas.conf zookeeper_jaas.conf client-sasl_ssl.conf"
-for i in broker-1 broker-2 broker-3 schemaregistry client
+for i in broker-1 broker-2 broker-3 schemaregistry client mosquittosecu
 do
     file_list="$file_list ${i}_sslkey_creds"
     file_list="$file_list ${i}_keystore_creds"
