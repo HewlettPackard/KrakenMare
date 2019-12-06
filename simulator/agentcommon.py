@@ -45,7 +45,7 @@ class AgentCommon:
         self.myMQTTregistered = False
         self.myDeviceRegistered = False
         
-        self.loggerName = "simulator.agent." + __version__ + ".log"
+        self.loggerName = "agentcommon." + __version__ + ".log"
 
         self.config = self.checkConfigurationFile(
             configFile, ["Daemon", "Logger", "MQTT", "Schemaregistry"]
@@ -208,9 +208,7 @@ class AgentCommon:
         self.client.loop_start()
         
         # subscribe to registration response topic
-        print("Topic list: ", str(topicList))
         for topic in topicList:
-            print("topic name: ", topic)
             result = -1
             while result != mqtt.MQTT_ERR_SUCCESS and topic != False:
                 (result, mid) = self.client.subscribe(topic) 
@@ -293,7 +291,49 @@ class AgentCommon:
     def mqtt_send_single_avro_ts_msg(self, topic, record):
         raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, record)
         self.client.publish(topic, raw_bytes)
+    
+    
+    # close client method
+    def mqtt_close(self):
+        self.client.loop_stop()
+        self.client.disconnect()
+        print("mqtt client loop stopped.")
+        print("mqtt client disconnected")
+    
+    # example send method with simple (timestamp, uuid, value)
+    def send_data(self):
         
+        myCounter = 1
+        
+        while true:
+            record_list = []
+            
+            # Assign time series values to the record to be serialized
+            # here we read a list of 10 sensors at each timestamp
+            
+            # Set time to milliseconds since the epoch
+            timestamp = int(round(time.time() * 1000))
+                    # counter for send message count
+            i = 1
+            while i <= 10:
+                record = {}
+                record["sensorUuid"] = uuid.UUID(hashlib.md5("AgentCommon" + str(random.randint(1, 100001)).encode()).hexdigest())
+                record["sensorValue"] = myCounter
+                record["timestamp"] = timestamp
+                record_list.append(record)
+                i += 1
+                myCounter += 1
+            
+            # publish collected time series data as individual (timestamp, sensor_uuid, value) records 
+            for eachRecord in record_list:
+                #print(str(eachRecord))
+                if self.myAgent_debug == True:
+                    print(str(i) + ":Publishing via mqtt (topic:%s)" % self.myAgent_send_ts_data_topic)
+                
+                self.mqtt_send_single_avro_ts_msg(self.myAgent_send_ts_data_topic, eachRecord)    
+    
+            # Infinite loop
+            time.sleep(self.sleepLoopTime)
 
     # END MQTT agent methods
     ################################################################################

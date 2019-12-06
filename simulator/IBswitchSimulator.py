@@ -12,6 +12,7 @@ import json
 import time
 import os
 import sys
+import signal
 import configparser
 import random
 import platform
@@ -74,7 +75,7 @@ class IBswitchSimulator(AgentCommon):
         self.myDeviceMap = {}
         
         # MQTT setup
-        self.data_topic = "ibswitch"
+        self.myAgent_send_ts_data_topic = "ibswitch"
         self.myAgent_registration_response_topic = "registration/" + self.myAgent_uid + "/response"
         self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
         self.myDevice_registration_response_topic = False
@@ -85,7 +86,7 @@ class IBswitchSimulator(AgentCommon):
     # defines self.myMQTTregistered and self.myAgent_uuid
     def mqtt_on_message(self, client, userdata, message):
         print("on_message: message received on topic: %s" % message.topic)
-        
+              
         if message.topic == self.myAgent_registration_response_topic:
             print("message received: %s " % message.payload)
             # TO-DO, decoding with schema-registry requires magic byte in message
@@ -100,7 +101,7 @@ class IBswitchSimulator(AgentCommon):
             self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid) + "/response"
             self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
         
-            #TO-DO: not sure id this persists, its a hack to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
+            # add device registration response topic to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
             userdata.append(self.myDevice_registration_response_topic)
         
         if message.topic == self.myDevice_registration_response_topic:
@@ -177,7 +178,7 @@ class IBswitchSimulator(AgentCommon):
         return seedMap
         
     
-    # assemble and send simulated sensor data via MQTT
+    # assemble and send simulated sensor data via MQTT (overwrites example method in parent class)
     def send_data(self):
                
         # counter for send message count
@@ -309,23 +310,27 @@ class IBswitchSimulator(AgentCommon):
                     for eachRecord in record_list:
                         #print(str(eachRecord))
                         if self.myAgent_debug == True:
-                            print(str(i) + ":Publishing via mqtt (topic:%s)" % self.data_topic)
+                            print(str(i) + ":Publishing via mqtt (topic:%s)" % self.myAgent_send_ts_data_topic)
                         
                         if i%1000 == 0:
-                            print(str(i) + " messages published via mqtt (topic:%s)" % self.data_topic)
+                            print(str(i) + " messages published via mqtt (topic:%s)" % self.myAgent_send_ts_data_topic)
                         
-                        self.mqtt_send_single_avro_ts_msg(self.data_topic, eachRecord)
+                        self.mqtt_send_single_avro_ts_msg(self.myAgent_send_ts_data_topic, eachRecord)
                         
                         i += 1
 
 
             # Infinite loop
-            seed_initilaized = True
             time.sleep(self.sleepLoopTime)
-
+                  
+    
+    def signal_handler(signal, frame):
+        self.mqtt_close()
+        sys.exit(0)
+    
     # main method of IBswitchSimulator
     def run(self):
-
+                
         # generate list of mqtt topics to subscribe, used in initial connection and to re-subscribe on re-connect
         subscriptionTopics=[]
         if self.myAgent_registration_response_topic != False: subscriptionTopics.append(self.myAgent_registration_response_topic)
@@ -348,7 +353,9 @@ class IBswitchSimulator(AgentCommon):
 # END IBswitchSimulator class
 ################################################################################
 
+
 def main():
+    
     usage = "usage: %s --mode=mqtt" % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
@@ -371,6 +378,7 @@ def main():
 
     # load container config
     myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", debug=option_dict["debug"])
+    signal.signal(signal.SIGINT, myIBswitchSimulator.signal_handler)
     myIBswitchSimulator.run()
 
 
