@@ -1,10 +1,10 @@
 FROM ubuntu:18.04
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash strace tcpdump mosquitto-clients wget libssl-dev curl
+RUN apt-get update && apt-get install -y bash strace tcpdump wget curl bind9-host
 
 # Build deps
-RUN apt-get update && apt-get install -y gcc g++ make cmake autoconf libtool wget libavro-dev libcurl4-gnutls-dev git gdb valgrind cppcheck
+RUN apt-get update && apt-get install -y gcc g++ make cmake autoconf libtool wget libavro-dev libcurl4-gnutls-dev git gdb valgrind cppcheck zlib1g-dev libssl-dev libsasl2-dev libzstd-dev
 
 # Jansson json library
 RUN wget --no-check-certificate https://github.com/akheron/jansson/archive/v2.12.tar.gz -O - | tar xzf - 
@@ -39,13 +39,23 @@ RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.2 s
 RUN apt-get update && apt-get install -y confluent-community-2.12
 
 # Add avrocat to work at commandline with avro files
-RUN apt update && apt install -y python3 python3-pip git libavro-dev
+RUN apt-get update && apt-get install -y python3 python3-pip git libavro-dev
 RUN pip3 install colorama
 RUN cd /usr/src && git clone https://github.com/simonwahlgren/avrocat.git && cd avrocat && pip3 install -e .
 
 # Bring in the environment of the simulator so we can play with it
 RUN pip3 install avro-python3
 RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro confluent-kafka
+
+# mosquitto ppa used because in 18.04 the version is old
+RUN apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+RUN apt-get update && apt-get install -y mosquitto-clients
+
+# mqtt-bench which is a go application
+RUN apt-get update && apt-get install -y golang unzip
+RUN wget https://github.com/takanorig/mqtt-bench/releases/download/v0.3.0/mqtt-bench_linux_amd64-0.3.0.zip
+RUN unzip mqtt-bench_linux_amd64-0.3.0.zip
+RUN mv linux_amd64/mqtt-bench /tmp/
 
 COPY ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh /tmp/
 
