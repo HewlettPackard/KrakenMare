@@ -14,6 +14,9 @@ RUN apt-get update -o Acquire::http::No-Cache=True && DEBIAN_FRONTEND=noninterac
 RUN pip3 install paho-mqtt python-schema-registry-client fastavro
 COPY redfish-sensors.py /
 COPY redfish-sensors.sh /
+COPY hello-world.py /
+COPY KrakenMareTriplet.py /
+COPY hello-world.sh /
 # Point to the test system
 ARG REDFISHIP
 ARG REDFISHACC
@@ -22,5 +25,5 @@ ENV REDFISHIP=$REDFISHIP
 ENV REDFISHACC=$REDFISHACC
 ENV REDFISHPWD=$REDFISHPWD
 RUN echo "Redfish IP: $REDFISHIP"
-CMD /redfish-sensors.sh
+CMD /hello-world.sh
 #CMD sleep infinity
