@@ -6,5 +6,7 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /simulator
-python3 IBswitchSimulator.py
+
+python3 IBswitchSimulator.py --encrypt
 sleep infinity
+
