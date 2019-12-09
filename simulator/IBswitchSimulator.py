@@ -36,7 +36,7 @@ class IBswitchSimulator(AgentCommon):
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, debug):
+    def __init__(self, configFile, debug, encrypt):
         """
             Class init
             
@@ -75,6 +75,7 @@ class IBswitchSimulator(AgentCommon):
         self.myDeviceMap = {}
         
         # MQTT setup
+        #self.myAgent_mqtt_encryption_enabled = encrypt
         self.myAgent_send_ts_data_topic = "ibswitch"
         
         self.myAgent_registration_request_topic = "agent-registration/" + self.myAgent_uid + "/request"
@@ -87,7 +88,7 @@ class IBswitchSimulator(AgentCommon):
                 
         self.myDevice_registration_response_topic = False
         
-        super().__init__(configFile, debug)
+        super().__init__(configFile, debug, encrypt)
         
 
     # defines self.myMQTTregistered and self.myAgent_uuid
@@ -372,7 +373,7 @@ class IBswitchSimulator(AgentCommon):
 
 def main():
     
-    usage = "usage: %s --mode=mqtt" % sys.argv[0]
+    usage = "usage: %s" % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
     parser.add_option(
@@ -381,6 +382,13 @@ def main():
         default=False,
         dest="debug",
         help="specify this option in order to run in debug mode",
+    )
+    parser.add_option(
+        "--encrypt",
+        action="store_true",
+        default=False,
+        dest="encrypt",
+        help="specify this option in order to encrypt the mqtt connection",
     )
     parser.add_option(
         "--logLevel",
@@ -393,7 +401,7 @@ def main():
     option_dict = vars(options)
 
     # load container config
-    myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", debug=option_dict["debug"])
+    myIBswitchSimulator = IBswitchSimulator("IBswitchSimulator.cfg", debug=option_dict["debug"], encrypt=option_dict["encrypt"])
     signal.signal(signal.SIGINT, myIBswitchSimulator.signal_handler)
     myIBswitchSimulator.run()
 
