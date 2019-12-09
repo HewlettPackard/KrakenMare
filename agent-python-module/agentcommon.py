@@ -34,7 +34,7 @@ from schema_registry.serializers import MessageSerializer
 class AgentCommon:
     loggerName = None
 
-    def __init__(self, configFile, debug):
+    def __init__(self, configFile, debug, encrypt):
         """
             Class init
             
@@ -51,14 +51,19 @@ class AgentCommon:
             configFile, ["Daemon", "Logger", "MQTT", "Schemaregistry"]
         )
         
+        
+        self.mqtt_encrypt = encrypt
+        
         # MQTT setup
-        self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
-        self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
-        self.mqtt_broker_sec = self.config.get("MQTT", "mqtt_broker_sec")
-        self.mqtt_port_sec = int(self.config.get("MQTT", "mqtt_port_sec"))
-        self.mqtt_ca_certs=self.config.get("MQTT", "mqtt_ca_certs")
-        self.mqtt_certfile=self.config.get("MQTT", "mqtt_certfile")
-        self.mqtt_keyfile=self.config.get("MQTT", "mqtt_keyfile")     
+        if not encrypt:
+            self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
+            self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
+        else:
+            self.mqtt_broker = self.config.get("MQTT", "mqtt_broker_sec")
+            self.mqtt_port = int(self.config.get("MQTT", "mqtt_port_sec"))
+            self.mqtt_ca_certs=self.config.get("MQTT", "mqtt_ca_certs")
+            self.mqtt_certfile=self.config.get("MQTT", "mqtt_certfile")
+            self.mqtt_keyfile=self.config.get("MQTT", "mqtt_keyfile")     
         
         # schemas and schema registry setup
         conf = {
@@ -197,9 +202,13 @@ class AgentCommon:
 
           
     # this method takes care of Agent registration
-    def mqtt_init(self, client_uid, topicList=[], encrypt=False):
+    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True):
+        self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=cleanSession)
+
+        if self.mqtt_encrypt == True:
+            print(self.mqtt_ca_certs + "; " + self.mqtt_certfile + "; " + self.mqtt_keyfile)
+            self.client.tls_set(ca_certs=self.mqtt_ca_certs, certfile=self.mqtt_certfile, keyfile=self.mqtt_keyfile)
         
-        self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=False)           
         self.client.on_log = self.mqtt_on_log
         self.client.on_message = self.mqtt_on_message
         self.client.on_subscribe = self.mqtt_on_subscribe

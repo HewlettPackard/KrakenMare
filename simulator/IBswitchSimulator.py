@@ -75,7 +75,9 @@ class IBswitchSimulator(AgentCommon):
         self.myDeviceMap = {}
         
         # MQTT setup
-        self.myAgent_mqtt_encryption_enabled = encrypt
+
+        #self.myAgent_mqtt_encryption_enabled = encrypt
+
         self.myAgent_send_ts_data_topic = "ibswitch"
         
         self.myAgent_registration_request_topic = "agent-registration/" + self.myAgent_uid + "/request"
@@ -88,7 +90,7 @@ class IBswitchSimulator(AgentCommon):
                 
         self.myDevice_registration_response_topic = False
         
-        super().__init__(configFile, debug)
+        super().__init__(configFile, debug, encrypt)
         
 
     # defines self.myMQTTregistered and self.myAgent_uuid
