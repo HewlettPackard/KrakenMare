@@ -34,7 +34,7 @@ from schema_registry.serializers import MessageSerializer
 class AgentCommon:
     loggerName = None
 
-    def __init__(self, configFile, debug, encrypt):
+    def __init__(self, configFile, debug):
         """
             Class init
             
@@ -51,19 +51,14 @@ class AgentCommon:
             configFile, ["Daemon", "Logger", "MQTT", "Schemaregistry"]
         )
         
-        
-        self.mqtt_encrypt = encrypt
-        
         # MQTT setup
-        if not encrypt:
-            self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
-            self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
-        else:
-            self.mqtt_broker = self.config.get("MQTT", "mqtt_broker_sec")
-            self.mqtt_port = int(self.config.get("MQTT", "mqtt_port_sec"))
-            self.mqtt_ca_certs=self.config.get("MQTT", "mqtt_ca_certs")
-            self.mqtt_certfile=self.config.get("MQTT", "mqtt_certfile")
-            self.mqtt_keyfile=self.config.get("MQTT", "mqtt_keyfile")     
+        self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
+        self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
+        self.mqtt_broker_sec = self.config.get("MQTT", "mqtt_broker_sec")
+        self.mqtt_port_sec = int(self.config.get("MQTT", "mqtt_port_sec"))
+        self.mqtt_ca_certs=self.config.get("MQTT", "mqtt_ca_certs")
+        self.mqtt_certfile=self.config.get("MQTT", "mqtt_certfile")
+        self.mqtt_keyfile=self.config.get("MQTT", "mqtt_keyfile")     
         
         # schemas and schema registry setup
         conf = {
@@ -193,7 +188,7 @@ class AgentCommon:
         self.client.subscribe(userdata)
 
     def mqtt_on_disconnect(self, client, userdata, rc):
-        if self.myAgentCommonDebug == True:
+        if self.myAgentCommonDebuself.g == True:
             print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
     
     def mqtt_on_publish(self, client, userdata, mid):
@@ -202,7 +197,7 @@ class AgentCommon:
 
           
     # this method takes care of Agent registration
-    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True):
+    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True, encrypt=False):
         self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=cleanSession)
 
         if self.mqtt_encrypt == True:
