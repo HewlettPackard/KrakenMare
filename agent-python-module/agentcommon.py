@@ -188,7 +188,7 @@ class AgentCommon:
         self.client.subscribe(userdata)
 
     def mqtt_on_disconnect(self, client, userdata, rc):
-        if self.myAgentCommonDebuself.g == True:
+        if self.myAgentCommonDebug == True:
             print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
     
     def mqtt_on_publish(self, client, userdata, mid):
