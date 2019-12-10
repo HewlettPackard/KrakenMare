@@ -181,7 +181,7 @@ class AgentCommon:
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         for topic in userdata and topic != False:
-            self.registration_client.subscribe(topic)
+            self.client.subscribe(topic)
 
     def mqtt_on_disconnect(self, client, userdata, rc):
         if self.myAgentCommonDebug == True:
@@ -242,7 +242,7 @@ class AgentCommon:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
             
-        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
+        #self.client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
 
         while not self.myMQTTregistered:
             print("waiting for agent registration result...")
@@ -250,7 +250,7 @@ class AgentCommon:
             '''
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
-                self.registration_client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
+                self.client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
             '''
         print(
             "registered with uid '%s' and km-uuid '%s'"
@@ -277,7 +277,7 @@ class AgentCommon:
         # use highest QoS for now
         print("sending device/sensor registration payload: --%s--" % raw_bytes)
         self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
-        #self.registration_client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
+        #self.client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
 
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")
@@ -286,7 +286,7 @@ class AgentCommon:
                 print("re-sending device/sensor registration payload")
                 self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
 
-        #self.registration_client.loop_stop()
+        #self.client.loop_stop()
 
     def mqtt_send_single_avro_ts_msg(self, topic, record):
         raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, record)
