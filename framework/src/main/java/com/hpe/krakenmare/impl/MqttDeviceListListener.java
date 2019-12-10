@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.avro.util.Utf8;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -27,12 +29,12 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttDeviceListListener.class);
 
-	public static void registerNew(FrameworkMqttClient listener, Repository<Agent> agentRepo) throws MqttException {
-		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttDeviceListListener(agentRepo, listener.getClient()));
+	public static void registerNew(FrameworkMqttClient listener, KafkaProducer<String, byte[]> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
+		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttDeviceListListener(agentRepo, listener.getClient(), kafkaProducer));
 	}
 
-	public MqttDeviceListListener(Repository<Agent> repository, IMqttAsyncClient mqtt) {
-		super(repository, mqtt);
+	public MqttDeviceListListener(Repository<Agent> repository, IMqttAsyncClient mqtt, KafkaProducer<String, byte[]> kafkaProducer) {
+		super(repository, mqtt, kafkaProducer);
 	}
 
 	@Override
@@ -74,8 +76,12 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
 		String respTopic = MqttUtils.getSensorListResponseTopic(response.getUuid());
 
-		LOG.debug("Sending message to topic '" + respTopic + "': " + mqttResponse);
+		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
+
+		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.REGISTRATION_TOPIC + "': " + respPayload);
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.REGISTRATION_TOPIC, respPayload);
+		kafkaProducer.send(record);
 	}
 
 }

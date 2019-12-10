@@ -2,6 +2,7 @@ package com.hpe.krakenmare.impl;
 
 import java.util.List;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,19 +23,22 @@ public class FrameworkImpl implements Framework {
 	private final AgentRedisRepository agents = new AgentRedisRepository(jedis);
 	private final FrameworkMqttClient mqttListener = new FrameworkMqttClient();
 
+	private final KafkaProducer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
+
 	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
 
 	public void startFramework() throws InterruptedException, MqttException {
 		mqttListener.start();
 		collectdStream.start();
 
-		MqttRegistrationListener.registerNew(mqttListener, agents);
-		MqttDeviceListListener.registerNew(mqttListener, agents);
+		MqttRegistrationListener.registerNew(mqttListener, kafkaProducer, agents);
+		MqttDeviceListListener.registerNew(mqttListener, kafkaProducer, agents);
 	}
 
 	public void stopFramework() {
 		collectdStream.close();
 		mqttListener.stop();
+		kafkaProducer.close();
 	}
 
 	@Override

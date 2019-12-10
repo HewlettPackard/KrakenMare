@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,9 @@ import com.hpe.krakenmare.Main;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
-import com.hpe.krakenmare.impl.MqttRegistrationListener;
+import com.hpe.krakenmare.impl.KafkaUtils;
 import com.hpe.krakenmare.impl.MqttDeviceListListener;
+import com.hpe.krakenmare.impl.MqttRegistrationListener;
 import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.repositories.AgentMemoryRepository;
 
@@ -31,9 +33,11 @@ public class MqttAgentTest {
 		FrameworkMqttClient listener = new FrameworkMqttClient();
 		listener.start();
 
+		KafkaProducer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
+
 		AgentMemoryRepository agents = new AgentMemoryRepository();
-		MqttRegistrationListener.registerNew(listener, agents);
-		MqttDeviceListListener.registerNew(listener, agents);
+		MqttRegistrationListener.registerNew(listener, kafkaProducer, agents);
+		MqttDeviceListListener.registerNew(listener, kafkaProducer, agents);
 	}
 
 	@Test

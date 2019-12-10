@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -21,10 +22,12 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 
 	protected final Repository<Agent> repository;
 	protected final IMqttAsyncClient mqtt;
+	protected final KafkaProducer<String, byte[]> kafkaProducer;
 
-	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt) {
+	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, KafkaProducer<String, byte[]> kafkaProducer) {
 		this.repository = repository;
 		this.mqtt = mqtt;
+		this.kafkaProducer = kafkaProducer;
 	}
 
 	@Override
