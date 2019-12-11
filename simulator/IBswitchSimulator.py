@@ -76,8 +76,15 @@ class IBswitchSimulator(AgentCommon):
         
         # MQTT setup
         self.myAgent_send_ts_data_topic = "ibswitch"
-        self.myAgent_registration_response_topic = "registration/" + self.myAgent_uid + "/response"
+        
         self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
+        
+        self.myAgent_registration_response_topic = []
+        myAgent_registration_response_topic = []
+        myAgent_registration_response_topic.append("registration/" + self.myAgent_uid + "/response")
+        myAgent_registration_response_topic.append(0)
+        self.myAgent_registration_response_topic.append(myAgent_registration_response_topic)
+                
         self.myDevice_registration_response_topic = False
         
         super().__init__(configFile, debug)
@@ -86,8 +93,9 @@ class IBswitchSimulator(AgentCommon):
     # defines self.myMQTTregistered and self.myAgent_uuid
     def mqtt_on_message(self, client, userdata, message):
         print("on_message: message received on topic: %s" % message.topic)
-              
-        if message.topic == self.myAgent_registration_response_topic:
+        
+        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name        
+        if message.topic == self.myAgent_registration_response_topic[0][0]:
             print("message received: %s " % message.payload)
             # TO-DO, decoding with schema-registry requires magic byte in message
             #decode_msg_obj = self.msg_serializer.decode_message(message.payload)
@@ -98,17 +106,28 @@ class IBswitchSimulator(AgentCommon):
             print("registration-result with KrakenMare UUID: %s" % data["uuid"])
             self.myMQTTregistered = True
             self.myAgent_uuid = data["uuid"]
-            self.myDevice_registration_response_topic = "device-registration/" + str(self.myAgent_uuid) + "/response"
+            
             self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
+            
+            # create new device response topic list with one entry [("topic name", qos)]
+            self.myDevice_registration_response_topic = []
+            myDevice_registration_response_topic = []
+            myDevice_registration_response_topic.append("device-registration/" + str(self.myAgent_uuid) + "/response")
+            myDevice_registration_response_topic.append(0)
+            self.myDevice_registration_response_topic.append(myDevice_registration_response_topic)
         
             # add device registration response topic to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
             userdata.append(self.myDevice_registration_response_topic)
         
-        if message.topic == self.myDevice_registration_response_topic:
+        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name 
+        elif message.topic == self.myDevice_registration_response_topic[0][0]:
             print("message received: %s " % message.payload)
             r_bytes = io.BytesIO(message.payload)
             data = schemaless_reader(r_bytes, self.device_register_response_schema)
             self.myDeviceRegistered = True
+            
+        else:
+            print("Unknown topic: " + str(message.topic) + " -- message received: %s " % message.payload)
 
     ################################################################################
     # create my device and sensor map
@@ -330,14 +349,11 @@ class IBswitchSimulator(AgentCommon):
     
     # main method of IBswitchSimulator
     def run(self):
-                
-        # generate list of mqtt topics to subscribe, used in initial connection and to re-subscribe on re-connect
-        subscriptionTopics=[]
-        if self.myAgent_registration_response_topic != False: subscriptionTopics.append(self.myAgent_registration_response_topic)
-        if self.myDevice_registration_response_topic != False: subscriptionTopics.append(self.myDevice_registration_response_topic)
         
         # start mqtt client
-        self.mqtt_init(self.myAgent_uid, subscriptionTopics)
+        myLoopForever = False
+        myCleanSession = False
+        self.mqtt_init(self.myAgent_uid, self.myAgent_registration_response_topic, myLoopForever, myCleanSession)
         
         # register myself
         self.mqtt_registration(self.myAgent_registration_request_topic, self.myRegistrationData)

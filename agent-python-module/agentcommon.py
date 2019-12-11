@@ -180,8 +180,7 @@ class AgentCommon:
 
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
-        for topic in userdata and topic != False:
-            self.client.subscribe(topic)
+        self.client.subscribe(userdata)
 
     def mqtt_on_disconnect(self, client, userdata, rc):
         if self.myAgentCommonDebug == True:
