@@ -25,7 +25,12 @@ test-framework:
     paths:
       - .mvnrepo
   script:
-  - mvn -f framework/pom.xml -P coverage -Dredis.server=redis:6379 -Dmqtt.server=eclipse-mosquitto:1883 test jacoco:report
+  - mvn -f framework/pom.xml
+        -Dredis.server=redis:6379
+        -Dmqtt.server=eclipse-mosquitto:1883
+        -Dbootstrap.servers=
+        -P coverage
+        test jacoco:report
   - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
   only:
     changes:

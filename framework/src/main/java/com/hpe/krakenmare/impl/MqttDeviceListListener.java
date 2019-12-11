@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.avro.util.Utf8;
-import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -29,11 +29,11 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttDeviceListListener.class);
 
-	public static void registerNew(FrameworkMqttClient listener, KafkaProducer<String, byte[]> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttClient listener, Producer<String, byte[]> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getSensorListRequestTopic(), new MqttDeviceListListener(agentRepo, listener.getClient(), kafkaProducer));
 	}
 
-	public MqttDeviceListListener(Repository<Agent> repository, IMqttAsyncClient mqtt, KafkaProducer<String, byte[]> kafkaProducer) {
+	public MqttDeviceListListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		super(repository, mqtt, kafkaProducer);
 	}
 

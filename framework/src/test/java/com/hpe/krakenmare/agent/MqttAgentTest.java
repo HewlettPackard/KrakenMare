@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class MqttAgentTest {
 		FrameworkMqttClient listener = new FrameworkMqttClient();
 		listener.start();
 
-		KafkaProducer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
+		Producer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
 
 		AgentMemoryRepository agents = new AgentMemoryRepository();
 		MqttRegistrationListener.registerNew(listener, kafkaProducer, agents);
