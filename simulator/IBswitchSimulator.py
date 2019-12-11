@@ -77,11 +77,11 @@ class IBswitchSimulator(AgentCommon):
         # MQTT setup
         self.myAgent_send_ts_data_topic = "ibswitch"
         
-        self.myAgent_registration_request_topic = "registration/" + self.myAgent_uid + "/request"
+        self.myAgent_registration_request_topic = "agent-registration/" + self.myAgent_uid + "/request"
         
         self.myAgent_registration_response_topic = []
         myAgent_registration_response_topic = []
-        myAgent_registration_response_topic.append("registration/" + self.myAgent_uid + "/response")
+        myAgent_registration_response_topic.append("agent-registration/" + self.myAgent_uid + "/response")
         myAgent_registration_response_topic.append(0)
         self.myAgent_registration_response_topic.append(myAgent_registration_response_topic)
                 

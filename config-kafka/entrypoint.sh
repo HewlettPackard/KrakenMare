@@ -15,6 +15,6 @@ kafka-topics --bootstrap-server broker-1:29092 --topic fabric --describe --comma
 kafka-topics --bootstrap-server broker-1:29092 --delete --topic agent-registration  --command-config /run/secrets/client-sasl_ssl.conf
 kafka-topics --bootstrap-server broker-1:29092 --create --topic agent-registration --config retention.ms=-1 --partitions 1 --replication-factor 3 --command-config /run/secrets/client-sasl_ssl.conf || exit 1
 kafka-topics --bootstrap-server broker-1:29092 --topic agent-registration --describe --command-config /run/secrets/client-sasl_ssl.conf || exit 1
-kafka-topics --bootstrap-server broker-1:29092 --delete --topic sensor-registration  --command-config /run/secrets/client-sasl_ssl.conf
-kafka-topics --bootstrap-server broker-1:29092 --create --topic sensor-registration --config retention.ms=-1  --partitions 1 --replication-factor 3 --command-config /run/secrets/client-sasl_ssl.conf || exit 1
-kafka-topics --bootstrap-server broker-1:29092 --topic sensor-registration --describe --command-config /run/secrets/client-sasl_ssl.conf || exit 1
+kafka-topics --bootstrap-server broker-1:29092 --delete --topic device-registration  --command-config /run/secrets/client-sasl_ssl.conf
+kafka-topics --bootstrap-server broker-1:29092 --create --topic device-registration --config retention.ms=-1  --partitions 1 --replication-factor 3 --command-config /run/secrets/client-sasl_ssl.conf || exit 1
+kafka-topics --bootstrap-server broker-1:29092 --topic device-registration --describe --command-config /run/secrets/client-sasl_ssl.conf || exit 1

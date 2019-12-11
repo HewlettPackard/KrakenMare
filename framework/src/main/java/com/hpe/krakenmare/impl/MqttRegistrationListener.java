@@ -63,8 +63,8 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
-		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.REGISTRATION_TOPIC + "': " + respPayload);
-		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.REGISTRATION_TOPIC, respPayload);
+		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "': " + respPayload);
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, respPayload);
 		kafkaProducer.send(record);
 	}
 

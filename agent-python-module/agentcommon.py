@@ -244,8 +244,6 @@ class AgentCommon:
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
-            
-        #self.client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
 
         while not self.myMQTTregistered:
             print("waiting for agent registration result...")
@@ -280,7 +278,6 @@ class AgentCommon:
         # use highest QoS for now
         print("sending device/sensor registration payload: --%s--" % raw_bytes)
         self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
-        #self.client.publish("registration/" + self.myAgent_uid + "/request", raw_bytes, 2, True)
 
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")

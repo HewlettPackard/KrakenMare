@@ -19,8 +19,8 @@ public class KafkaUtils {
 	public final static Logger LOG = LoggerFactory.getLogger(KafkaUtils.class);
 
 	public static final String BOOTSTRAP_SERVERS = Main.getProperty("bootstrap.servers");
-	public static final String REGISTRATION_TOPIC = Main.getProperty("km.registration.kafka.topic");
-	public static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.kafka.topic");
+	public static final String AGENT_REGISTRATION_TOPIC = Main.getProperty("km.agent-registration.kafka.topic");
+	public static final String DEVICE_REGISTRATION_TOPIC = Main.getProperty("km.device-registration.kafka.topic");
 
 	public static Producer<String, byte[]> createByteArrayProducer(String clientId) {
 		if (Strings.isNullOrEmpty(BOOTSTRAP_SERVERS)) {

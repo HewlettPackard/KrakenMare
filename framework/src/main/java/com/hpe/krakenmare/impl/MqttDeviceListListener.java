@@ -79,8 +79,8 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
-		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.SENSOR_LIST_TOPIC + "': " + respPayload);
-		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.SENSOR_LIST_TOPIC, respPayload);
+		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.DEVICE_REGISTRATION_TOPIC + "': " + respPayload);
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.DEVICE_REGISTRATION_TOPIC, respPayload);
 		kafkaProducer.send(record);
 	}
 
