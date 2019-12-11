@@ -45,6 +45,7 @@ class FanIn:
         """
 
         self.sensors = []
+        self.mqttTopicList = []
 
         self.loggerName = "simulator.agent." + __version__ + ".log"
 
@@ -56,12 +57,21 @@ class FanIn:
 
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
-        self.kafkaProducerTopics = self.config.get("Kafka", "kafkaProducerTopic").split(
-            ","
-        )
+        self.kafkaProducerTopics = self.config.get("Kafka", "kafkaProducerTopic").split(",")
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
+        
+        # create topic list: [(‘topicName1’, 1),(‘topicName2’, 1)]
         self.mqttTopicList = self.config.get("MQTT", "mqttTopicList").split(",")
+        for item in self.config.get("MQTT", "mqttTopicList").split(","):
+            addValue = []
+            value = item.split(":")
+            addValue.append(value[0])
+            addValue.append(int(value[1]))
+            self.mqttTopicList.append(addValue)
+            print(self.mqttTopicList)
+            print(type(self.mqttTopicList))
+        sys.exit(0)
         self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 
@@ -154,25 +164,6 @@ class FanIn:
             + ": subscribed to MQTT for topics: "
             + self.myMQTTtopic
         )
-
-    # The callback for when the client receives LOG response
-    def mqtt_on_log(self, client, userdata, level, buf):
-        if self.myFanInGateway_debug == True:
-            print("log: %s" % buf)
-
-    # The callback for when the client receives a CONNACK response from the server.
-    def mqtt_on_connect(self, client, userdata, flags, rc):
-        
-        if self.myFanInGateway_debug == True:
-            print("Connected with result code " + str(rc))
-
-        # Subscribing in on_connect() means that if we lose the connection and
-        # reconnect then subscriptions will be renewed.
-        self.client.subscribe(self.myMQTTtopic)
-
-    def mqtt_on_disconnect(self, client, userdata, rc=0):
-        if self.myFanInGateway_debug == True:
-            print("DisConnected result code " + str(rc))
 
     # converts message to AVRO and sends message to Kafka (in batches)
     # TODO: do we need multiple threads here?
@@ -290,6 +281,14 @@ class FanIn:
         # self.mqtt_registration()
         self.kafka_producer_connect()
         # TODO: should be own process via process class (from multiprocessing import Process)
+        # generate list of mqtt topics to subscribe, used in initial connection and to re-subscribe on re-connect
+        
+        mqttSubscriptionTopics=self.mqttTopicList
+        
+        # start mqtt client
+        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics)
+        
+        # start listening to data
         self.mqtt_subscription()
         # while True:
         # 	pass
