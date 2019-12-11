@@ -9,12 +9,9 @@
 
 # import from OS
 import subprocess
-import json
 import time
 import os
-import re
 import sys
-import string
 import configparser
 from random import *
 from multiprocessing import Process, Lock
@@ -26,7 +23,6 @@ import threading
 import uuid
 from confluent_kafka import Producer as KafkaProducer
 from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
-import paho.mqtt.client as mqtt
 from optparse import OptionParser
 
 # project imports
