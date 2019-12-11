@@ -23,7 +23,7 @@ public class FrameworkImpl implements Framework {
 	private final AgentRedisRepository agents = new AgentRedisRepository(jedis);
 	private final FrameworkMqttClient mqttListener = new FrameworkMqttClient();
 
-	private final Producer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
+	private final Producer<String, byte[]> kafkaProducer = KafkaUtils.createByteArrayProducer("framework-manager");
 
 	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
 

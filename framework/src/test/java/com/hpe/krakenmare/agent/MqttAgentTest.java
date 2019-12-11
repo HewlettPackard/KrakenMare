@@ -33,7 +33,7 @@ public class MqttAgentTest {
 		FrameworkMqttClient listener = new FrameworkMqttClient();
 		listener.start();
 
-		Producer<String, byte[]> kafkaProducer = KafkaUtils.createProducer("framework-manager");
+		Producer<String, byte[]> kafkaProducer = KafkaUtils.createByteArrayProducer("framework-manager");
 
 		AgentMemoryRepository agents = new AgentMemoryRepository();
 		MqttRegistrationListener.registerNew(listener, kafkaProducer, agents);
