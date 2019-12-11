@@ -11,7 +11,7 @@ import com.hpe.krakenmare.Main;
 
 public class KafkaUtils {
 
-	public static final String BOOTSTRAP_SERVERS = "broker-1, broker-2, broker-3";
+	public static final String BOOTSTRAP_SERVERS = Main.getProperty("bootstrap.servers");
 	public static final String REGISTRATION_TOPIC = Main.getProperty("km.registration.kafka.topic");
 	public static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.kafka.topic");
 
