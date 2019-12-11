@@ -193,8 +193,8 @@ class AgentCommon:
 
           
     # this method takes care of Agent registration
-    def mqtt_init(self, client_uid, topicList=[]):
-        self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=False)
+    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True):
+        self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=cleanSession)
         self.client.on_log = self.mqtt_on_log
         self.client.on_message = self.mqtt_on_message
         self.client.on_subscribe = self.mqtt_on_subscribe
@@ -204,15 +204,19 @@ class AgentCommon:
         print("connecting to mqtt broker:" + self.mqtt_broker)
         self.client.connect(self.mqtt_broker, self.mqtt_port)
         
-        # start listening loop
-        self.client.loop_start()
-        
         # subscribe to registration response topic
-        for topic in topicList:
-            result = -1
-            while result != mqtt.MQTT_ERR_SUCCESS and topic != False:
-                (result, mid) = self.client.subscribe(topic) 
+        result = -1
+        while result != mqtt.MQTT_ERR_SUCCESS and topicList != False:
+            #(result, mid) = self.client.subscribe([("ibswitch",0),("registration-result", 0)])
+            print(topicList)
+            (result, mid) = self.client.subscribe(topicList)
         
+        # start listening loop
+        if not loopForever:
+            self.client.loop_start()
+        else:
+            self.client.loop_forever(retry_first_connection=True)
+                    
 
     # this method takes care of Agent registration
     def mqtt_registration(self, requestTopic, RegistrationData={

@@ -325,6 +325,10 @@ services:
     <<: *deploy
     networks:
       - krakenmare
+    secrets:
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
+      - km-ca-1.crt
 
   druid:
     image: ${REGISTRY_FULL_PATH}druid

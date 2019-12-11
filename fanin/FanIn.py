@@ -32,10 +32,11 @@ from optparse import OptionParser
 # project imports
 from version import __version__
 import KrakenMareLogger
+from agentcommon import AgentCommon
 
 
 ### START IBswitchSimulator class ##################################################
-class FanIn:
+class FanIn(AgentCommon):
     registered = False
     loggerName = None
 
@@ -61,17 +62,18 @@ class FanIn:
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         
-        # create topic list: [(‘topicName1’, 1),(‘topicName2’, 1)]
-        self.mqttTopicList = self.config.get("MQTT", "mqttTopicList").split(",")
+        # create topic list: [ ("topicName1", int(qos1)),("topicName2", int(qos2)) ]
+        #                    [ ("ibswitch", 0), ("redfish", 0)]
+        
         for item in self.config.get("MQTT", "mqttTopicList").split(","):
             addValue = []
             value = item.split(":")
             addValue.append(value[0])
             addValue.append(int(value[1]))
             self.mqttTopicList.append(addValue)
-            print(self.mqttTopicList)
-            print(type(self.mqttTopicList))
-        sys.exit(0)
+            #print(self.mqttTopicList)
+            #print(type(self.mqttTopicList))
+            
         self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 
@@ -89,6 +91,8 @@ class FanIn:
         self.kafka_consumer = None
         
         self.kafka_msg_counter = 0
+        
+        super().__init__(configFile, debug)
 
     def resetLogLevel(self, logLevel):
         """
@@ -143,32 +147,10 @@ class FanIn:
 
     #######################################################################################
     # MQTT agent methods
-
-    # connect to MQTT broker and subscribe to receive agent messages
-
-    def mqtt_subscription(self):
-        self.myMQTTtopic = "ibswitch"
-        self.mqtt_client = mqtt.Client(client_id="FanInUUID", clean_session=True)
-        self.mqtt_client.on_connect = self.mqtt_on_connect
-        self.mqtt_client.on_disconnect = self.mqtt_on_disconnect
-        self.mqtt_client.on_message = self.mqtt_on_agent_message
-        self.mqtt_client.connect(self.mqtt_broker, self.mqtt_port)
-        # use '#' to subscribe to all topics
-        self.mqtt_client.subscribe(self.myMQTTtopic, qos=0)
-        self.mqtt_client.loop_forever(retry_first_connection=True)
-
-        print(
-            self.__class__.__name__
-            + "."
-            + inspect.currentframe().f_code.co_name
-            + ": subscribed to MQTT for topics: "
-            + self.myMQTTtopic
-        )
-
-    # converts message to AVRO and sends message to Kafka (in batches)
+    # sends MQTT messages to Kafka (in batches)
     # TODO: do we need multiple threads here?
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
-    def mqtt_on_agent_message(self, client, userdata, message):
+    def mqtt_on_message(self, client, userdata, message):
         if message.topic == "ibswitch":
             
             with self.myFanInGateway_threadLock:
@@ -267,7 +249,7 @@ class FanIn:
                 print(e.args[0])
                 print("waiting for Kafka brokers..." + self.bootstrapServerStr)
 
-        print(inspect.currentframe().f_code.co_name + ": producer connected")
+        print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": producer connected")
 
     # END Kafka agent methods
     #######################################################################################
@@ -286,10 +268,12 @@ class FanIn:
         mqttSubscriptionTopics=self.mqttTopicList
         
         # start mqtt client
-        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics)
+        myLoopForever = True
+        myCleanSession = True
+        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics, myLoopForever, myCleanSession)
         
         # start listening to data
-        self.mqtt_subscription()
+        #self.mqtt_subscription()
         # while True:
         # 	pass
         # self.send_data("kafka")
