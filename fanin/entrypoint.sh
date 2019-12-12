@@ -9,5 +9,5 @@
 /tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
 
 cd /fanin
-python3 FanIn.py --debug
+python3 FanIn.py
 sleep infinity

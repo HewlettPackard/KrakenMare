@@ -148,14 +148,12 @@ class FanIn(AgentCommon):
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
     def mqtt_on_message(self, client, userdata, message):
         if self.myFanInGateway_debug == True:
-                print("On message start")
+                print("On mqtt message start")
                 
         if message.topic == self.mqttTopicList[0][0]:
             # first topic in config file ("ibswitch")            
             try:
-                print("Publishing to kafka topic: " + "fabric")
-                
-                self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
+                self.kafka_producer.produce(self.kafkaProducerTopic, message.payload, on_delivery=self.kafka_producer_on_delivery)
                 with self.myFanInGateway_threadLock:
                     self.kafka_msg_counter += 1
                 
@@ -263,7 +261,7 @@ class FanIn(AgentCommon):
         # local and debug flag are not used from here at the moment
 
         # self.kafka_check_topic("registration-result")
-        self.kafka_check_topic("fabric")
+        self.kafka_check_topic(self.kafkaProducerTopic)
         # self.mqtt_registration()
         self.kafka_producer_connect()
         # TODO: should be own process via process class (from multiprocessing import Process)
