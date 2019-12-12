@@ -36,7 +36,7 @@ class FanIn(AgentCommon):
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, debug):
+    def __init__(self, configFile, debug, encrypt):
         """
                 Class init
         """
@@ -55,6 +55,7 @@ class FanIn(AgentCommon):
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
         self.kafkaProducerTopic = self.config.get("Kafka", "kafkaProducerTopic")
+        self.myFanIn_mqtt_encryption_enabled = encrypt
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         
@@ -272,7 +273,7 @@ class FanIn(AgentCommon):
         # start mqtt client
         myLoopForever = True
         myCleanSession = True
-        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics, myLoopForever, myCleanSession)
+        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics, myLoopForever, myCleanSession, self.myFanIn_mqtt_encryption_enabled)
         
         # start listening to data
         #self.mqtt_subscription()
@@ -286,18 +287,15 @@ class FanIn(AgentCommon):
 
 
 def main():
-    usage = "usage: %s --mode=redfish|mqtt" % sys.argv[0]
+    usage = "usage: %s " % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
     parser.add_option(
-        "--mode", dest="modename", help="specify mode, possible modes are: redfish|mqtt"
-    )
-    parser.add_option(
-        "--local",
+        "--encrypt",
         action="store_true",
         default=False,
-        dest="local",
-        help="specify this option in order to run in local mode",
+        dest="encrypt",
+        help="specify this option in order to encrypt the mqtt connection",
     )
     parser.add_option(
         "--debug",
@@ -316,7 +314,7 @@ def main():
 
     option_dict = vars(options)
 
-    myFanIn = FanIn("FanIn.cfg", debug=option_dict["debug"])
+    myFanIn = FanIn("FanIn.cfg", debug=option_dict["debug"], encrypt=option_dict["encrypt"])
 
     if options.logLevel:
         myFanIn.resetLogLevel(options.logLevel)

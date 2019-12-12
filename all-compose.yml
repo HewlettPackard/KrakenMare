@@ -328,15 +328,13 @@ services:
     volumes:
       - ./agent-python-module/agentcommon.py:/fanin/agentcommon.py
     <<: *deploy
-    secrets:
-      - mosquittosecu.certificate.pem
-      - mosquittosecu.key
-      - km-ca-1.crt
     networks:
       - krakenmare
     secrets:
       - schemaregistry.certificate.pem
       - schemaregistry.key
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
       - km-ca-1.crt
 
   druid:

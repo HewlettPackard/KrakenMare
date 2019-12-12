@@ -366,7 +366,7 @@ class IBswitchSimulator(AgentCommon):
         self.mqtt_close()
         
         
-        self.mqtt_init(self.myAgent_uid, subscriptionTopics, self.myAgent_mqtt_encryption_enabled)
+        self.mqtt_init(self.myAgent_uid, self.myAgent_registration_response_topic, myLoopForever, myCleanSession, self.myAgent_mqtt_encryption_enabled)
         # start sending data
         self.send_data()
 
