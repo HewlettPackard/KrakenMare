@@ -36,7 +36,7 @@ class FanIn(AgentCommon):
     registered = False
     loggerName = None
 
-    def __init__(self, configFile, mode, debug):
+    def __init__(self, configFile, debug):
         """
                 Class init
         """
@@ -54,7 +54,7 @@ class FanIn(AgentCommon):
 
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
-        self.kafkaProducerTopics = self.config.get("Kafka", "kafkaProducerTopic").split(",")
+        self.kafkaProducerTopic = self.config.get("Kafka", "kafkaProducerTopic")
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         
@@ -147,21 +147,29 @@ class FanIn(AgentCommon):
     # TODO: do we need multiple threads here?
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
     def mqtt_on_message(self, client, userdata, message):
-        if message.topic == "ibswitch":
-            
-            with self.myFanInGateway_threadLock:
-                self.kafka_msg_counter += 1
+        if self.myFanInGateway_debug == True:
+                print("On message start")
                 
-            if self.myFanInGateway_debug == True:
-                print(str(self.kafka_msg_counter) + ":published to Kafka")
-            
-            if self.kafka_msg_counter%1000 == 0:
-                print(str(self.kafka_msg_counter) + " messages published to Kafka")
-            
+        if message.topic == self.mqttTopicList[0][0]:
+            # first topic in config file ("ibswitch")            
             try:
+                print("Publishing to kafka topic: " + "fabric")
+                
                 self.kafka_producer.produce("fabric", message.payload, on_delivery=self.kafka_producer_on_delivery)
-            except BufferError:
+                with self.myFanInGateway_threadLock:
+                    self.kafka_msg_counter += 1
+                
+                if self.myFanInGateway_debug == True:
+                    print(str(self.kafka_msg_counter) + ":published to Kafka")
+                
+                if self.kafka_msg_counter%1000 == 0:
+                    print(str(self.kafka_msg_counter) + " messages published to Kafka")
+                    
+            except BufferError as e1:
                 print('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %len(self.kafka_producer))
+            except KafkaException as e2:
+                print("MQTT message not published to Kafka! Cause is ERROR:")
+                print(e2)
             
             # Serve delivery callback queue.
             # NOTE: Since produce() is an asynchronous API this poll() call
@@ -197,11 +205,10 @@ class FanIn(AgentCommon):
 
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
-            "client.id": socket.gethostname(),
+            "client.id": socket.gethostname() + "topicCheck",
             "socket.timeout.ms": 10,
             "error_cb": self.kafka_producer_error_cb,
             "message.timeout.ms": 10,
-            "produce.offset.report": True,
         }
 
         while test == False:
@@ -216,7 +223,7 @@ class FanIn(AgentCommon):
             except KafkaException as e:
                 # print(e.args[0])
                 print("waiting for " + myTopic + " topic...")
-
+                
     # connect to Kafka broker as producer
 
     def kafka_producer_connect(self):
@@ -227,6 +234,7 @@ class FanIn(AgentCommon):
 
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
+            "client.id": socket.gethostname(),
             "socket.timeout.ms": 10,
             "error_cb": self.kafka_producer_error_cb,
             "message.timeout.ms": 10,
@@ -255,7 +263,7 @@ class FanIn(AgentCommon):
         # local and debug flag are not used from here at the moment
 
         # self.kafka_check_topic("registration-result")
-        # self.kafka_check_topic("fabric")
+        self.kafka_check_topic("fabric")
         # self.mqtt_registration()
         self.kafka_producer_connect()
         # TODO: should be own process via process class (from multiprocessing import Process)
@@ -310,12 +318,7 @@ def main():
 
     option_dict = vars(options)
 
-    if options.local == True:
-        # load development config to run outside of container
-        myFanIn = FanIn("FanIn_dev.cfg", "local", debug=option_dict["debug"])
-    else:
-        # load container config
-        myFanIn = FanIn("FanIn.cfg", "container", debug=option_dict["debug"])
+    myFanIn = FanIn("FanIn.cfg", debug=option_dict["debug"])
 
     if options.logLevel:
         myFanIn.resetLogLevel(options.logLevel)

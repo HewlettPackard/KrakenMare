@@ -7,4 +7,4 @@
 
 cd /simulator
 python3 IBswitchSimulator.py
-sleep 1000000000
+sleep infinity

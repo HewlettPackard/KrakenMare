@@ -117,7 +117,7 @@ class IBswitchSimulator(AgentCommon):
             self.myDevice_registration_response_topic.append(myDevice_registration_response_topic)
         
             # add device registration response topic to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
-            userdata.append(self.myDevice_registration_response_topic)
+            userdata.append(myDevice_registration_response_topic)
         
         # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name 
         elif message.topic == self.myDevice_registration_response_topic[0][0]:

@@ -308,7 +308,7 @@ class AgentCommon:
         
         myCounter = 1
         
-        while true:
+        while True:
             record_list = []
             
             # Assign time series values to the record to be serialized
