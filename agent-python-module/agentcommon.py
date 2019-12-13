@@ -209,7 +209,7 @@ class AgentCommon:
         
         if encrypt == True:
             self.client.tls_set(ca_certs=self.mqtt_ca_certs, certfile=self.mqtt_certfile, keyfile=self.mqtt_keyfile)
-            print("connecting to mqtt broker:" + self.mqtt_broker_sec)       
+            print("connecting to mqtt broker (secured):" + self.mqtt_broker_sec)       
             self.client.connect(self.mqtt_broker_sec, self.mqtt_port_sec)
         else:
             print("connecting to mqtt broker:" + self.mqtt_broker)       
