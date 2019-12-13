@@ -27,7 +27,7 @@ test-framework:
   script:
   - mvn -f framework/pom.xml
         -Dredis.server=redis:6379
-        -Dmqtt.server=eclipse-mosquitto:1883
+        -Dmqtt.server=tcp://eclipse-mosquitto:1883
         -Dbootstrap.servers=
         -P coverage
         test jacoco:report

@@ -2,6 +2,7 @@ package com.hpe.krakenmare.agent;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +44,13 @@ public class MqttAgent extends Agent {
 	}
 
 	// TODO: open a long living MQTT connection to "MY-UUID/+" to receive all messages, then process them base on topic name
-	public void register(String broker) throws IOException, InterruptedException, MqttException {
+	public void register(String broker) throws IOException, InterruptedException, MqttException, GeneralSecurityException {
 		String myAgentTopic = MqttUtils.getRegistrationRequestTopic(this);
 		String myManagerTopic = MqttUtils.getRegistrationResponseTopic(this);
 
 		try (MqttClient mqtt = new MqttClient(broker, getUid().toString(), new MemoryPersistence())) {
-			MqttConnectOptions connOpts = new MqttConnectOptions();
 			LOG.info("Connecting to broker: " + broker);
+			MqttConnectOptions connOpts = MqttUtils.getConnectOptions();
 			mqtt.connect(connOpts);
 			LOG.info("Connected");
 
@@ -83,13 +84,13 @@ public class MqttAgent extends Agent {
 		}
 	}
 
-	public void registerDevices(String broker) throws MqttException, IOException, InterruptedException {
+	public void registerDevices(String broker) throws MqttException, IOException, InterruptedException, GeneralSecurityException {
 		String myAgentTopic = MqttUtils.getSensorListRequestTopic(this);
 		String myManagerTopic = MqttUtils.getSensorListResponseTopic(this);
 
 		try (MqttClient mqtt = new MqttClient(broker, getUid().toString(), new MemoryPersistence())) {
-			MqttConnectOptions connOpts = new MqttConnectOptions();
 			LOG.info("Connecting to broker: " + broker);
+			MqttConnectOptions connOpts = MqttUtils.getConnectOptions();
 			mqtt.connect(connOpts);
 			LOG.info("Connected");
 

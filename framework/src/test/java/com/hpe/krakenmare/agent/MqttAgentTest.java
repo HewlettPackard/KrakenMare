@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -26,10 +27,10 @@ public class MqttAgentTest {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgentTest.class);
 
-	static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
+	static String broker = Main.getProperty("mqtt.server");
 
 	@BeforeEach
-	public void setup() throws MqttException {
+	public void setup() throws MqttException, GeneralSecurityException {
 		FrameworkMqttClient listener = new FrameworkMqttClient();
 		listener.start();
 
@@ -41,7 +42,7 @@ public class MqttAgentTest {
 	}
 
 	@Test
-	public void registerAgent() throws IOException, InterruptedException, MqttException {
+	public void registerAgent() throws IOException, InterruptedException, MqttException, GeneralSecurityException {
 		MqttAgent agent = new MqttAgent();
 		agent.register(broker);
 		// at the end of registration process, agent UUID must be set
@@ -56,7 +57,7 @@ public class MqttAgentTest {
 		}
 	}
 
-	public static void main(String[] args) throws IOException, InterruptedException, MqttException {
+	public static void main(String[] args) throws IOException, InterruptedException, MqttException, GeneralSecurityException {
 		new MqttAgent().register(broker);
 	}
 

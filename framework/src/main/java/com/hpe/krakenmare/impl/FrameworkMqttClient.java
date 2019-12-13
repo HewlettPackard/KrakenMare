@@ -1,5 +1,7 @@
 package com.hpe.krakenmare.impl;
 
+import java.security.GeneralSecurityException;
+
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -21,7 +23,7 @@ public class FrameworkMqttClient {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
-	final static String broker = "tcp://" + Main.getProperty("mqtt.server"); // "tcp://mosquitto:1883";
+	final static String broker = Main.getProperty("mqtt.server");
 	final static String clientId = FrameworkMqttClient.class.getSimpleName();
 	final static int qos = 2;
 
@@ -56,18 +58,13 @@ public class FrameworkMqttClient {
 		client.subscribe(topicFilter, qos, null, callback, messageListener);
 	}
 
-	public synchronized void start() {
+	public synchronized void start() throws GeneralSecurityException {
 		if (client != null) {
 			LOG.warn("Client already started");
 			return;
 		}
 		try {
 			client = new MqttAsyncClient(broker, clientId, persistence);
-
-			MqttConnectOptions connOpts = new MqttConnectOptions();
-			connOpts.setAutomaticReconnect(true);
-			connOpts.setCleanSession(false);
-
 			client.setCallback(new MqttCallback() {
 				@Override
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -94,6 +91,7 @@ public class FrameworkMqttClient {
 			});
 
 			LOG.info("Connecting to broker: " + broker + " ...");
+			MqttConnectOptions connOpts = MqttUtils.getConnectOptions();
 			client.connect(connOpts).waitForCompletion();
 			LOG.info("Connected to broker: " + broker);
 		} catch (MqttException me) {

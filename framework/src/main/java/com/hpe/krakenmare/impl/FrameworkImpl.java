@@ -1,5 +1,6 @@
 package com.hpe.krakenmare.impl;
 
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import org.apache.kafka.clients.producer.Producer;
@@ -27,7 +28,7 @@ public class FrameworkImpl implements Framework {
 
 	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
 
-	public void startFramework() throws InterruptedException, MqttException {
+	public void startFramework() throws InterruptedException, MqttException, GeneralSecurityException {
 		mqttListener.start();
 		collectdStream.start();
 
