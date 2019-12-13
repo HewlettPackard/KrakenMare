@@ -17,7 +17,7 @@ rm -f *.crt *.csr *_creds *.pfx *.srl *.key *.pem *.der *.p12 2> /dev/null
 
 # Generate CA key
 openssl req -new -x509 -keyout km-ca-1.key -out km-ca-1.crt -days 365 -subj '/CN=ca1.test.hpe.com/OU=KM/O=HPE/L=SanJose/ST=Ca/C=US' -passin pass:krakenmare -passout pass:krakenmare || exit 1
-
+# We make a full set of secrets that a java application would use for mosquitto even though we don't use most of them.
 for i in broker-1 broker-2 broker-3 schemaregistry client mosquittosecu
 do
 	echo "------------------------------- $i -------------------------------"
