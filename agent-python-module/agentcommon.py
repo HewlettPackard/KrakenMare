@@ -172,11 +172,11 @@ class AgentCommon:
             print("on_log: %s" % buf)
 
     def mqtt_on_subscribe(self, client, userdata, mid, granted_qos):
-        print("on_subscribe: Subscribed with message id (mid): " + str(mid))
+        if self.myAgentCommonDebug == True:
+            print("on_subscribe: Subscribed with message id (mid): " + str(mid))
         
     # The callback for when the client receives a CONNACK response from the server.
     def mqtt_on_connect(self, client, userdata, flags, rc):
-        
         if self.myAgentCommonDebug == True:
             if (rc != 0):
                 print("on_connect: Connection error: " + mqtt.connack_string(rc))
@@ -208,7 +208,6 @@ class AgentCommon:
         self.client.on_publish = self.mqtt_on_publish
         
         if encrypt == True:
-            print(self.mqtt_ca_certs + "; " + self.mqtt_certfile + "; " + self.mqtt_keyfile)
             self.client.tls_set(ca_certs=self.mqtt_ca_certs, certfile=self.mqtt_certfile, keyfile=self.mqtt_keyfile)
             print("connecting to mqtt broker:" + self.mqtt_broker_sec)       
             self.client.connect(self.mqtt_broker_sec, self.mqtt_port_sec)
@@ -219,8 +218,10 @@ class AgentCommon:
         # subscribe to registration response topic
         result = -1
         while result != mqtt.MQTT_ERR_SUCCESS and topicList != False:
+            if self.myAgentCommonDebug == True:
+                print(topicList)
+            
             #(result, mid) = self.client.subscribe([("ibswitch",0),("registration-result", 0)])
-            print(topicList)
             (result, mid) = self.client.subscribe(topicList)
         
         # start listening loop
