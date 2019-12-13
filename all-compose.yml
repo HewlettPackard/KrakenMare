@@ -589,7 +589,6 @@ services:
     hostname: mosquittosecu
     ports:
       - "8883:8883"
-      - "19001:9001"
     volumes:
       - ./mosquittosecu/mosquitto.conf:/mosquitto/config/mosquitto.conf
     <<: *deploy
