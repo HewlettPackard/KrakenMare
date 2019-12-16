@@ -118,7 +118,7 @@ function push_to_swarm ()
 {
     for file in $file_list
     do
-	docker secret rm $file 
+	docker secret inspect $file &> /dev/null && { docker secret rm $file || return 1 ; } 
 	docker secret create $file $secrets_path/$file || return 1
 	if [ "$delete_pushed" == "true" ] ; then
 	    rm $secrets_path/$file || return 1
