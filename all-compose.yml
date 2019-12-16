@@ -563,7 +563,6 @@ services:
         REDFISHPWD: "$REDFISHPWD"
     hostname: redfish
     volumes:
-    volumes:
       - ./agent-python-module/agentcommon.py:/redfish/agentcommon.py
     <<: *deploy
     secrets:
