@@ -562,6 +562,9 @@ services:
         REDFISHACC: "$REDFISHACC"
         REDFISHPWD: "$REDFISHPWD"
     hostname: redfish
+    volumes:
+    volumes:
+      - ./agent-python-module/agentcommon.py:/redfish/agentcommon.py
     <<: *deploy
     secrets:
       - km-ca-1.crt
@@ -572,6 +575,12 @@ services:
     networks:
       - zookeeper_kafka
       - krakenmare
+    secrets:
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
+      - mosquittosecu.certificate.pem
+      - mosquittosecu.key
+      - km-ca-1.crt
 
   config-druid:
     image: ${REGISTRY_FULL_PATH}config-druid
