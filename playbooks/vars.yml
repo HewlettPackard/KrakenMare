@@ -9,8 +9,8 @@ docker_compose_version : 1.24.0
 ansible_python_interpreter : '/usr/bin/python3'
 RHEL_Version: rh8rc4_x86_64
 iso_server: 16.16.184.151
-iso_source_path: /opt/cmu/repositories
-iso_mount_point : /opt/cmu/repositories
+iso_source_path: /data/repositories
+iso_mount_point : /data/repositories
 
 #generated with :
 #password is kmu
