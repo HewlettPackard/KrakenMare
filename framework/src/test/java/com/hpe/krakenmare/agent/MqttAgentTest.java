@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.krakenmare.Main;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
@@ -27,7 +26,7 @@ public class MqttAgentTest {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgentTest.class);
 
-	static String broker = Main.getProperty("mqtt.server");
+	static String broker = MqttUtils.getBroker();
 
 	@BeforeEach
 	public void setup() throws MqttException, GeneralSecurityException {

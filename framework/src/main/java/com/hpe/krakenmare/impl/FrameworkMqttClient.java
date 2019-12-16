@@ -17,13 +17,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hpe.krakenmare.Main;
-
 public class FrameworkMqttClient {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
-	final static String broker = Main.getProperty("mqtt.server");
 	final static String clientId = FrameworkMqttClient.class.getSimpleName();
 	final static int qos = 2;
 
@@ -64,6 +61,7 @@ public class FrameworkMqttClient {
 			return;
 		}
 		try {
+			String broker = MqttUtils.getBroker();
 			client = new MqttAsyncClient(broker, clientId, persistence);
 			client.setCallback(new MqttCallback() {
 				@Override

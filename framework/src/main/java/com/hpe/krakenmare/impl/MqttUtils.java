@@ -59,11 +59,21 @@ public class MqttUtils {
 		return SENSOR_LIST_TOPIC + "/" + uuid + "/response";
 	}
 
+	public static String getBroker() {
+		return Main.getProperty("mqtt.server");
+	}
+
+	public static boolean isBrokerSecured() {
+		return getBroker().startsWith("ssl://");
+	}
+
 	public static MqttConnectOptions getConnectOptions() throws GeneralSecurityException {
 		MqttConnectOptions connOpts = new MqttConnectOptions();
-		// TODO: need to get rid of this by properly setup certificates, keystore, etc.
-		MqttUtils.setUpTrustAllCerts();
-		connOpts.setSocketFactory(SSLContext.getDefault().getSocketFactory());
+		if (isBrokerSecured()) {
+			// TODO: need to get rid of this by properly setup certificates, keystore, etc.
+			MqttUtils.setUpTrustAllCerts();
+			connOpts.setSocketFactory(SSLContext.getDefault().getSocketFactory());
+		}
 		connOpts.setAutomaticReconnect(true);
 		connOpts.setCleanSession(false);
 		return connOpts;
