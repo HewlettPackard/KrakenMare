@@ -6,8 +6,8 @@ export http_proxy=http://grewebcachevip.bastion.europe.hp.com:8080
 export https_proxy=http://grewebcachevip.bastion.europe.hp.com:8080
 
 ## Setup repo
-echo "Mounting repo from 172.16.7.253"
-mkdir -p /opt/cmu/repositories && mount 172.16.7.253:/opt/cmu/repositories /opt/cmu/repositories || exit 1
+echo "Mounting repo from 16.16.184.151"
+mkdir -p /opt/cmu/repositories && mount 16.16.184.151:/opt/cmu/repositories /opt/cmu/repositories || exit 1
 cat << EOF > /etc/yum.repos.d/dvd.repo
 [MyRepo2]
 name=MyRepo2

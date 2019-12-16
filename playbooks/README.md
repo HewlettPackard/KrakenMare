@@ -48,7 +48,7 @@ Default values in vars.yml:
 * proxy : http://web-proxy.corp.hpecorp.net:8080
 * ansible_python_interpreter : '/usr/bin/python3'
 * RHEL_Version: rh8rc4_x86_64
-* iso_server: 172.16.7.253
+* iso_server: 16.16.184.151
 * iso_source_path: /opt/cmu/repositories
 * iso_mount_point : /opt/cmu/repositories
 * docker_compose_version : 1.24.0
