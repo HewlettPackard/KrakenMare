@@ -79,8 +79,9 @@ deploy-master: &deploy-master
     name: u176i109
     url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
   dependencies: []
-  script:
+  before_script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
+  script:
     - bash -x playbooks/setup.sh -sarbd
   only:
     - master
@@ -90,8 +91,7 @@ deploy-master: &deploy-master
 full-rebuild-deploy:
   <<: *deploy-master
   script:
-    - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
     - bash -x playbooks/setup.sh -sarbdF
   only:
     - schedules
-  except:
+  except: []
