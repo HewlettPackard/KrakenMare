@@ -197,7 +197,7 @@ class AgentCommon:
 
           
     # this method takes care of Agent registration
-    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True, encrypt=False):
+    def mqtt_init(self, client_uid, topicList=[], loopForever = False, cleanSession = True, encrypt=True):
         
         self.client = mqtt.Client(str(client_uid), userdata=topicList, clean_session=cleanSession)
         self.client.on_log = self.mqtt_on_log

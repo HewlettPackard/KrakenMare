@@ -354,7 +354,7 @@ class IBswitchSimulator(AgentCommon):
         # start mqtt client
         myLoopForever = False
         myCleanSession = False
-        self.mqtt_init(self.myAgent_uid, self.myAgent_registration_response_topic, myLoopForever, myCleanSession)
+        self.mqtt_init(self.myAgent_uid, self.myAgent_registration_response_topic, myLoopForever, myCleanSession, self.myAgent_mqtt_encryption_enabled)
         
         # register myself
         self.mqtt_registration(self.myAgent_registration_request_topic, self.myRegistrationData)
