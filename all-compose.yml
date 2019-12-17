@@ -455,9 +455,6 @@ services:
       - km-ca-1.crt
     networks:
       - krakenmare
-    secrets:
-      - mosquittosecu.certificate.pem
-      - mosquittosecu.key
 
   redis:
     image: redis:5.0.3
