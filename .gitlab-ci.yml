@@ -84,3 +84,14 @@ deploy-master: &deploy-master
     - bash -x playbooks/setup.sh -sarbd
   only:
     - master
+  except:
+    - schedules
+
+full-rebuild-deploy:
+  <<: *deploy-master
+  script:
+    - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
+    - bash -x playbooks/setup.sh -sarbdF
+  only:
+    - schedules
+  except:

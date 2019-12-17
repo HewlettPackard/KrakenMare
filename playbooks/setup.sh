@@ -16,6 +16,7 @@ unset $deploy;
 unset $proxy;
 unset $setupRegistry;
 unset $restartDocker;
+unset $no_cache
 unset $stop;
 dockerpull="--pull";
 #DEFAULT ARGS
@@ -43,6 +44,7 @@ usage () {
      echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
      echo "-s: to stop the stack"
      echo "-h: to display help"
+     echo "-F: perform a full docker build with --no-cache (do not combine with -f)"
      echo "return code is 0 if all tasks success"
      echo "            is 1 if a task failed "
      echo "            is 2 if there is no registry available"
@@ -63,7 +65,7 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdrfi:Rs" Option
+while getopts "hfapbdrfi:FRs" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
@@ -73,6 +75,7 @@ do
          d     ) deploy=1       ;;
          f     ) dockerpull=""  ;;
          R     ) restartDocker=1;;
+         F     ) no_cache='--no-cache';;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
          s     ) stop=1        ;;
@@ -134,10 +137,9 @@ fi
 compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " -c $file "; done;)
 # Example ../all-compose.yml:../docker-proxy.yml  ====> -c ../all-compose.yml -c ../docker-proxy.yml
 
-
 if [  "$ansible" == "1"  ]; then
     #Build ansible
-    docker build $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
+    docker build $no_cache $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
     
     mkdir -p $KM_HOME/download-cache || exit 1
     
@@ -178,7 +180,7 @@ if [  "$ansible" == "1"  ]; then
 fi
 
 if [ "$build" == "1" ]; then
-    docker-compose build $dockerpull || exit 1
+    docker-compose build $no_cache $dockerpull || exit 1
     docker-compose push || exit 1
 fi
 
