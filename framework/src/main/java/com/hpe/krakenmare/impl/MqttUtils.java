@@ -80,7 +80,9 @@ public class MqttUtils {
 	}
 
 	// hacky method to pass through hostname validation
-	// NEEDS TO EVENTUALLY BE REMOVED
+	// TODO: NEEDS TO EVENTUALLY BE REMOVED
+	// the proper method is likely to import the MQTT broker cert into this JVM trustore
+	// see https://stackoverflow.com/questions/2893819/accept-servers-self-signed-ssl-certificate-in-java-client/2893932#2893932
 	private static void setUpTrustAllCerts() throws GeneralSecurityException {
 		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 			@Override
