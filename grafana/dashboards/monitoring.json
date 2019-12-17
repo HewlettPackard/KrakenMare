@@ -85,19 +85,13 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceUuid",
+          "dimension": "sensorUuid",
           "druidDS": "perfquery",
           "druidMetric": "sensorValue",
           "errors": {
             "aggregators": "You must supply at least one aggregator"
           },
-          "filters": [
-            {
-              "dimension": "sensorName",
-              "type": "selector",
-              "value": "SymbolErrorCounter"
-            }
-          ],
+          "filters": [],
           "hide": false,
           "limit": 9999,
           "queryType": "topN",
@@ -221,19 +215,13 @@
             "metric": ""
           },
           "customGranularity": "ten_second",
-          "dimension": "deviceUuid",
+          "dimension": "sensorUuid",
           "druidDS": "perfquery",
           "druidMetric": "sensorValue",
           "errors": {
             "aggregators": "You must supply at least one aggregator"
           },
-          "filters": [
-            {
-              "dimension": "sensorName",
-              "type": "selector",
-              "value": "PortXmitData"
-            }
-          ],
+          "filters": [],
           "hide": false,
           "limit": 9999,
           "queryType": "topN",

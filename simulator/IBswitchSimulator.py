@@ -233,11 +233,9 @@ class IBswitchSimulator(AgentCommon):
         
         """ Sample data record for a timestamp using the new flat version:
         record = {
-            "uuid": str(self.myAgent_uuid),
             "timestamp": 1570135369000,
             "sensorUuid": "afbfa80d-cd9d-487a-841c-6da12b10c6d0",
             "sensorValue": 0.0,
-            "deviceUuid" : "afbfd80d-cd9d-487a-841c-6da12b10c6d0",
         }
         """
         
@@ -316,14 +314,9 @@ class IBswitchSimulator(AgentCommon):
                     # Assign the simulator values to the record to be serialized
                     for ibmetric in ibmetrics:
                         record = {}
-                        record["agentUuid"] = self.myAgent_uuid
-                        record["agentId"] = self.myAgent_uid
+                        record["timestamp"] = timestamp
                         record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
                         record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
-                        record["timestamp"] = timestamp
-                        record["deviceUuid"] = device_uuid[cmc][switchGUID]
-                        record["sensorName"] = ibmetric
-                        record["deviceId"] = switchGUID
                         #print(record)
                         record_list.append(record)
 

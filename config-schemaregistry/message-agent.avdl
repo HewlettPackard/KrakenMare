@@ -82,29 +82,25 @@ protocol Protocol {
 		@logicalType("timestamp-millis")
 		long timestamp;
 
-		/** Agent UUID */
+		/** Sensor UUID */
 		@logicalType("uuid")
-		string agentUuid;
+		string sensorUuid;
 
-		/** Agent ID */
-		string agentId;
+		/** Sensor value */
+		float sensorValue;
+	}
 
-		/** Device UUID */
-		@logicalType("uuid")
-		string deviceUuid;
-
-		/** Device ID */
-		string deviceId;
+	record SendEventsDruid {
+		/** Timestamp of sensor value, milliseconds since the epoch */
+		@logicalType("timestamp-millis")
+		long timestamp;
 
 		/** Sensor UUID */
 		@logicalType("uuid")
 		string sensorUuid;
 
-		/** Human readable sensor name */
-		string sensorName;
-
-		/** Sensor value */
-		float sensorValue;
+		/** Event text */
+		string sensorEvent;
 	}
 
 }
