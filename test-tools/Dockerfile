@@ -14,9 +14,9 @@ RUN mv /jansson-2.12 /jansson && cd /jansson && autoreconf -fi ; ./configure && 
 RUN cd / && wget --no-check-certificate https://github.com/lloyd/yajl/archive/2.1.0.tar.gz -O - | tar xzf - \
 && mv /yajl-2.1.0 /yajl && cd /yajl && ./configure && make && make install
 
-# Confluent serdes library at top of tree
-# Will be replaced by a version once we settle on that
-RUN cd / && git clone https://github.com/confluentinc/libserdes.git && cd libserdes && ./configure && make && make install
+# Confluent serdes library at version to match Kafka components from Confluent
+RUN cd / && wget --no-check-certificate https://github.com/confluentinc/libserdes/archive/v5.2.0.tar.gz  -O - | tar xzf - \
+&& mv /libserdes-5.2.0 /libserdes && cd /libserdes && ./configure && make && make install
 
 # librdkafa release version 1.1.0
 RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
