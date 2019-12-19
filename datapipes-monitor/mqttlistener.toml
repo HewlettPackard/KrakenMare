@@ -17,7 +17,7 @@ hourstoforget                       = 72.0 # in hours, no msg on a topic for thi
 
 [mqtt_server]
 host      = "mosquitto"     # Name or IP
-port      = 1883            # integer
+port      = 8883            # integer
 keepalive = 30
 
 [influxdb]

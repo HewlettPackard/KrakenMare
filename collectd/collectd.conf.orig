@@ -868,7 +868,7 @@ LoadPlugin rrdtool
 #<Plugin mqtt>
 #	<Publish "name">
 #		Host "localhost"
-#		Port 1883
+#		Port 8883
 #		ClientId "localhost"
 #		User "user"
 #		Password "secret"
@@ -884,7 +884,7 @@ LoadPlugin rrdtool
 #	</Publish>
 #	<Subscribe "name">
 #		Host "localhost"
-#		Port 1883
+#		Port 8883
 #		ClientId "localhost"
 #		User "user"
 #		Password "secret"

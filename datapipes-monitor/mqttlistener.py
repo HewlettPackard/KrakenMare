@@ -510,7 +510,7 @@ if __name__ == '__main__':
             Leclient.on_message = on_message
             print("MQTT Broker : Connecting...")
             Leclient.connect(host=broker_server_host,
-                             port=conf.get('mqtt_server').get('port') or 1883,
+                             port=conf.get('mqtt_server').get('port') or 8883,
                              keepalive=conf.get('mqtt_server').get('keepalive') or 30,
                              bind_address="")
         except Exception as MQC :
