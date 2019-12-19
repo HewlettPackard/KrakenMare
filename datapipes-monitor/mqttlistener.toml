@@ -19,6 +19,9 @@ hourstoforget                       = 72.0 # in hours, no msg on a topic for thi
 host      = "mosquitto"     # Name or IP
 port      = 8883            # integer
 keepalive = 30
+ca_certs  = "/run/secrets/km-ca-1.crt"
+certfile  = "/run/secrets/mosquitto.certificate.pem"
+keyfile   = "/run/secrets/mosquitto.key"
 
 [influxdb]
 ip          = "influxdb"

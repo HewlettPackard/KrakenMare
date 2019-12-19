@@ -96,6 +96,9 @@ if __name__ == '__main__':
     enable_last_seen_message_to_influx  = conf.get('topics_full_hierarchy_by_filters').get('enable_last_seen_message_to_influx') or False
 
     broker_server_host = conf.get('mqtt_server').get('host') or "mosquitto"
+    broker_ca_certs = conf.get('mqtt_server').get('ca_certs') or "/run/secrets/km-ca-1.crt"
+    broker_certfile = conf.get('mqtt_server').get('certfile') or "/run/secrets/mosquitto.certificate.pem"
+    broker_keyfile = conf.get('mqtt_server').get('keyfile') or "/run/secrets/mosquitto.key"
 
     # --------------- The callback for when the client receives a CONNACK response from the server.
     def on_connect(client, userdata, flags, rc):
@@ -509,6 +512,7 @@ if __name__ == '__main__':
             Leclient.on_connect = on_connect
             Leclient.on_message = on_message
             print("MQTT Broker : Connecting...")
+            Leclient.tls_set(ca_certs=broker_ca_certs, certfile=broker_certfile, keyfile=broker_keyfile)
             Leclient.connect(host=broker_server_host,
                              port=conf.get('mqtt_server').get('port') or 8883,
                              keepalive=conf.get('mqtt_server').get('keepalive') or 30,

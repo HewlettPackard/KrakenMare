@@ -505,6 +505,10 @@ services:
     ports:
       - "7575:7575"
     <<: *deploy
+    secrets:
+      - mosquitto.certificate.pem
+      - mosquitto.key
+      - km-ca-1.crt
     networks:
       - krakenmare
 
