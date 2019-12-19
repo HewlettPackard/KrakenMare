@@ -179,14 +179,15 @@ if [  "$ansible" == "1"  ]; then
      
 fi
 
+if [ "$pull" == "1" ]; then
+     # pull registry's content to warm-up cache before build
+     # displays an error message for image not already existing in the registry, which is not a problem
+     docker-compose pull
+fi
+
 if [ "$build" == "1" ]; then
     docker-compose build $no_cache $dockerpull || exit 1
     docker-compose push || exit 1
-fi
-
-if [ "$pull" == "1" ]; then
-     # to only pull registry's content
-     docker-compose pull || exit 1
 fi
 
 if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
