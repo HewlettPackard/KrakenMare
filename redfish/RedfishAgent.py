@@ -280,14 +280,14 @@ class redfishAgent(AgentCommon):
                     sensor_uuid = uuid.UUID(hashlib.md5((str(self.myAgent_uuid) + chassis_name + fan).encode()).hexdigest())
                             
                     record = {}
-                    record["agentUuid"] = self.myAgent_uuid
-                    record["agentId"] = self.myAgent_uid
+                    #record["agentUuid"] = self.myAgent_uuid
+                    #record["agentId"] = self.myAgent_uid
                     record["sensorUuid"] = sensor_uuid
                     record["sensorValue"] = float(rpm)
                     record["timestamp"] = timestamp
-                    record["deviceUuid"] = chassis_uuid
-                    record["sensorName"] = fan
-                    record["deviceId"] = chassis_name
+                    #record["deviceUuid"] = chassis_uuid
+                    #record["sensorName"] = fan
+                    #record["deviceId"] = chassis_name
                     
                     #print(record)
                     record_list.append(record)

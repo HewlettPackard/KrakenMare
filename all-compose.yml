@@ -577,8 +577,8 @@ services:
     secrets:
       - schemaregistry.certificate.pem
       - schemaregistry.key
-      - mosquittosecu.certificate.pem
-      - mosquittosecu.key
+      - mosquitto.certificate.pem
+      - mosquitto.key
       - km-ca-1.crt
 
   config-druid:
