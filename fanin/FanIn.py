@@ -205,9 +205,7 @@ class FanIn(AgentCommon):
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
             "client.id": socket.gethostname() + "topicCheck",
-            "socket.timeout.ms": 10,
-            "error_cb": self.kafka_producer_error_cb,
-            "message.timeout.ms": 10,
+            "error_cb": self.kafka_producer_error_cb
         }
 
         while test == False:
@@ -228,15 +226,12 @@ class FanIn(AgentCommon):
     def kafka_producer_connect(self):
         test = False
 
-        # conf = {'bootstrap.servers': self.bootstrapServerStr,'client.id': socket.gethostname(), 'socket.timeout.ms': 10,
-        #          'error_cb': self.kafka_producer_error_cb, 'message.timeout.ms': 10}
-
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
             "client.id": socket.gethostname(),
-            "socket.timeout.ms": 10,
             "error_cb": self.kafka_producer_error_cb,
-            "message.timeout.ms": 10,
+            "linger.ms": 1000,
+            "message.max.bytes": 256000
         }
 
         while test == False:
