@@ -35,6 +35,8 @@ from agentcommon import AgentCommon
 class FanIn(AgentCommon):
     registered = False
     loggerName = None
+    timet0 = time.time()
+    MsgCount = 0
 
     def __init__(self, configFile, debug, encrypt):
         """
@@ -88,6 +90,7 @@ class FanIn(AgentCommon):
         self.kafka_consumer = None
         
         self.kafka_msg_counter = 0
+        self.kafka_msg_ack_received = 0
         
         super().__init__(configFile, debug)
 
@@ -153,6 +156,14 @@ class FanIn(AgentCommon):
                 
         if message.topic == self.mqttTopicList[0][0]:
             # first topic in config file ("ibswitch")            
+
+            if self.kafka_msg_counter%1000 == 0:
+                deltat   = time.time() - FanIn.timet0
+                deltaMsg = self.kafka_msg_counter - FanIn.MsgCount
+                FanIn.MsgCount = self.kafka_msg_counter
+                FanIn.timet0   = time.time()
+                print(str(self.kafka_msg_counter) + " messages published to Kafka, rate = {:.2f} msg/min".format(60*deltaMsg/deltat))
+            
             try:
                 self.kafka_producer.produce(self.kafkaProducerTopic, message.payload, on_delivery=self.kafka_producer_on_delivery)
                 with self.myFanInGateway_threadLock:
@@ -188,15 +199,18 @@ class FanIn(AgentCommon):
     # Kafka error printer
 
     def kafka_producer_error_cb(self, err):
-        print("error_cb", err)
+        print("KAFKA_PROD_CALLBACK_ERR : {:s}".format(str(err)))
 
     def kafka_producer_on_delivery(self, err, msg):
         if err:
-            print('%% Message failed delivery: %s - to %s [%d] @ %d\n' % (err, msg.topic(), msg.partition(), msg.offset()))
+            print('KAFKA_MESSAGE_CALLBACK_ERR : %% Message failed delivery: %s - to %s [%d] @ %d\n' % (err, msg.topic(), msg.partition(), msg.offset()))
         else:
-            if self.myFanInGateway_debug == True:
+            self.kafka_msg_ack_received += 1
+            if self.kafka_msg_ack_received%500 == 0:
+                print("KAFKA_MESSAGE_CALLBACK : Nb Msg ACK Delivered OK = {:d} <-> {:d} msg sent to producer".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
+            if self.myFanInGateway_debug == True :
                 print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
-    
+
     # connect to Kafka broker as producer to check topic 'myTopic'
     def kafka_check_topic(self, myTopic):
         print("Connecting as kafka consumer to check for topic: " + myTopic)
