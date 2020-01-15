@@ -210,7 +210,10 @@ if [ "$deploy" == "1" ]; then
     ./km-secrets-tool.sh -wcgpd || exit 1
 
     cd ../playbooks || exit 1
-    docker stack deploy $compose_args $project_name || exit 1 
-
+    cmd="docker stack deploy $compose_args $project_name"
+    echo "running..."
+    echo "REGISTRY_FULL_PATH=$REGISTRY_FULL_PATH"
+    echo $cmd
+    eval $cmd || exit 1
 fi
 
