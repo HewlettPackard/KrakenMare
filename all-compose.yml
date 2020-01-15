@@ -323,7 +323,7 @@ services:
       - km-ca-1.crt
       
   fanin:
-    image: ${REGISTRY_FULL_PATH}fanin
+    image: ${REGISTRY_FULL_PATH}fanin:latest
     build:
       context: fanin
       dockerfile: Dockerfile
