@@ -207,7 +207,7 @@ class FanIn(AgentCommon):
         else:
             self.kafka_msg_ack_received += 1
             if self.kafka_msg_ack_received%500 == 0:
-                print("KAFKA_MESSAGE_CALLBACK : Nb Msg ACK Delivered OK = {:d} <-> {:d} msg sent to producer".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
+                print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
             if self.myFanInGateway_debug == True :
                 print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
 
