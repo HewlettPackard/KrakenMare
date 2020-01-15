@@ -19,6 +19,8 @@ import platform
 import io
 import uuid
 import hashlib
+import requests
+import logging
 
 # import special classes
 import paho.mqtt.client as mqtt
@@ -161,6 +163,10 @@ class redfishAgent(AgentCommon):
             simulator = False
             enforceSSL = True
         try:
+
+            redfish.config.TORTILLADEBUG = False
+            requests.packages.urllib3.disable_warnings()
+            redfish.config.CONSOLE_LOGGER_LEVEL = logging.CRITICAL
             redfish_data = redfish.connect(self.myAgent_redfish_ip,
                                         self.myAgent_redfish_acc,
                                         self.myAgent_redfish_pwd,
@@ -232,6 +238,9 @@ class redfishAgent(AgentCommon):
                 
             while not connected:
                 try:
+                    redfish.config.TORTILLADEBUG = False
+                    requests.packages.urllib3.disable_warnings()
+                    redfish.config.CONSOLE_LOGGER_LEVEL = logging.CRITICAL
                     redfish_data = redfish.connect(self.myAgent_redfish_ip,
                                                 self.myAgent_redfish_acc,
                                                 self.myAgent_redfish_pwd,
