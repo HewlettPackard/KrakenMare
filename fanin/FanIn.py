@@ -207,8 +207,8 @@ class FanIn(AgentCommon):
             print('KAFKA_MESSAGE_CALLBACK_ERR : %% Message failed delivery: %s - to %s [%d] @ %d\n' % (err, msg.topic(), msg.partition(), msg.offset()))
         else:
             self.kafka_msg_ack_received += 1
-            if self.kafka_msg_ack_received%500 == 0:
-                print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
+            #if self.kafka_msg_ack_received%500 == 0:
+                #print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
             if self.myFanInGateway_debug == True :
                 print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
 
@@ -281,15 +281,16 @@ class FanIn(AgentCommon):
         mqttSubscriptionTopics=self.mqttTopicList
         
         # start mqtt client
-        myLoopForever = True
+        myLoopForever = False
         myCleanSession = True
         self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics, myLoopForever, myCleanSession, self.myFanIn_mqtt_encryption_enabled)
         
         # start listening to data
         #self.mqtt_subscription()
-        # while True:
-        # 	pass
-        # self.send_data("kafka")
+        while True:
+            time.sleep(1)
+            self.kafka_producer.poll(0)
+            print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
         print("FanIn terminated")
 
 
