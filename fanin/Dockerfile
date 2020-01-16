@@ -1,6 +1,7 @@
 # Create container for fanin using ubuntu 18.04 and build librdkafa with full features
 FROM ubuntu:18.04 as faninbuild
 
+RUN apt-get update && apt-get upgrade -y && apt-get -y install software-properties-common
 RUN apt-get update && apt-get install -y netcat wget python3.7 python3.7-dev
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 RUN apt-get update && apt-get install -y python3-pip
@@ -29,6 +30,7 @@ RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/a
 # Create container for fanin using ubuntu 18.04 and copy over build features as needed
 FROM ubuntu:18.04
 
+RUN apt-get update && apt-get upgrade -y && apt-get -y install software-properties-common
 RUN apt-get update && apt-get install -y netcat wget python3.7 python3.7-dev
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 RUN apt-get update && apt-get install -y python3-pip
