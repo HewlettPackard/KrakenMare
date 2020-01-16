@@ -72,6 +72,7 @@ class IBswitchSimulator(AgentCommon):
         self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
+        self.sendNumberOfMessages = int(self.config.get("Others", "sendNumberOfMessages"))
         self.myDeviceMap = {}
         
         # MQTT setup
@@ -202,7 +203,7 @@ class IBswitchSimulator(AgentCommon):
     def send_data(self):
                
         # counter for send message count
-        i = 1
+        i = 0
 
         # Create a dictionary of the 18 IB metrics names
         ibmetrics = [
@@ -321,6 +322,10 @@ class IBswitchSimulator(AgentCommon):
                         record_list.append(record)
 
                     for eachRecord in record_list:
+                        if self.sendNumberOfMessages == i:
+                            print("All " + str(self.sendNumberOfMessages) + " messages published.")
+                            sys.exit(0)
+                        
                         #print(str(eachRecord))
                         if self.myAgent_debug == True:
                             print(str(i) + ":Publishing via mqtt (topic:%s)" % self.myAgent_send_ts_data_topic)
