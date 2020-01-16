@@ -73,6 +73,7 @@ class IBswitchSimulator(AgentCommon):
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
         self.sendNumberOfMessages = int(self.config.get("Others", "sendNumberOfMessages"))
+        if self.sendNumberOfMessages == '': self.sendNumberOfMessages = -1
         self.myDeviceMap = {}
         
         # MQTT setup
@@ -324,6 +325,7 @@ class IBswitchSimulator(AgentCommon):
                     for eachRecord in record_list:
                         if self.sendNumberOfMessages == i:
                             print("All " + str(self.sendNumberOfMessages) + " messages published.")
+                            self.mqtt_close()
                             sys.exit(0)
                         
                         #print(str(eachRecord))
@@ -344,7 +346,7 @@ class IBswitchSimulator(AgentCommon):
     
     def signal_handler(signal, frame):
         # self is not in parameters. have to comment next line.
-        # self.mqtt_close()
+        #self.mqtt_close()
         sys.exit(0)
     
     # main method of IBswitchSimulator
