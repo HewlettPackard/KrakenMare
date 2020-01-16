@@ -19,6 +19,7 @@ RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro
 COPY RedfishAgent.py RedfishAgent.cfg entrypoint.sh version.py KrakenMareTriplet.py /redfish/
 
 COPY SensorDescriptor/*.json  /redfish/
+COPY start.sh /redfish
 
 WORKDIR /redfish
 ENV PYTHONUNBUFFERED=1

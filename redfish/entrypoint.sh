@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# Wait for all three brokers to be up
-/tmp/wait-for --timeout=240 mosquitto:8883 || exit 1
-/tmp/wait-for --timeout=240 framework:8080 || exit 1
-/tmp/wait-for --timeout=240 schemaregistry:8081 || exit 1
+#container is hot and ready, just start start.sh to do actual work.
 
-cd /redfish
-python3 RedfishAgent.py --debug --encrypt
+echo use: "cd /redfish && start.sh" to actually start the container payload.
 sleep infinity
