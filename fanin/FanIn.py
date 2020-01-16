@@ -35,7 +35,8 @@ from agentcommon import AgentCommon
 class FanIn(AgentCommon):
     registered = False
     loggerName = None
-    timet0 = time.time()
+# All time is in seconds as float. We use time_ns to get highest resolution
+    timet0 = float(time.time_ns())/1000000000
     MsgCount = 0
 
     def __init__(self, configFile, debug, encrypt):
@@ -158,11 +159,11 @@ class FanIn(AgentCommon):
             # first topic in config file ("ibswitch")            
 
             if self.kafka_msg_counter%1000 == 0:
-                deltat   = time.time() - FanIn.timet0
+                deltat   = float(time.time_ns())/1000000000 - FanIn.timet0
                 deltaMsg = self.kafka_msg_counter - FanIn.MsgCount
                 FanIn.MsgCount = self.kafka_msg_counter
-                FanIn.timet0   = time.time()
-                print(str(self.kafka_msg_counter) + " messages published to Kafka, rate = {:.2f} msg/min".format(60*deltaMsg/deltat))
+                FanIn.timet0  = float(time.time_ns())/1000000000
+                print(str(self.kafka_msg_counter) + " messages published to Kafka, rate = {:.2f} msg/sec".format(deltaMsg/deltat))
             
             try:
                 self.kafka_producer.produce(self.kafkaProducerTopic, message.payload, on_delivery=self.kafka_producer_on_delivery)
