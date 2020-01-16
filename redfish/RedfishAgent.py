@@ -318,7 +318,7 @@ class redfishAgent(AgentCommon):
             time.sleep(self.sleepLoopTime)
                   
     
-    def signal_handler(signal, frame):
+    def signal_handler(self, signal, frame):
         self.mqtt_close()
         sys.exit(0)
     

@@ -344,9 +344,8 @@ class IBswitchSimulator(AgentCommon):
             time.sleep(self.sleepLoopTime)
                   
     
-    def signal_handler(signal, frame):
-        # self is not in parameters. have to comment next line.
-        #self.mqtt_close()
+    def signal_handler(self, signal, frame):
+        self.mqtt_close()
         sys.exit(0)
     
     # main method of IBswitchSimulator
