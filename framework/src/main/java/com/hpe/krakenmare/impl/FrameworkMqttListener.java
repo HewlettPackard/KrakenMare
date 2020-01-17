@@ -22,9 +22,9 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 
 	protected final Repository<Agent> repository;
 	protected final IMqttAsyncClient mqtt;
-	protected final Producer<String, byte[]> kafkaProducer;
+	protected final Producer<String, R> kafkaProducer;
 
-	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
+	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, R> kafkaProducer) {
 		this.repository = repository;
 		this.mqtt = mqtt;
 		this.kafkaProducer = kafkaProducer;

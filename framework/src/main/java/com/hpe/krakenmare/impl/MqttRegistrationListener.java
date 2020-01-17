@@ -23,11 +23,11 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttRegistrationListener.class);
 
-	public static void registerNew(FrameworkMqttClient listener, Producer<String, byte[]> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttClient listener, Producer<String, RegisterResponse> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getRegistrationRequestTopic(), new MqttRegistrationListener(agentRepo, listener.getClient(), kafkaProducer));
 	}
 
-	public MqttRegistrationListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
+	public MqttRegistrationListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, RegisterResponse> kafkaProducer) {
 		super(repository, mqtt, kafkaProducer);
 	}
 
@@ -64,7 +64,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "': " + respPayload);
-		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, respPayload);
+		ProducerRecord<String, RegisterResponse> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
 		kafkaProducer.send(record);
 	}
 
