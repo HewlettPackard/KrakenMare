@@ -1,5 +1,7 @@
 package com.hpe.krakenmare.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.avro.Schema;
@@ -38,11 +40,23 @@ public class KafkaUtils {
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
 
-		props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY);
-		props.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, false);
-		props.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, CustomNameStrategy.class);
+		props.putAll(getAvroConfig());
 
 		return new KafkaProducer<>(props);
+	}
+
+	private static Map<String, Object> getAvroConfig() {
+		Map<String, Object> map = new HashMap<>();
+		map.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY);
+		map.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, false);
+		map.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, CustomNameStrategy.class);
+		return map;
+	}
+
+	public static KafkaAvroSerializer getAvroValueSerializer() {
+		KafkaAvroSerializer ser = new KafkaAvroSerializer();
+		ser.configure(getAvroConfig(), false);
+		return ser;
 	}
 
 	public static class CustomNameStrategy extends RecordNameStrategy {

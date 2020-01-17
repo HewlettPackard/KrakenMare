@@ -2,6 +2,7 @@ package com.hpe.krakenmare.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -18,6 +19,8 @@ import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
+
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequest, RegisterResponse> {
 
@@ -59,6 +62,11 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		byte[] respPayload = response.toByteBuffer().array();
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
 		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getUid());
+
+		System.out.println(Arrays.toString(respPayload));
+		KafkaAvroSerializer ser = KafkaUtils.getAvroValueSerializer();
+		respPayload = ser.serialize(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
+		System.out.println(Arrays.toString(respPayload));
 
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
