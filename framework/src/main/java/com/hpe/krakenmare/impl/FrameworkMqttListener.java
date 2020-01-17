@@ -16,15 +16,18 @@ import org.slf4j.LoggerFactory;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
+
 public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R extends SpecificRecordBase> implements IMqttMessageListener {
 
 	final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttListener.class);
 
 	protected final Repository<Agent> repository;
 	protected final IMqttAsyncClient mqtt;
-	protected final Producer<String, R> kafkaProducer;
+	protected final Producer<String, byte[]> kafkaProducer;
+	protected final KafkaAvroSerializer serializer = KafkaUtils.getAvroValueSerializer();
 
-	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, R> kafkaProducer) {
+	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		this.repository = repository;
 		this.mqtt = mqtt;
 		this.kafkaProducer = kafkaProducer;

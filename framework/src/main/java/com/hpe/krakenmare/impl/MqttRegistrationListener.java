@@ -2,7 +2,6 @@ package com.hpe.krakenmare.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -20,17 +19,15 @@ import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
-
 public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequest, RegisterResponse> {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttRegistrationListener.class);
 
-	public static void registerNew(FrameworkMqttClient listener, Producer<String, RegisterResponse> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
+	public static void registerNew(FrameworkMqttClient listener, Producer<String, byte[]> kafkaProducer, Repository<Agent> agentRepo) throws MqttException {
 		listener.addSubscriber(MqttUtils.getRegistrationRequestTopic(), new MqttRegistrationListener(agentRepo, listener.getClient(), kafkaProducer));
 	}
 
-	public MqttRegistrationListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, RegisterResponse> kafkaProducer) {
+	public MqttRegistrationListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		super(repository, mqtt, kafkaProducer);
 	}
 
@@ -59,20 +56,15 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 	@Override
 	void afterProcess(RegisterRequest payload, RegisterResponse response) throws Exception {
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
-		byte[] respPayload = response.toByteBuffer().array();
+		byte[] respPayload = serializer.serialize(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
 		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getUid());
-
-		System.out.println(Arrays.toString(respPayload));
-		KafkaAvroSerializer ser = KafkaUtils.getAvroValueSerializer();
-		respPayload = ser.serialize(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
-		System.out.println(Arrays.toString(respPayload));
 
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "': " + respPayload);
-		ProducerRecord<String, RegisterResponse> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, respPayload);
 		kafkaProducer.send(record);
 	}
 

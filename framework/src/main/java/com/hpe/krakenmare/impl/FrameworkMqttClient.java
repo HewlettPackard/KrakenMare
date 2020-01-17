@@ -21,7 +21,6 @@ public class FrameworkMqttClient {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
-	// clientId has to be constant with setCleanSession(false)
 	final static String clientId = FrameworkMqttClient.class.getSimpleName();
 	final static int qos = 2;
 
