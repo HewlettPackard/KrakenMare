@@ -1,12 +1,15 @@
 package com.hpe.krakenmare.impl;
 
+import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
@@ -84,7 +87,7 @@ public class MqttUtils {
 	// the proper method is likely to import the MQTT broker cert into this JVM trustore
 	// see https://stackoverflow.com/questions/2893819/accept-servers-self-signed-ssl-certificate-in-java-client/2893932#2893932
 	private static void setUpTrustAllCerts() throws GeneralSecurityException {
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+		TrustManager[] trustAllCerts = new TrustManager[] { new X509ExtendedTrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
 				return null;
@@ -96,6 +99,22 @@ public class MqttUtils {
 
 			@Override
 			public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+			}
+
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+			}
+
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
 			}
 		} };
 
