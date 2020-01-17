@@ -159,10 +159,10 @@ class FanIn(AgentCommon):
             # first topic in config file ("ibswitch")            
 
             if self.kafka_msg_counter%1000 == 0:
-                deltat   = float(time.time_ns())/1000000000 - FanIn.timet0
-                deltaMsg = self.kafka_msg_counter - FanIn.MsgCount
-                FanIn.MsgCount = self.kafka_msg_counter
-                FanIn.timet0  = float(time.time_ns())/1000000000
+                deltat   = float(time.time_ns())/1000000000 - self.timet0
+                deltaMsg = self.kafka_msg_counter - self.MsgCount
+                self.MsgCount = self.kafka_msg_counter
+                self.timet0  = float(time.time_ns())/1000000000
                 print(str(self.kafka_msg_counter) + " messages published to Kafka, rate = {:.2f} msg/sec".format(deltaMsg/deltat))
             
             try:
@@ -186,7 +186,7 @@ class FanIn(AgentCommon):
             # NOTE: Since produce() is an asynchronous API this poll() call
             #       will most likely not serve the delivery callback for the
             #       last produce()d message.
-            self.kafka_producer.poll(0)
+            #self.kafka_producer.poll(0)
         else:
             if self.myFanInGateway_debug == True:
                 print("Not ibswitch topic")
