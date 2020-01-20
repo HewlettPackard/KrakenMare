@@ -1,7 +1,6 @@
 package com.hpe.krakenmare.impl;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,6 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 
 	public MqttDeviceListListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		super(repository, mqtt, kafkaProducer);
-	}
-
-	@Override
-	DeviceList fromByteBuffer(ByteBuffer b) throws IOException {
-		return DeviceList.fromByteBuffer(b);
 	}
 
 	@Override

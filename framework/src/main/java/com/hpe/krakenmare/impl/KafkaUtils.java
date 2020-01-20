@@ -18,6 +18,8 @@ import com.google.common.base.Strings;
 import com.hpe.krakenmare.Main;
 
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.subject.RecordNameStrategy;
 
@@ -39,6 +41,9 @@ public class KafkaUtils {
 		props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		// we don't use KafkaAvroSerializer here as *we* do the serialization first, then actually send the bytes[] to Kafka
+		// doing so, we can intercept the serialized bytes[] and send it to MQTT also
+		// props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
 
 		props.putAll(getAvroConfig());
@@ -51,6 +56,8 @@ public class KafkaUtils {
 		map.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY);
 		// auto register schema during tests
 		map.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, SCHEMA_REGISTRY.startsWith(/* AbstractKafkaAvroSerDe.MOCK_URL_PREFIX */ "mock://"));
+		// https://github.com/confluentinc/schema-registry/issues/265
+		map.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 		map.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, CustomNameStrategy.class);
 		return map;
 	}
@@ -59,6 +66,12 @@ public class KafkaUtils {
 		KafkaAvroSerializer ser = new KafkaAvroSerializer();
 		ser.configure(getAvroConfig(), false);
 		return ser;
+	}
+
+	public static KafkaAvroDeserializer getAvroValueDeserializer() {
+		KafkaAvroDeserializer des = new KafkaAvroDeserializer();
+		des.configure(getAvroConfig(), false);
+		return des;
 	}
 
 	public static class CustomNameStrategy extends RecordNameStrategy {

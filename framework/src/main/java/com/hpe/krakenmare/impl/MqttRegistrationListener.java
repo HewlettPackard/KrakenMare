@@ -1,7 +1,5 @@
 package com.hpe.krakenmare.impl;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -36,11 +34,6 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		repository.save(agent);
 		LOG.info("New agent registered: '" + agent.getName() + "', '" + agent.getUuid() + "'");
 		return agent;
-	}
-
-	@Override
-	RegisterRequest fromByteBuffer(ByteBuffer b) throws IOException {
-		return RegisterRequest.fromByteBuffer(b);
 	}
 
 	@Override

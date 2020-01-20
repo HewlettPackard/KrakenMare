@@ -1,7 +1,6 @@
 package com.hpe.krakenmare.agent;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
+import com.hpe.krakenmare.impl.KafkaUtils;
 import com.hpe.krakenmare.impl.MqttUtils;
 import com.hpe.krakenmare.message.agent.DeviceList;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
@@ -29,11 +29,17 @@ import com.hpe.krakenmare.message.manager.DeviceListResponse;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
 import com.hpe.krakenmare.message.manager.SensorUuids;
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
+
 public class MqttAgent extends Agent {
 
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgent.class);
 
 	private final static String NAME = MqttAgent.class.getSimpleName();
+
+	private final KafkaAvroSerializer avroSer = KafkaUtils.getAvroValueSerializer();
+	private final KafkaAvroDeserializer avroDes = KafkaUtils.getAvroValueDeserializer();
 
 	public MqttAgent() {
 		super(-1l,
@@ -57,7 +63,7 @@ public class MqttAgent extends Agent {
 			CountDownLatch registrationLatch = new CountDownLatch(1);
 			mqtt.subscribe(myManagerTopic, (topic, message) -> {
 				LOG.info("Message received on topic '" + topic + "': " + message);
-				RegisterResponse response = RegisterResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
+				RegisterResponse response = (RegisterResponse) avroDes.deserialize(null /* ignored */, message.getPayload());
 				UUID uuid = response.getUuid();
 				setUuid(uuid);
 				LOG.info("UUID received from manager: " + uuid);
@@ -65,9 +71,9 @@ public class MqttAgent extends Agent {
 			});
 
 			RegisterRequest req = new RegisterRequest(getUid(), new Utf8("test-agent"), getName(), new Utf8("A Java based test agent"), false);
-			byte[] payload = req.toByteBuffer().array();
+			byte[] payload = avroSer.serialize(KafkaUtils.AGENT_REGISTRATION_TOPIC, req);
 
-			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");
+			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);
 			mqtt.publish(myAgentTopic, message);
 			LOG.info("Message published");
@@ -97,7 +103,7 @@ public class MqttAgent extends Agent {
 			CountDownLatch registrationLatch = new CountDownLatch(1);
 			mqtt.subscribe(myManagerTopic, (topic, message) -> {
 				LOG.info("Message received on topic '" + topic + "': " + message);
-				DeviceListResponse response = DeviceListResponse.fromByteBuffer(ByteBuffer.wrap(message.getPayload()));
+				DeviceListResponse response = (DeviceListResponse) avroDes.deserialize(null /* ignored */, message.getPayload());
 				LOG.info("Devices UUID received from manager: " + response.getDeviceUuids());
 
 				try {
@@ -143,9 +149,9 @@ public class MqttAgent extends Agent {
 			setDevices(devices);
 
 			DeviceList req = new DeviceList(getUuid(), getDevices());
-			byte[] payload = req.toByteBuffer().array();
+			byte[] payload = avroSer.serialize(KafkaUtils.DEVICE_REGISTRATION_TOPIC, req);
 
-			LOG.info("Publishing message '" + new String(payload) + "' to topic '" + myAgentTopic + "'");
+			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);
 			mqtt.publish(myAgentTopic, message);
 			LOG.info("Message published");
