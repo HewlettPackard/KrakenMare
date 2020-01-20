@@ -49,7 +49,8 @@ public class KafkaUtils {
 	private static Map<String, Object> getAvroConfig() {
 		Map<String, Object> map = new HashMap<>();
 		map.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY);
-		map.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, false);
+		// auto register schema during tests
+		map.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, SCHEMA_REGISTRY.startsWith(/* AbstractKafkaAvroSerDe.MOCK_URL_PREFIX */ "mock://"));
 		map.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, CustomNameStrategy.class);
 		return map;
 	}
