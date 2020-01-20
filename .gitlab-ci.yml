@@ -29,6 +29,7 @@ test-framework:
         -Dredis.server=redis:6379
         -Dmqtt.server=tcp://eclipse-mosquitto:1883
         -Dbootstrap.servers=
+        -Dschema.registry=mock://test
         -P coverage
         test jacoco:report
   - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
