@@ -25,7 +25,6 @@ import logging
 # import special classes
 import paho.mqtt.client as mqtt
 from optparse import OptionParser
-from fastavro import schemaless_writer, schemaless_reader
 from schema_registry.client import SchemaRegistryClient
 from schema_registry.serializers import MessageSerializer
 import redfish
@@ -108,12 +107,8 @@ class redfishAgent(AgentCommon):
         # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name        
         if message.topic == self.myAgent_registration_response_topic[0][0]:
             print("message received: %s " % message.payload)
-            # TO-DO, decoding with schema-registry requires magic byte in message
-            #decode_msg_obj = self.msg_serializer.decode_message(message.payload)
-            #print("registration-result with km UUID: %s" % decode_msg_obj["uuid"])
-            
             r_bytes = io.BytesIO(message.payload)
-            data = schemaless_reader(r_bytes, self.agent_register_response_schema)
+            data = self.msg_serializer.decode_message(r_bytes)
             print("registration-result with KrakenMare UUID: %s" % data["uuid"])
             self.myMQTTregistered = True
             self.myAgent_uuid = data["uuid"]
@@ -134,7 +129,7 @@ class redfishAgent(AgentCommon):
         elif message.topic == self.myDevice_registration_response_topic[0][0]:
             print("message received: %s " % message.payload)
             r_bytes = io.BytesIO(message.payload)
-            data = schemaless_reader(r_bytes, self.device_register_response_schema)
+            data = self.msg_serializer.decode_message(r_bytes)
             self.myDeviceRegistered = True
             
         else:

@@ -18,7 +18,6 @@ import platform
 
 # import special classes
 import paho.mqtt.client as mqtt
-from fastavro import schemaless_writer, schemaless_reader
 
 import io
 import uuid
@@ -239,17 +238,9 @@ class AgentCommon:
             "description": "This is a fine description",
             "useSensorTemplate": False,
         }): 
-               
+
         # publish registration data
-        w_bytes = io.BytesIO()
-
-        schemaless_writer(
-            w_bytes, self.agent_register_request_schema, RegistrationData)
-
-        raw_bytes = w_bytes.getvalue()
-
-        # TO-DO: change to magic byte in Avro message on FM site
-        #raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.agent_register_request_schema_id, RegistrationData)
+        raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.agent_register_request_schema_id, RegistrationData)
 
         # use highest QoS for now
         print("sending registration payload: --%s--" % raw_bytes)
@@ -280,15 +271,10 @@ class AgentCommon:
         result = -1
         while result != mqtt.MQTT_ERR_SUCCESS:
             (result, mid) = self.client.subscribe(deviceMQTTresponseTopic)
-        
+
         # publish registration data
-        w_bytes = io.BytesIO()
+        raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.device_register_request_schema_id, deviceMap)
 
-        schemaless_writer(
-            w_bytes, self.device_register_request_schema, deviceMap)
-
-        raw_bytes = w_bytes.getvalue()
-        
         # use highest QoS for now
         print("sending device/sensor registration payload: --%s--" % raw_bytes)
         self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
