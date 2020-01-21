@@ -451,6 +451,7 @@ services:
       REDIS_SERVER: "redis:6379"
       MQTT_SERVER: "ssl://mosquitto:8883"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
+      SCHEMA_REGISTRY: "https://schemaregistry:8081"
     <<: *deploy
     secrets:
       - mosquitto.certificate.pem
