@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.avro.Schema;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -58,7 +57,7 @@ public class KafkaUtils {
 		map.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, SCHEMA_REGISTRY.startsWith(/* AbstractKafkaAvroSerDe.MOCK_URL_PREFIX */ "mock://"));
 		// https://github.com/confluentinc/schema-registry/issues/265
 		map.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
-		map.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, CustomNameStrategy.class);
+		map.put(AbstractKafkaAvroSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, RecordNameStrategy.class);
 		return map;
 	}
 
@@ -72,13 +71,6 @@ public class KafkaUtils {
 		KafkaAvroDeserializer des = new KafkaAvroDeserializer();
 		des.configure(getAvroConfig(), false);
 		return des;
-	}
-
-	public static class CustomNameStrategy extends RecordNameStrategy {
-		@Override
-		public String subjectName(String topic, boolean isKey, Schema schema) {
-			return super.subjectName(topic, isKey, schema).replace(".", "-"); // see schema registration in schema config container
-		}
 	}
 
 }

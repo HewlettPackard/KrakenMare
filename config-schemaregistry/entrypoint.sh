@@ -10,10 +10,10 @@ done
 
 for schema in *.avsc
 do
-  namespace=`jq -r .namespace < $schema | sed 's/\./-/g'`
+  namespace=`jq -r .namespace < $schema`
   # name=`jq -r .name < $schema | tr '[:upper:]' '[:lower:]'`
   name=`jq -r .name < $schema`
-  topic=`echo $namespace-$name`
+  topic=`echo $namespace.$name`
   if ! java -jar avro-cli-0.2.7.jar validate -s $schema > /dev/null 2>&1 ; then
     echo "$schema fails to validate. Not pushed to schema registry. See below" >&2
     java -jar avro-cli-0.2.7.jar validate -s $schema 

@@ -71,7 +71,7 @@ class AgentCommon:
         self.msg_serializer = MessageSerializer(client)
         
         # TO-DO: schema names could be in config file as list
-        subject = "com-hpe-krakenmare-message-agent-RegisterRequest"
+        subject = "com.hpe.krakenmare.message.agent.RegisterRequest"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -80,7 +80,7 @@ class AgentCommon:
         self.agent_register_request_schema = cg.schema.schema
         self.agent_register_request_schema_id = cg.schema_id
 
-        subject = "com-hpe-krakenmare-message-manager-RegisterResponse"
+        subject = "com.hpe.krakenmare.message.manager.RegisterResponse"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -89,7 +89,7 @@ class AgentCommon:
         self.agent_register_response_schema = cg.schema.schema
         self.agent_register_response_schema_id = cg.schema_id
 
-        subject = "com-hpe-krakenmare-message-agent-SendTimeSeriesDruid"
+        subject = "com.hpe.krakenmare.message.agent.SendTimeSeriesDruid"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -98,7 +98,7 @@ class AgentCommon:
         self.send_time_series_schema = cg.schema.schema
         self.send_time_series_schema_id = cg.schema_id
         
-        subject = "com-hpe-krakenmare-message-agent-DeviceList"
+        subject = "com.hpe.krakenmare.message.agent.DeviceList"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
@@ -107,7 +107,7 @@ class AgentCommon:
         self.device_register_request_schema = cg.schema.schema
         self.device_register_request_schema_id = cg.schema_id
         
-        subject = "com-hpe-krakenmare-message-manager-DeviceListResponse"
+        subject = "com.hpe.krakenmare.message.manager.DeviceListResponse"
         cg = None
         while cg is None:
             cg = client.get_schema(subject)
