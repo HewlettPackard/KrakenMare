@@ -39,7 +39,7 @@ RUN apt-get update && apt-get install -y libavro23 libcurl3-gnutls zlib1g libssl
 COPY --from=faninbuild /tmp/wait-for /tmp/wait-for
 COPY --from=faninbuild /usr/local /usr/local/
 
-RUN pip3 install paho-mqtt confluent-kafka configparser colorlog python-schema-registry-client fastavro
+RUN pip3 install paho-mqtt confluent-kafka configparser colorlog python-schema-registry-client
 
 COPY FanIn.py entrypoint.sh version.py FanIn.cfg KrakenMareLogger.py /fanin/
 

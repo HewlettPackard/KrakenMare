@@ -45,7 +45,7 @@ RUN cd /usr/src && git clone https://github.com/simonwahlgren/avrocat.git && cd 
 
 # Bring in the environment of the simulator so we can play with it
 RUN pip3 install avro-python3
-RUN pip3 install paho-mqtt configparser python-schema-registry-client fastavro confluent-kafka
+RUN pip3 install paho-mqtt configparser python-schema-registry-client confluent-kafka
 
 # mosquitto ppa used because in 18.04 the version is old
 RUN apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
