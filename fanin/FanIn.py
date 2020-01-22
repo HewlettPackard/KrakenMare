@@ -37,6 +37,7 @@ class FanIn(AgentCommon):
     loggerName = None
 # All time is in seconds as float. We use time_ns to get highest resolution
     timet0 = float(time.time_ns())/1000000000
+    startTime = float(time.time_ns())/1000000000
     MsgCount = 0
 
     def __init__(self, configFile, debug, encrypt):
@@ -158,12 +159,14 @@ class FanIn(AgentCommon):
         if message.topic == self.mqttTopicList[0][0]:
             # first topic in config file ("ibswitch")            
 
-            if self.kafka_msg_counter%1000 == 0:
-                deltat   = float(time.time_ns())/1000000000 - self.timet0
-                deltaMsg = self.kafka_msg_counter - self.MsgCount
+            if self.kafka_msg_counter%10000 == 0:
+                deltat    = float(time.time_ns())/1000000000 - self.timet0
+                deltaAllt = float(time.time_ns())/1000000000 - self.startTime
+                deltaMsg  = self.kafka_msg_counter - self.MsgCount
                 self.MsgCount = self.kafka_msg_counter
                 self.timet0  = float(time.time_ns())/1000000000
-                print(str(self.kafka_msg_counter) + " messages published to Kafka, rate = {:.2f} msg/sec".format(deltaMsg/deltat))
+                print(str(self.kafka_msg_counter) + " messages published to Kafka, last 10000 rate = {:.2f} msg/sec".format(deltaMsg/deltat))
+                print(str(self.kafka_msg_counter) + " messages published to Kafka, all time rate = {:.2f} msg/sec".format(self.kafka_msg_counter/deltaAllt))
             
             try:
                 self.kafka_producer.produce(self.kafkaProducerTopic, message.payload, on_delivery=self.kafka_producer_on_delivery)
