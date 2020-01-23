@@ -1,5 +1,6 @@
 package com.hpe.krakenmare.impl;
 
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -51,6 +52,14 @@ public class KafkaUtils {
 	}
 
 	private static Map<String, Object> getAvroConfig() {
+		if (SCHEMA_REGISTRY.startsWith("https://")) {
+			try {
+				MqttUtils.setUpTrustAllCerts();
+			} catch (GeneralSecurityException e) {
+				e.printStackTrace();
+			}
+		}
+
 		Map<String, Object> map = new HashMap<>();
 		map.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY);
 		// auto register schema during tests
