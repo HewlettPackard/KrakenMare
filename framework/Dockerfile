@@ -16,8 +16,6 @@ COPY config-schemaregistry/*.avdl /opt/krakenmare/config-schemaregistry/
 ARG MAVEN_OPTS
 RUN echo "Using MAVEN_OPTS: $MAVEN_OPTS"
 # run a first assembly to cache maven dependencies in the image
-# src/main/resources/velocity-templates/record.vm shall exist or avro-maven-plugin will fail
-COPY framework/src/main/resources/velocity-templates/ /opt/krakenmare/framework/src/main/resources/velocity-templates/
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
 COPY framework/src /opt/krakenmare/framework/src

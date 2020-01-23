@@ -164,7 +164,6 @@
 							<stringType>Utf8</stringType>
 							<fieldVisibility>private</fieldVisibility>
 							<customConversions>org.apache.avro.Conversions$UUIDConversion</customConversions>
-							<templateDirectory>${project.basedir}/src/main/resources/velocity-templates/</templateDirectory>
 						</configuration>
 					</execution>
 				</executions>
