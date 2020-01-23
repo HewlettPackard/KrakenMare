@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hpe.krakenmare.api.Framework;
 import com.hpe.krakenmare.impl.FrameworkImpl;
+import com.hpe.krakenmare.rest.ObjectMapperContextResolver;
 
 public class Main {
 
@@ -69,6 +70,7 @@ public class Main {
 			});
 			// Jackson
 			register(JacksonFeature.class);
+			register(ObjectMapperContextResolver.class);
 		}
 
 	}

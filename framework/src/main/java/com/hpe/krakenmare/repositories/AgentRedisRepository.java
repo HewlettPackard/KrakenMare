@@ -6,17 +6,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.avro.util.Utf8;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
+import com.hpe.krakenmare.rest.ObjectMapperContextResolver;
 
 import redis.clients.jedis.Jedis;
 
@@ -24,19 +21,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	public final static Logger LOG = LoggerFactory.getLogger(AgentRedisRepository.class);
 
-	private final static ObjectMapper MAPPER = new ObjectMapper();
-
-	// mixin to define Utf8(String string) as a JSON creator
-	private static class Utf8Mixin {
-		@JsonCreator
-		public Utf8Mixin(String string) {
-		}
-	}
-
-	static {
-		MAPPER.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-		MAPPER.addMixIn(Utf8.class, Utf8Mixin.class);
-	}
+	private final static ObjectMapper MAPPER = ObjectMapperContextResolver.getCopy();
 
 	static String toJson(Agent agent) {
 		try {
