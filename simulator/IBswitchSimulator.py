@@ -132,10 +132,6 @@ class IBswitchSimulator(AgentCommon):
         # store for final device and sensor map according to InfinibandAgent.json syntax
         deviceMap = {}
         
-        # read device json template
-        with open(self.device_json_dir + "/InfinibandDevice.json", "r") as f:
-                deviceTemplate = json.load(f)
-           
         deviceMap["uuid"] = str(self.myAgent_uuid)
         deviceMap["devices"] = []
         
@@ -149,6 +145,10 @@ class IBswitchSimulator(AgentCommon):
             # For each switch found in the JSON data ,
             # assemble map for each device and store it in myDeviceMap
             for switch in query_data["Switch"]:
+                # read device json template to reset it
+                with open(self.device_json_dir + "/InfinibandDevice.json", "r") as f:
+                    deviceTemplate = json.load(f)
+
                 deviceTemplate["id"] = switch["Node_GUID"]
                 deviceTemplate["name"] = cmc + "-ib"
                 deviceTemplate["type"] = "Infiniband Switch"
