@@ -159,6 +159,9 @@ class FanIn(AgentCommon):
         if message.topic == self.mqttTopicList[0][0]:
             # first topic in config file ("ibswitch")            
 
+            if self.kafka_msg_counter == 0:
+                self.startTime = float(time.time_ns())/1000000000
+            
             if self.kafka_msg_counter%10000 == 0:
                 deltat    = float(time.time_ns())/1000000000 - self.timet0
                 deltaAllt = float(time.time_ns())/1000000000 - self.startTime
