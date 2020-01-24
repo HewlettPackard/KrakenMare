@@ -37,7 +37,6 @@ class FanIn(AgentCommon):
     loggerName = None
 # All time is in seconds as float. We use time_ns to get highest resolution
     timet0 = float(time.time_ns())/1000000000
-    startTime = float(time.time_ns())/1000000000
     MsgCount = 0
 
     def __init__(self, configFile, debug, encrypt):
@@ -158,6 +157,8 @@ class FanIn(AgentCommon):
                 
         if message.topic == self.mqttTopicList[0][0]:
             # first topic in config file ("ibswitch")            
+            if self.kafka_msg_counter == 0:
+                startTime = float(time.time_ns())/1000000000
 
             if self.kafka_msg_counter%10000 == 0:
                 deltat    = float(time.time_ns())/1000000000 - self.timet0
