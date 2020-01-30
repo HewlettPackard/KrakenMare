@@ -7,9 +7,12 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 RUN apt update && apt install -y python3 python3-pip
 RUN pip3 install paho-mqtt configparser python-schema-registry-client
 
-COPY IBswitchSimulator.py version.py IBswitchSimulator.cfg r1i0c-ibswitch r1i1c-ibswitch entrypoint.sh /simulator/
-COPY seed/* /tmp/
-COPY SensorDescriptors/*.json /simulator/
+# this is image MUST be built from the upper directory (docker build -f simulator/Dockerfile .) to access agentcommon.py
+
+COPY ./simulator/IBswitchSimulator.py ./simulator/version.py ./simulator/IBswitchSimulator.cfg ./simulator/r1i0c-ibswitch ./simulator/r1i1c-ibswitch ./simulator/entrypoint.sh /simulator/
+COPY ./agent-python-module/agentcommon.py /simulator/
+COPY ./simulator/seed/* /tmp/
+COPY ./simulator/SensorDescriptors/*.json /simulator/
 
 WORKDIR /simulator
 ENV PYTHONUNBUFFERED=1

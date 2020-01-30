@@ -41,7 +41,8 @@ COPY --from=faninbuild /usr/local /usr/local/
 
 RUN pip3 install paho-mqtt confluent-kafka configparser colorlog python-schema-registry-client
 
-COPY FanIn.py entrypoint.sh version.py FanIn.cfg KrakenMareLogger.py /fanin/
+COPY ./fanin/FanIn.py ./fanin/entrypoint.sh fanin/version.py fanin/FanIn.cfg fanin/KrakenMareLogger.py /fanin/
+COPY ./agent-python-module/agentcommon.py /fanin
 
 WORKDIR /fanin
 ENV PYTHONUNBUFFERED=1

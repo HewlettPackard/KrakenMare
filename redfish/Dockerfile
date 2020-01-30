@@ -16,10 +16,11 @@ RUN wget -qO - http://ftp.mondorescue.org/ubuntu/18.04/python-redfish.pubkey | a
 RUN apt-get update -o Acquire::http::No-Cache=True && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-redfish
 RUN pip3 install paho-mqtt configparser python-schema-registry-client
 
-COPY RedfishAgent.py RedfishAgent.cfg entrypoint.sh version.py KrakenMareTriplet.py /redfish/
+COPY ./redfish/RedfishAgent.py ./redfish/RedfishAgent.cfg ./redfish/entrypoint.sh ./redfish/version.py ./redfish/KrakenMareTriplet.py /redfish/
 
-COPY SensorDescriptor/*.json  /redfish/
-COPY start.sh /redfish
+COPY ./redfish/SensorDescriptor/*.json  /redfish/
+COPY ./redfish/start.sh /redfish
+COPY ./agent-python-module/agentcommon.py /redfish/
 
 WORKDIR /redfish
 ENV PYTHONUNBUFFERED=1

@@ -307,11 +307,9 @@ services:
   simulator:
     image: ${REGISTRY_FULL_PATH}simulator
     build:
-      context: simulator
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: simulator/Dockerfile
     hostname: simulator
-    volumes:
-      - ./agent-python-module/agentcommon.py:/simulator/agentcommon.py
     <<: *deploy
     networks:
       - krakenmare
@@ -325,11 +323,9 @@ services:
   fanin:
     image: ${REGISTRY_FULL_PATH}fanin:latest
     build:
-      context: fanin
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./fanin/Dockerfile
     hostname: fanin
-    volumes:
-      - ./agent-python-module/agentcommon.py:/fanin/agentcommon.py
     <<: *deploy
     networks:
       - krakenmare
@@ -556,15 +552,13 @@ services:
   redfish:
     image: ${REGISTRY_FULL_PATH}redfish
     build:
-      context: redfish
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./redfish/Dockerfile
       args:
         REDFISHIP: "$REDFISHIP"
         REDFISHACC: "$REDFISHACC"
         REDFISHPWD: "$REDFISHPWD"
     hostname: redfish
-    volumes:
-      - ./agent-python-module/agentcommon.py:/redfish/agentcommon.py
     <<: *deploy
     secrets:
       - km-ca-1.crt
