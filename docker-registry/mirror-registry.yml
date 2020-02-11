@@ -5,6 +5,7 @@ services:
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
     volumes:
+      - /tmp/registry-mirror:/var/lib/registry
       - ./config-mirror-registry.yml:/etc/docker/registry/config.yml
     ports: 
       - "5000:5000"
@@ -12,6 +13,8 @@ services:
     image: registry
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+    volumes:
+      - /tmp/registry-private:/var/lib/registry
     ports: 
       - "5001:5000"
-  
+
