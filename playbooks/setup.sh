@@ -18,6 +18,7 @@ unset $setupRegistry;
 unset $restartDocker;
 unset $no_cache
 unset $stop;
+unset $export;
 dockerpull="--pull";
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
@@ -43,8 +44,9 @@ usage () {
      echo "-i: to specify the inventory file (DEFAULT is ${DEFAULT_INVENTORY_FILE})"
      echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
      echo "-s: to stop the stack"
-     echo "-h: to display help"
      echo "-F: perform a full docker build with --no-cache (do not combine with -f)"
+     echo "-h: to display help"
+     echo "-e: export registry content to an archive for later import"
      echo "return code is 0 if all tasks success"
      echo "            is 1 if a task failed "
      echo "            is 2 if there is no registry available"
@@ -65,7 +67,7 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdrfi:FRs" Option
+while getopts "hfapbdrfi:FRse" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
@@ -78,7 +80,8 @@ do
          F     ) no_cache='--no-cache';;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
-         s     ) stop=1        ;;
+         s     ) stop=1         ;;
+         e     ) export=1       ;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
 done
@@ -185,12 +188,21 @@ if [ "$pull" == "1" ]; then
      docker-compose pull
 fi
 
+if [ "$export" == "1" ]; then
+    build=1
+    stop=1
+fi
+
 if [ "$build" == "1" ]; then
     docker-compose build --parallel $no_cache $dockerpull || exit 1
     docker-compose push || exit 1
 fi
 
-if [ "$stop" == "1" ] || [ "$deploy" == "1" ]; then
+if [ "$deploy" == "1" ]; then
+    stop=1
+fi
+
+if [ "$stop" == "1" ] ]; then
     echo "Check if prior krakenmare stack is completely gone"
     docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
     #wait until that the stack is stopped
@@ -215,5 +227,9 @@ if [ "$deploy" == "1" ]; then
     echo "REGISTRY_FULL_PATH=$REGISTRY_FULL_PATH"
     echo $cmd
     eval $cmd || exit 1
+fi
+
+if [ "$export" == "1" ]; then
+    tar -cf registries-content.tar /tmp/registry-mirror /tmp/registry-private
 fi
 

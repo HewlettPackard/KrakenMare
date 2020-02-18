@@ -57,6 +57,7 @@ deploy-dev: &deploy-dev
   script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
     - bash -x playbooks/setup.sh -sarbd
+    - du -sh /tmp/registry-*
   except:
     - master
 
