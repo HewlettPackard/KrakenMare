@@ -47,6 +47,7 @@ usage () {
      echo "-F: perform a full docker build with --no-cache (do not combine with -f)"
      echo "-h: to display help"
      echo "-e: export registry content to an archive for later import"
+     echo "-I: import registry content from an archive (created with -e)"
      echo "return code is 0 if all tasks success"
      echo "            is 1 if a task failed "
      echo "            is 2 if there is no registry available"
@@ -67,21 +68,22 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdrfi:FRse" Option
+while getopts "hfapbdrfi:FRseI" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
          a     ) ansible=1      ;;
          p     ) pull=1         ;;
          b     ) build=1        ;;
-         d     ) deploy=1       ;;
+         d     ) deploy=1; stop=1 ;;
          f     ) dockerpull=""  ;;
          R     ) restartDocker=1;;
          F     ) no_cache='--no-cache';;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
-         r     ) setupRegistry=1; ansible=1     ;;# To setup registry you have to setup the node first
-         s     ) stop=1         ;;
-         e     ) export=1       ;;
+         r     ) setupRegistry=1; ansible=1;;# To setup registry you have to setup the node first
+         s     ) stop=1                    ;;
+         e     ) export=1; build=1; stop=1 ;;#need to build, push and stop the stack before exporting registry content
+         I     ) import=1; pull=1          ;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
 done
@@ -182,15 +184,14 @@ if [  "$ansible" == "1"  ]; then
      
 fi
 
+if [ "$import" == "1" ]; then
+    cd /tmp/ && tar -xf registries-content.tar
+fi
+
 if [ "$pull" == "1" ]; then
      # pull registry's content to warm-up cache before build
      # displays an error message for image not already existing in the registry, which is not a problem
      docker-compose pull
-fi
-
-if [ "$export" == "1" ]; then
-    build=1
-    stop=1
 fi
 
 if [ "$build" == "1" ]; then
@@ -198,11 +199,7 @@ if [ "$build" == "1" ]; then
     docker-compose push || exit 1
 fi
 
-if [ "$deploy" == "1" ]; then
-    stop=1
-fi
-
-if [ "$stop" == "1" ] ]; then
+if [ "$stop" == "1" ]; then
     echo "Check if prior krakenmare stack is completely gone"
     docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
     #wait until that the stack is stopped
@@ -230,6 +227,6 @@ if [ "$deploy" == "1" ]; then
 fi
 
 if [ "$export" == "1" ]; then
-    tar -cf registries-content.tar /tmp/registry-mirror /tmp/registry-private
+    cd /tmp/ && tar -cf registries-content.tar  registry-mirror/ registry-private/
 fi
 
