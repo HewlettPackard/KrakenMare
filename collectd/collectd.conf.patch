@@ -150,7 +150,7 @@
  
  #<Plugin nfs>
  #	ReportV2 false
-@@ -1731,12 +1731,13 @@ LoadPlugin network
+@@ -1731,12 +1731,21 @@ LoadPlugin network
  #	</Node>
  #</Plugin>
  
@@ -161,7 +161,15 @@
 -#  </Topic>
 -#</Plugin>
 +<Plugin write_kafka>
-+  Property "metadata.broker.list" "broker-1:9092"
++  Property "metadata.broker.list" "broker-1:29092,broker-2:29093,broker-3:29094"
++  Property "security.protocol" "SASL_SSL"
++  Property "sasl.mechanisms" "SCRAM-SHA-256"
++  Property "sasl.username" "client"
++  Property "sasl.password" "client-secret"
++  Property "ssl.key.password" "krakenmare"
++  Property "ssl.ca.location" "/run/secrets/km-ca-1.crt"
++  Property "ssl.certificate.location" "/run/secrets/client.certificate.pem"
++  Property "ssl.key.location" "/run/secrets/client.key"
 +  <Topic "collectd">
 +    Format JSON
 +    Key "localhost"

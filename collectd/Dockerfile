@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y bash wget diffutils patch
 # Build deps
 RUN apt-get update && apt-get install -y gcc g++ make \
 	&& apt-get install -y autoconf libtool wget \
-	&& apt-get install -y  gdb valgrind cppcheck build-essential flex bison automake pkg-config
+	&& apt-get install -y  gdb valgrind cppcheck build-essential flex bison automake pkg-config libssl-dev libsasl2-dev
 
 RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
 && mv /librdkafka-1.1.0 /librdkafka && cd /librdkafka && ./configure && make && make install
@@ -23,7 +23,7 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 FROM ubuntu:18.04
 #
 RUN apt-get update && apt-get upgrade -y
-RUN apt update && apt install -y netcat
+RUN apt update && apt install -y netcat libssl1.1 libsasl2-2
 COPY --from=collectdbuild /usr/local/lib/* /usr/local/lib/
 COPY --from=collectdbuild /opt/collectd /opt/collectd
 COPY --from=collectdbuild /tmp/wait-for /tmp/wait-for

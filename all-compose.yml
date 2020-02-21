@@ -477,6 +477,10 @@ services:
       placement:
         constraints:
           - node.labels.injectors == true
+    secrets:
+      - client.certificate.pem
+      - client.key
+      - km-ca-1.crt
     networks:
       - krakenmare
 
