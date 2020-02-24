@@ -92,6 +92,7 @@ deploy-master: &deploy-master
 full-rebuild-deploy:
   <<: *deploy-master
   script:
+    - docker image prune --force
     - bash -x playbooks/setup.sh -sarbdF
   only:
     - schedules
