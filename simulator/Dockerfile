@@ -5,7 +5,7 @@ RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 RUN apt update && apt install -y python3 python3-pip
-RUN pip3 install paho-mqtt configparser python-schema-registry-client
+RUN pip3 install paho-mqtt configparser python-schema-registry-client faust
 
 # this is image MUST be built from the upper directory (docker build -f simulator/Dockerfile .) to access agentcommon.py
 
