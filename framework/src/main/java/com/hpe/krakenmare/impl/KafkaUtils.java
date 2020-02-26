@@ -30,6 +30,7 @@ public class KafkaUtils {
 	public static final String BOOTSTRAP_SERVERS = Main.getProperty("bootstrap.servers");
 	public static final String SCHEMA_REGISTRY = Main.getProperty("schema.registry");
 	public static final String AGENT_REGISTRATION_TOPIC = Main.getProperty("km.agent-registration.kafka.topic");
+	public static final String AGENT_DEREGISTRATION_TOPIC = Main.getProperty("km.agent-deregistration.kafka.topic");
 	public static final String DEVICE_REGISTRATION_TOPIC = Main.getProperty("km.device-registration.kafka.topic");
 
 	public static Producer<String, byte[]> createByteArrayProducer(String clientId) {

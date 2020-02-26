@@ -21,6 +21,7 @@ public class MqttUtils {
 	public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
 	private static final String REGISTRATION_TOPIC = Main.getProperty("km.agent-registration.mqtt.topic");
+	private static final String DEREGISTRATION_TOPIC = Main.getProperty("km.agent-deregistration.mqtt.topic");
 	private static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.mqtt.topic");
 
 	/* Registration */
@@ -60,6 +61,16 @@ public class MqttUtils {
 
 	public static String getSensorListResponseTopic(UUID uuid) {
 		return SENSOR_LIST_TOPIC + "/" + uuid + "/response";
+	}
+
+	/* Deregistration */
+
+	public static String getDeregistrationRequestTopic() {
+		return DEREGISTRATION_TOPIC + "/+/request";
+	}
+
+	public static String getDeregistrationResponseTopic(UUID uuid) {
+		return DEREGISTRATION_TOPIC + "/" + uuid + "/response";
 	}
 
 	public static String getBroker() {
