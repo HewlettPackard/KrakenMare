@@ -34,6 +34,7 @@ public class FrameworkImpl implements Framework {
 
 		MqttRegistrationListener.registerNew(mqttListener, kafkaProducer, agents);
 		MqttDeviceListListener.registerNew(mqttListener, kafkaProducer, agents);
+		MqttDeregistrationListener.registerNew(mqttListener, kafkaProducer, agents);
 	}
 
 	public void stopFramework() {

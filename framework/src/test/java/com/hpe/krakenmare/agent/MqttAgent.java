@@ -23,8 +23,10 @@ import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.KafkaUtils;
 import com.hpe.krakenmare.impl.MqttUtils;
+import com.hpe.krakenmare.message.agent.DeregisterRequest;
 import com.hpe.krakenmare.message.agent.DeviceList;
 import com.hpe.krakenmare.message.agent.RegisterRequest;
+import com.hpe.krakenmare.message.manager.DeregisterResponse;
 import com.hpe.krakenmare.message.manager.DeviceListResponse;
 import com.hpe.krakenmare.message.manager.RegisterResponse;
 import com.hpe.krakenmare.message.manager.SensorUuids;
@@ -150,6 +152,45 @@ public class MqttAgent extends Agent {
 
 			DeviceList req = new DeviceList(getUuid(), getDevices());
 			byte[] payload = avroSer.serialize(KafkaUtils.DEVICE_REGISTRATION_TOPIC, req);
+
+			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
+			MqttMessage message = new MqttMessage(payload);
+			mqtt.publish(myAgentTopic, message);
+			LOG.info("Message published");
+
+			try {
+				// await registration response
+				if (!registrationLatch.await(5, TimeUnit.SECONDS)) {
+					throw new RuntimeException("No response received");
+				}
+			} finally {
+				mqtt.disconnect();
+				LOG.info("Disconnected");
+			}
+		}
+	}
+
+	public void deregister(String broker) throws IOException, InterruptedException, MqttException, GeneralSecurityException {
+		String myAgentTopic = MqttUtils.getDeregistrationRequestTopic(this);
+		String myManagerTopic = MqttUtils.getDeregistrationResponseTopic(this);
+
+		try (MqttClient mqtt = new MqttClient(broker, getUid().toString(), new MemoryPersistence())) {
+			LOG.info("Connecting to broker: " + broker);
+			MqttConnectOptions connOpts = MqttUtils.getConnectOptions();
+			mqtt.connect(connOpts);
+			LOG.info("Connected");
+
+			CountDownLatch registrationLatch = new CountDownLatch(1);
+			mqtt.subscribe(myManagerTopic, (topic, message) -> {
+				LOG.info("Message received on topic '" + topic + "': " + message);
+				DeregisterResponse response = (DeregisterResponse) avroDes.deserialize(null /* ignored */, message.getPayload());
+				boolean success = response.getSuccess();
+				LOG.info("Deregistration " + (success ? "succeed" : "failed"));
+				registrationLatch.countDown();
+			});
+
+			DeregisterRequest req = new DeregisterRequest(getUuid());
+			byte[] payload = avroSer.serialize(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, req);
 
 			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);

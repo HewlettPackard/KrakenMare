@@ -69,6 +69,14 @@ public class MqttUtils {
 		return DEREGISTRATION_TOPIC + "/+/request";
 	}
 
+	public static String getDeregistrationRequestTopic(Agent agent) {
+		return DEREGISTRATION_TOPIC + "/" + agent.getUuid() + "/request";
+	}
+
+	public static String getDeregistrationResponseTopic(Agent agent) {
+		return getDeregistrationResponseTopic(agent.getUuid());
+	}
+
 	public static String getDeregistrationResponseTopic(UUID uuid) {
 		return DEREGISTRATION_TOPIC + "/" + uuid + "/response";
 	}

@@ -1,5 +1,6 @@
 package com.hpe.krakenmare.agent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -13,10 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.krakenmare.api.Repository;
+import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
 import com.hpe.krakenmare.core.Sensor;
 import com.hpe.krakenmare.impl.FrameworkMqttClient;
 import com.hpe.krakenmare.impl.KafkaUtils;
+import com.hpe.krakenmare.impl.MqttDeregistrationListener;
 import com.hpe.krakenmare.impl.MqttDeviceListListener;
 import com.hpe.krakenmare.impl.MqttRegistrationListener;
 import com.hpe.krakenmare.impl.MqttUtils;
@@ -27,6 +31,7 @@ public class MqttAgentTest {
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgentTest.class);
 
 	static String broker = MqttUtils.getBroker();
+	static Repository<Agent> repo;
 
 	@BeforeEach
 	public void setup() throws MqttException, GeneralSecurityException {
@@ -35,17 +40,19 @@ public class MqttAgentTest {
 
 		Producer<String, byte[]> kafkaProducer = KafkaUtils.createByteArrayProducer("framework-manager");
 
-		AgentMemoryRepository agents = new AgentMemoryRepository();
-		MqttRegistrationListener.registerNew(listener, kafkaProducer, agents);
-		MqttDeviceListListener.registerNew(listener, kafkaProducer, agents);
+		repo = new AgentMemoryRepository();
+		MqttRegistrationListener.registerNew(listener, kafkaProducer, repo);
+		MqttDeviceListListener.registerNew(listener, kafkaProducer, repo);
+		MqttDeregistrationListener.registerNew(listener, kafkaProducer, repo);
 	}
 
 	@Test
-	public void registerAgent() throws IOException, InterruptedException, MqttException, GeneralSecurityException {
+	public void agentLifecycle() throws IOException, InterruptedException, MqttException, GeneralSecurityException {
 		MqttAgent agent = new MqttAgent();
 		agent.register(broker);
 		// at the end of registration process, agent UUID must be set
 		assertNotNull(agent.getUuid());
+		assertEquals(1, repo.count());
 
 		agent.registerDevices(broker);
 		for (Device device : agent.getDevices()) {
@@ -54,6 +61,9 @@ public class MqttAgentTest {
 				assertNotEquals(MqttUtils.EMPTY_UUID, sensor.getUuid());
 			}
 		}
+
+		agent.deregister(broker);
+		assertEquals(0, repo.count());
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException, MqttException, GeneralSecurityException {
