@@ -79,6 +79,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public boolean delete(Agent agent) {
+		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		String agentKey = agentDataKey + ":" + agent.getUuid();
 		return jedis.hdel(agentsKey, agentKey) == 1;
 	}

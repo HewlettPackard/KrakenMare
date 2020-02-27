@@ -40,6 +40,7 @@ public class AgentMemoryRepository implements Repository<Agent> {
 
 	@Override
 	public boolean delete(Agent agent) {
+		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		return agents.remove(agent);
 	}
 
