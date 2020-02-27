@@ -46,6 +46,7 @@ public class AgentRedisRepositoryTest {
 		Agent agent = repo.create(newAgent("myAgent"));
 		assertTrue(repo.save(agent));
 		assertEquals(1, repo.getAll().size());
+		assertEquals(1, repo.count());
 	}
 
 	@Test
@@ -57,12 +58,17 @@ public class AgentRedisRepositoryTest {
 		Agent agent3 = repo.create(newAgent("myAgent3"));
 		assertTrue(repo.save(agent3));
 		assertEquals(3, repo.getAll().size());
+		assertEquals(3, repo.count());
 
 		assertTrue(repo.delete(agent2));
 		assertEquals(2, repo.getAll().size());
+		assertEquals(2, repo.count());
+
 
 		assertTrue(repo.delete(agent1));
 		assertEquals(1, repo.getAll().size());
+		assertEquals(1, repo.count());
+
 	}
 
 }

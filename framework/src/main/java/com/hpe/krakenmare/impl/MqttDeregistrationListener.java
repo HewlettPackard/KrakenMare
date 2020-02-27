@@ -31,15 +31,18 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 	// TODO: atomicity? repo.delete(UUID)?
 	private boolean deregisterAgent(UUID agentUuid) {
 		Agent agent = repository.get(agentUuid);
-		repository.delete(agent);
-		LOG.info("Agent deregistered: '" + agent.getName() + "', '" + agent.getUuid() + "'");
-		return true;
+		return repository.delete(agent);
 	}
 
 	@Override
 	DeregisterResponse process(DeregisterRequest payload) {
 		UUID uuid = payload.getUuid();
 		boolean success = deregisterAgent(uuid);
+		if (success) {
+			LOG.info("Agent deregistered: " + uuid);
+		} else {
+			LOG.warn("Unable to deleted agent: " + uuid);
+		}
 		return new DeregisterResponse(uuid, success);
 	}
 
