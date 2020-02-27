@@ -50,7 +50,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 
 		Agent agent = repository.get(agentUuid);
 		agent.setDevices(devices);
-		repository.save(agent);
+		repository.update(agent);
 
 		Map<Utf8, SensorUuids> uuids = new HashMap<>();
 		devices.forEach(d -> {
