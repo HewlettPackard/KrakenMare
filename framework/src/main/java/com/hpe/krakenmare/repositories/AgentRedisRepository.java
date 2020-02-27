@@ -92,7 +92,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public long count() {
-		return jedis.llen(agentsKey);
+		return jedis.hlen(agentsKey);
 	}
 
 	@Override
