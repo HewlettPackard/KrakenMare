@@ -82,8 +82,8 @@ do
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1;;# To setup registry you have to setup the node first
          s     ) stop=1                    ;;
-         e     ) export=1; build=1; stop=1 ;;#need to build, push and stop the stack before exporting registry content
-         I     ) import=1; pull=1          ;;
+         e     ) export=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
+         I     ) import=1; setupRegistry=1; ansible=1; pull=1;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
 done
@@ -143,14 +143,21 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 # Example ../all-compose.yml:../docker-proxy.yml  ====> -c ../all-compose.yml -c ../docker-proxy.yml
 
 if [  "$ansible" == "1"  ]; then
-    #Build ansible
-    docker build $no_cache $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
-    
-    mkdir -p $KM_HOME/download-cache || exit 1
-    
-    #The last task restarts docker and therefore exits brutally, FIXME
-    
-    docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
+
+     if [ "$import" == "1" ]; then
+         cd /tmp/
+         tar -xf registries-content.tar
+         docker import ansible-docker-image.tar ansible
+         cd $KM_HOME
+     else
+         #Build ansible
+         docker build $no_cache $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
+     fi
+
+     mkdir -p $KM_HOME/download-cache || exit 1
+
+     #The last task restarts docker and therefore exits brutally, FIXME
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
@@ -177,10 +184,6 @@ if [  "$ansible" == "1"  ]; then
          #d925eb8ce317        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 
          docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
-
-         if [ "$import" == "1" ]; then
-             cd /tmp/ && tar -xf registries-content.tar
-         fi
 
          mkdir -p /tmp/{registry-mirror,registry-private}
          docker run --rm --volume /tmp/registry-mirror/:/tmp/registry-mirror/ --volume /tmp/registry-private/:/tmp/registry-private/ --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $KM_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100
@@ -227,6 +230,9 @@ if [ "$deploy" == "1" ]; then
 fi
 
 if [ "$export" == "1" ]; then
-    cd /tmp/ && tar -cf registries-content.tar  registry-mirror/ registry-private/
+    cd /tmp/
+    docker save ansible:latest -o ansible-docker-image.tar
+    tar -cf registries-content.tar  ansible-docker-image.tar registry-mirror/ registry-private/
+    cd $KM_HOME
 fi
 
