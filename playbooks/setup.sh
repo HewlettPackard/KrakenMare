@@ -186,7 +186,7 @@ if [ "$pull" == "1" ]; then
 fi
 
 if [ "$build" == "1" ]; then
-    docker-compose build $no_cache $dockerpull || exit 1
+    docker-compose build --parallel $no_cache $dockerpull || exit 1
     docker-compose push || exit 1
 fi
 
