@@ -146,8 +146,10 @@ if [  "$ansible" == "1"  ]; then
 
      if [ "$import" == "1" ]; then
          cd /tmp/
+         echo "Extracting registries content tarball..."
          tar -xf registries-content.tar
-         docker import ansible-docker-image.tar ansible
+         echo "Importing ansible docker image..."
+         docker load -i ansible-docker-image.tar
          cd $KM_HOME
      else
          #Build ansible
