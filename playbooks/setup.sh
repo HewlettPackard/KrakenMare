@@ -148,8 +148,10 @@ if [  "$ansible" == "1"  ]; then
          cd /tmp/
          echo "Extracting registries content tarball..."
          tar -xf registries-content.tar
-         echo "Importing ansible docker image..."
+         echo "Loading ansible docker image..."
          docker load -i ansible-docker-image.tar
+         echo "Loading registry docker image..."
+         docker load -i registry-docker-image.tar
          cd $KM_HOME
      else
          #Build ansible
@@ -233,8 +235,11 @@ fi
 
 if [ "$export" == "1" ]; then
     cd /tmp/
+    echo "Saving ansible docker image..."
     docker save ansible:latest -o ansible-docker-image.tar
-    tar -cf registries-content.tar  ansible-docker-image.tar registry-mirror/ registry-private/
+    echo "Saving registry docker image..."
+    docker save registry -o registry-docker-image.tar
+    tar -cf registries-content.tar  ansible-docker-image.tar registry-docker-image.tar registry-mirror/ registry-private/
     cd $KM_HOME
 fi
 
