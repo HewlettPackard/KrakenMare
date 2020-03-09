@@ -190,7 +190,7 @@ if [  "$ansible" == "1"  ]; then
          docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
 
          mkdir -p /tmp/{registry-mirror,registry-private}
-         docker run --rm --volume /tmp/registry-mirror/:/tmp/registry-mirror/ --volume /tmp/registry-private/:/tmp/registry-private/ --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --volume $KM_HOME/../docker-registry:/docker-registry/  --network=host ansible ansible-playbook /playbooks/launch_registry.yml --forks 100
+         docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
      fi
      
 fi
