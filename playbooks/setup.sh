@@ -189,8 +189,12 @@ if [  "$ansible" == "1"  ]; then
 
          docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
 
-         mkdir -p /tmp/{registry-mirror,registry-private}
-         docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
+         if [ "$import" == "1" ]; then
+              # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
+              docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
+         else
+              docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml -f ../docker-registry/registry-proxy.yml up -d
+         fi
      fi
      
 fi

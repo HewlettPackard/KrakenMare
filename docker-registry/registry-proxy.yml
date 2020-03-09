@@ -1,0 +1,6 @@
+version: '3'
+services:
+  registry-mirror:
+    environment:
+      - REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io
+

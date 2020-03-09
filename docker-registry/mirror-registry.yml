@@ -4,7 +4,6 @@ services:
     image: registry
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
-      - REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io
     volumes:
       - /tmp/registry-mirror:/var/lib/registry
     ports: 
