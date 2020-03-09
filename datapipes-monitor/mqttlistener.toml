@@ -7,7 +7,7 @@ refresh_period_sec  = 29
 enable              = true
 
 [topics_full_hierarchy_by_filters]
-filters_for_topics                  = [ "registration/#" , "device-registration/#" , "ibswitch" , "test/#" ]
+filters_for_topics                  = [ "registration/#" , "device-registration/#" , "ibswitch/#" , "test/#" ]
 enable_message_rates_to_influx      = true
 enable_message_rates_to_webserv     = false
 directory_for_json                  = "./www"

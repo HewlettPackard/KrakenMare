@@ -18,12 +18,19 @@ from multiprocessing import Process, Lock
 import socket
 import inspect
 import threading
+import concurrent.futures
+import signal
+import base64
+import json
+import random
 
 # import special classes
 import uuid
 from confluent_kafka import Producer as KafkaProducer
 from confluent_kafka import Consumer as KafkaConsumer, KafkaError, KafkaException
 from optparse import OptionParser
+from schema_registry.client import SchemaRegistryClient
+from schema_registry.serializers import MessageSerializer
 
 # project imports
 from version import __version__
@@ -35,12 +42,13 @@ from agentcommon import AgentCommon
 class FanIn(AgentCommon):
     registered = False
     loggerName = None
-# All time is in seconds as float. We use time_ns to get highest resolution
-    timet0 = float(time.time_ns())/1000000000
-    startTime = float(time.time_ns())/1000000000
+    # All time is in seconds as float. We use time_ns to get highest resolution
+    timet0 = 0
     MsgCount = 0
 
-    def __init__(self, configFile, debug, encrypt):
+    def __init__(
+        self, configFile, debug, encrypt, TopicForThisProcess=False, batching=False
+    ):
         """
                 Class init
         """
@@ -54,46 +62,67 @@ class FanIn(AgentCommon):
             configFile, ["Daemon", "Logger", "Kafka", "MQTT"]
         )
 
-        # self.logger = self.helperFunctions.setLogger(self.config, self.loggerName)
-
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
         self.kafkaProducerTopic = self.config.get("Kafka", "kafkaProducerTopic")
         self.myFanIn_mqtt_encryption_enabled = encrypt
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
-        
+        self.mqttBatching = batching
+
         # create topic list: [ ("topicName1", int(qos1)),("topicName2", int(qos2)) ]
         #                    [ ("ibswitch", 0), ("redfish", 0)]
-        
-        for item in self.config.get("MQTT", "mqttTopicList").split(","):
-            addValue = []
-            value = item.split(":")
+        addValue = []
+        if TopicForThisProcess != False:
+            # multi-process version
+            value = TopicForThisProcess.split(":")
+            addValue.append(value[0])
+            addValue.append(int(value[1]))
+            self.processID = os.getpid()
+            self.threadID = threading.get_ident()
+            self.logMPMT = "P-{:d} | T-{:d} |".format(self.processID, self.threadID)
+            print(
+                "MULTIPROC {:s} Starting FanIn Gateway in its process for {:s}".format(
+                    self.logMPMT, TopicForThisProcess
+                )
+            )
+            self.mqttTopicList.append(addValue)
+            self.processID = os.getpid()
+            self.myFanInGatewayName = "FanIn-test[" + str(self.processID) + "]"
+        else:
+            # single threaded version
+            value = self.config.get("MQTT", "mqttSingleThreadTopic").split(":")
             addValue.append(value[0])
             addValue.append(int(value[1]))
             self.mqttTopicList.append(addValue)
-            #print(self.mqttTopicList)
-            #print(type(self.mqttTopicList))
-            
-        self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
+            self.myFanInGatewayName = "FanIn-test"
+
+        addValue = []
+        value = self.config.get("MQTT", "mqttRegistrayionResultTopic").split(":")
+        addValue.append(value[0])
+        addValue.append(int(value[1]))
+        self.mqttTopicList.append(addValue)
+
         self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
 
         # Register to the framework
         self.myFanInGateway_id = -1
         self.myFanInGateway_debug = debug
         self.myFanInGateway_uuid = str(uuid.uuid4())
-        self.myFanInGatewayName = "FanIn-test1"
-        
+        self.myFanInGateway_uid = self.myFanInGatewayName + str(
+            random.randint(1, 100001)
+        )
+
         # for thread safe counter
         self.myFanInGateway_threadLock = threading.Lock()
-        
+
         self.myMQTTregistered = False
         self.kafka_producer = None
         self.kafka_consumer = None
-        
-        self.kafka_msg_counter = 0
+
+        self.kafka_msg_counter = 1
         self.kafka_msg_ack_received = 0
-        
+
         super().__init__(configFile, debug)
 
     def resetLogLevel(self, logLevel):
@@ -102,51 +131,6 @@ class FanIn(AgentCommon):
         """
         self.logger = KrakenMareLogger().getLogger(self.loggerName, logLevel)
 
-    def checkConfigurationFile(
-        self, configurationFileFullPath, sectionsToCheck, **options
-    ):
-        """
-                Checks if the submitted.cfg configuration file is found 
-                and contains required sections
-
-                configurationFileFullPath	 - full path to the configuration file (e.g. /home/agent/myConf.cfg)
-                sectionsToCheck			   - list of sections in the configuration file that should be checked for existence 
-        """
-
-        config = configparser.SafeConfigParser()
-
-        if os.path.isfile(configurationFileFullPath) == False:
-            print(
-                "ERROR: the configuration file "
-                + configurationFileFullPath
-                + " is not found"
-            )
-            print("Terminating ...")
-            sys.exit(2)
-
-        try:
-            config.read(configurationFileFullPath)
-        except Exception as e:
-            print(
-                "ERROR: Could not read the configuration file "
-                + configurationFileFullPath
-            )
-            print("Detailed error description: "), e
-            print("Terminating ...")
-            sys.exit(2)
-
-        if sectionsToCheck != None:
-            for section in sectionsToCheck:
-                if not config.has_section(section):
-                    print(
-                        "ERROR: the configuration file is not correctly set - it does not contain required section: "
-                        + section
-                    )
-                    print("Terminating ...")
-                    sys.exit(2)
-
-        return config
-
     #######################################################################################
     # MQTT agent methods
     # sends MQTT messages to Kafka (in batches)
@@ -154,45 +138,61 @@ class FanIn(AgentCommon):
     # TODO: have processing method per client type OR topic for each sensor type to convert messages?
     def mqtt_on_message(self, client, userdata, message):
         if self.myFanInGateway_debug == True:
-                print("On mqtt message start")
-                
-        if message.topic == self.mqttTopicList[0][0]:
-            # first topic in config file ("ibswitch")            
+            print("mqtt_on_message start")
 
-            if self.kafka_msg_counter == 0:
-                self.startTime = float(time.time_ns())/1000000000
-            
-            if self.kafka_msg_counter%10000 == 0:
-                deltat    = float(time.time_ns())/1000000000 - self.timet0
-                deltaAllt = float(time.time_ns())/1000000000 - self.startTime
-                deltaMsg  = self.kafka_msg_counter - self.MsgCount
-                self.MsgCount = self.kafka_msg_counter
-                self.timet0  = float(time.time_ns())/1000000000
-                print(str(self.kafka_msg_counter) + " messages published to Kafka, last 10000 rate = {:.2f} msg/sec".format(deltaMsg/deltat))
-                print(str(self.kafka_msg_counter) + " messages published to Kafka, all time rate = {:.2f} msg/sec".format(self.kafka_msg_counter/deltaAllt))
-            
+        query_data = []
+
+        if message.topic == self.mqttTopicList[0][0]:
+
+            if self.timet0 == 0:
+                self.timet0 = time.time_ns() / 1000000000
+
             try:
-                self.kafka_producer.produce(self.kafkaProducerTopic, message.payload, on_delivery=self.kafka_producer_on_delivery)
-                with self.myFanInGateway_threadLock:
-                    self.kafka_msg_counter += 1
-                
+                if self.mqttBatching == True:
+                    self.kafka_producer.produce(
+                        self.kafkaProducerTopic,
+                        message.payload,
+                        on_delivery=self.kafka_producer_on_delivery,
+                    )
+
+                else:
+                    self.kafka_producer.produce(
+                        self.kafkaProducerTopic,
+                        message.payload,
+                        on_delivery=self.kafka_producer_on_delivery,
+                    )
+
+                self.kafka_msg_counter += 1
+
                 if self.myFanInGateway_debug == True:
                     print(str(self.kafka_msg_counter) + ":published to Kafka")
-                
-                if self.kafka_msg_counter%1000 == 0:
-                    print(str(self.kafka_msg_counter) + " messages published to Kafka")
-                    
+
+                if self.kafka_msg_counter % 1000 == 0:
+                    deltat = time.time_ns() / 1000000000 - self.timet0
+                    deltaMsg = self.kafka_msg_counter - self.MsgCount
+                    self.MsgCount = self.kafka_msg_counter
+                    self.timet0 = time.time_ns() / 1000000000
+                    logMPMT = "Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
+                        os.getpid(), threading.get_ident(), str(message.topic)
+                    )
+                    print(
+                        logMPMT
+                        + " | "
+                        + str(self.kafka_msg_counter)
+                        + " messages published to Kafka, rate = {:.2f} msg/sec".format(
+                            deltaMsg / deltat
+                        )
+                    )
+
             except BufferError as e1:
-                print('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %len(self.kafka_producer))
+                print(
+                    "%% Local producer queue is full (%d messages awaiting delivery): try again\n"
+                    % len(self.kafka_producer)
+                )
             except KafkaException as e2:
                 print("MQTT message not published to Kafka! Cause is ERROR:")
                 print(e2)
-            
-            # Serve delivery callback queue.
-            # NOTE: Since produce() is an asynchronous API this poll() call
-            #       will most likely not serve the delivery callback for the
-            #       last produce()d message.
-            #self.kafka_producer.poll(0)
+
         else:
             if self.myFanInGateway_debug == True:
                 print("Not ibswitch topic")
@@ -204,19 +204,23 @@ class FanIn(AgentCommon):
     # Kafka agent methods
 
     # Kafka error printer
-
     def kafka_producer_error_cb(self, err):
-        print("KAFKA_PROD_CALLBACK_ERR : {:s}".format(str(err)))
+        logMPMT = "P-{:d} | T-{:d} |".format(os.getpid(), threading.get_ident())
+        print("{:s} KAFKA_PROD_CALLBACK_ERR : {:s}".format(logMPMT, str(err)))
 
     def kafka_producer_on_delivery(self, err, msg):
         if err:
-            print('KAFKA_MESSAGE_CALLBACK_ERR : %% Message failed delivery: %s - to %s [%d] @ %d\n' % (err, msg.topic(), msg.partition(), msg.offset()))
+            print(
+                "KAFKA_MESSAGE_CALLBACK_ERR : %% Message failed delivery: %s - to %s [%s] @ %s\n"
+                % (err, msg.topic(), str(msg.partition()), str(msg.offset()))
+            )
         else:
             self.kafka_msg_ack_received += 1
-            #if self.kafka_msg_ack_received%500 == 0:
-                #print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
-            if self.myFanInGateway_debug == True :
-                print('%% Message delivered to %s [%d] @ %d\n' % (msg.topic(), msg.partition(), msg.offset()))
+            if self.myFanInGateway_debug == True:
+                print(
+                    "%% Message delivered to %s [%d] @ %d\n"
+                    % (msg.topic(), msg.partition(), msg.offset())
+                )
 
     # connect to Kafka broker as producer to check topic 'myTopic'
     def kafka_check_topic(self, myTopic):
@@ -226,7 +230,7 @@ class FanIn(AgentCommon):
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
             "client.id": socket.gethostname() + "topicCheck",
-            "error_cb": self.kafka_producer_error_cb
+            "error_cb": self.kafka_producer_error_cb,
         }
 
         while test == False:
@@ -241,7 +245,7 @@ class FanIn(AgentCommon):
             except KafkaException as e:
                 # print(e.args[0])
                 print("waiting for " + myTopic + " topic...")
-                
+
     # connect to Kafka broker as producer
 
     def kafka_producer_connect(self):
@@ -252,7 +256,7 @@ class FanIn(AgentCommon):
             "client.id": socket.gethostname(),
             "error_cb": self.kafka_producer_error_cb,
             "linger.ms": 1000,
-            "message.max.bytes": 256000
+            "message.max.bytes": 256000,
         }
 
         while test == False:
@@ -268,10 +272,19 @@ class FanIn(AgentCommon):
                 print(e.args[0])
                 print("waiting for Kafka brokers..." + self.bootstrapServerStr)
 
-        print(self.__class__.__name__ + "." + inspect.currentframe().f_code.co_name + ": producer connected")
+        print(
+            self.__class__.__name__
+            + "."
+            + inspect.currentframe().f_code.co_name
+            + ": producer connected"
+        )
 
     # END Kafka agent methods
     #######################################################################################
+
+    def signal_handler(self, signal, frame):
+        self.mqtt_close()
+        sys.exit(0)
 
     # main method of FanIn
     def run(self):
@@ -283,20 +296,31 @@ class FanIn(AgentCommon):
         self.kafka_producer_connect()
         # TODO: should be own process via process class (from multiprocessing import Process)
         # generate list of mqtt topics to subscribe, used in initial connection and to re-subscribe on re-connect
-        
-        mqttSubscriptionTopics=self.mqttTopicList
-        
+
+        mqttSubscriptionTopics = self.mqttTopicList
+        print("MQTT topic list:" + str(self.mqttTopicList))
+
         # start mqtt client
         myLoopForever = False
         myCleanSession = True
-        self.mqtt_init(self.myFanInGateway_uuid, mqttSubscriptionTopics, myLoopForever, myCleanSession, self.myFanIn_mqtt_encryption_enabled)
-        
+        self.mqtt_init(
+            self.myFanInGateway_uuid,
+            mqttSubscriptionTopics,
+            myLoopForever,
+            myCleanSession,
+            self.myFanIn_mqtt_encryption_enabled,
+        )
+
         # start listening to data
-        #self.mqtt_subscription()
+        # self.mqtt_subscription()
+        regularLog = 300
         while True:
-            time.sleep(1)
+            time.sleep(0.05)
             self.kafka_producer.poll(0)
-            print("KAFKA_MESSAGE_CALLBACK : num msg ACKed by KAFKA = {:d} of {:d} MQTT msg received and sent to KAFKA".format(self.kafka_msg_ack_received, self.kafka_msg_counter))
+            regularLog -= 1
+            if regularLog <= 0:
+                regularLog = 300
+        self.mqtt_close
         print("FanIn terminated")
 
 
@@ -304,6 +328,8 @@ class FanIn(AgentCommon):
 
 
 def main():
+    topics_list = []
+
     usage = "usage: %s " % sys.argv[0]
     parser = OptionParser(usage=usage, version=__version__)
 
@@ -322,6 +348,19 @@ def main():
         help="specify this option in order to run in debug mode",
     )
     parser.add_option(
+        "--batching",
+        action="store_true",
+        default=False,
+        dest="batching",
+        help="specify this option in order to enable MQTT batch processing",
+    )
+    parser.add_option(
+        "--numberOfTopic",
+        dest="numberOfTopic",
+        default=False,
+        help="specify this option in order to publish to multiple topics (# of topics (need to be able to divide 16 by this,e.g. --numberOfTopic=2), defaults to 1",
+    )
+    parser.add_option(
         "--logLevel",
         dest="logLevel",
         help="specify the logger level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
@@ -331,12 +370,72 @@ def main():
 
     option_dict = vars(options)
 
-    myFanIn = FanIn("FanIn.cfg", debug=option_dict["debug"], encrypt=option_dict["encrypt"])
+    if options.numberOfTopic:
+        numberOfMqttTopics = int(option_dict["numberOfTopic"])
+    else:
+        numberOfMqttTopics = 1
 
-    if options.logLevel:
-        myFanIn.resetLogLevel(options.logLevel)
+    if numberOfMqttTopics > 1:
+        print("MULTIPROC-MAIN - Starting")
 
-    myFanIn.run()
+        config = configparser.ConfigParser()
+        config.read("FanIn.cfg")
+        rootTopic = config.get("MQTT", "mqttMultiProcessRootTopic")
+        rootTopicQOS = config.get("MQTT", "mqttMultiProcessTopicQOS")
+
+        i = 0
+        while i < numberOfMqttTopics:
+            topics_list.append(rootTopic + "/" + str(i) + ":" + str(rootTopicQOS))
+            i += 1
+
+        def fanin_mp_launcher(
+            debugP=False, encryptP=False, topic_to_listen="", batchingP=False
+        ):
+            myFanInMP = FanIn(
+                "FanIn.cfg",
+                debug=debugP,
+                encrypt=encryptP,
+                TopicForThisProcess=str(topic_to_listen),
+                batching=batchingP,
+            )
+            signal.signal(signal.SIGINT, myFanInMP.signal_handler)
+            myFanInMP.run()
+
+        print("MULTIPROC-MAIN - List of topics = {:s}".format(str(topics_list)))
+        for onetopic in topics_list:
+            print(
+                "MULTIPROC-MAIN - Forking FanIn Gateway process for {:s}".format(
+                    onetopic
+                )
+            )
+            NewP = Process(
+                target=fanin_mp_launcher,
+                kwargs={
+                    "debugP": option_dict["debug"],
+                    "encryptP": option_dict["encrypt"],
+                    "topic_to_listen": onetopic,
+                    "batchingP": option_dict["batching"],
+                },
+            )
+            NewP.start()
+            time.sleep(2)
+
+        print(
+            "MULTIPROC-MAIN - All processes launched, now main process will wait forever as Signals across Processes & threads is not handled."
+        )
+    else:
+        myFanIn = FanIn(
+            "FanIn.cfg",
+            debug=option_dict["debug"],
+            encrypt=option_dict["encrypt"],
+            batching=option_dict["batching"],
+        )
+        signal.signal(signal.SIGINT, myFanIn.signal_handler)
+
+        if options.logLevel:
+            myFanIn.resetLogLevel(options.logLevel)
+
+        myFanIn.run()
 
 
 if __name__ == "__main__":

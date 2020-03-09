@@ -79,7 +79,6 @@ protocol Protocol {
 
 	record SendTimeSeriesDruid {
 		/** Timestamp of sensor value, milliseconds since the epoch */
-		@logicalType("timestamp-millis")
 		long timestamp;
 
 		/** Sensor UUID */
@@ -101,6 +100,11 @@ protocol Protocol {
 
 		/** Event text */
 		string sensorEvent;
+	}
+
+	record SendTimeSeriesDruidArray {
+		/** Array of SendTimeSeriesDruid records  */
+    array<SendTimeSeriesDruid> tripletBatch;
 	}
 
 }
