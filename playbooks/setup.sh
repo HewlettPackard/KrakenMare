@@ -130,11 +130,10 @@ echo "$r"
 if [ ! $r -eq 0 ]; then
     wget -q --dns-timeout=5 --timeout=5 autocache.hpecorp.net -O /dev/null
     if [ $? -eq 0 ]; then
-	export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
-	echo "HPE proxy USED..."
+        export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
+        echo "HPE proxy USED..."
     else
-	echo "network connectivity issue..."
-	exit 1
+        echo "network connectivity issue..."
     fi
 fi
 
