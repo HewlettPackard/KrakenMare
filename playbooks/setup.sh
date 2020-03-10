@@ -82,7 +82,7 @@ do
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1;;# To setup registry you have to setup the node first
          s     ) stop=1                    ;;
-         e     ) export=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
+         e     ) export=1; setupRegistry=1; ansible=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
          I     ) import=1; setupRegistry=1; ansible=1; pull=1;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
