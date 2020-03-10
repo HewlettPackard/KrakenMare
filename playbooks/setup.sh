@@ -60,10 +60,10 @@ registry_content () {
      echo $registry will be used as registry node
      
      echo -n "[info] $registry catalog content on mirror registry (can be void if not running):"
-     curl --max-time 3 $registry:5001/v2/_catalog 2> /dev/null
+     curl --max-time 3 $registry:5000/v2/_catalog 2> /dev/null
      echo ""
      echo -n "[info] $registry catalog content on private registry (can be void if not running):"
-     curl --max-time 3 $registry:5000/v2/_catalog 2> /dev/null
+     curl --max-time 3 $registry:5001/v2/_catalog 2> /dev/null
      echo ""
 }
 
@@ -242,6 +242,7 @@ if [ "$export" == "1" ]; then
     docker save ansible:latest -o ansible-docker-image.tar
     echo "Saving registry docker image..."
     docker save registry -o registry-docker-image.tar
+    echo "Exporting registries content..."
     tar -cf registries-content.tar  ansible-docker-image.tar registry-docker-image.tar registry-mirror/ registry-private/
     cd $KM_HOME
 fi
