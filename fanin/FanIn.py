@@ -147,51 +147,53 @@ class FanIn(AgentCommon):
             if self.timet0 == 0:
                 self.timet0 = time.time_ns() / 1000000000
 
-            try:
-                if self.mqttBatching == True:
+            if self.mqttBatching == True:
+                query_data = self.msg_serializer.decode_message(message.payload)
+
+            else:
+                query_data.append(message.payload)
+
+            for data in query_data["tripletBatch"]:
+                try:
+                    raw_bytes = self.msg_serializer.encode_record_with_schema_id(
+                        self.send_time_series_schema_id, data
+                    )
                     self.kafka_producer.produce(
                         self.kafkaProducerTopic,
-                        message.payload,
+                        raw_bytes,
                         on_delivery=self.kafka_producer_on_delivery,
                     )
+                    self.kafka_msg_counter += 1
 
-                else:
-                    self.kafka_producer.produce(
-                        self.kafkaProducerTopic,
-                        message.payload,
-                        on_delivery=self.kafka_producer_on_delivery,
-                    )
+                    if self.myFanInGateway_debug == True:
+                        print(str(self.kafka_msg_counter) + ":published to Kafka")
 
-                self.kafka_msg_counter += 1
-
-                if self.myFanInGateway_debug == True:
-                    print(str(self.kafka_msg_counter) + ":published to Kafka")
-
-                if self.kafka_msg_counter % 1000 == 0:
-                    deltat = time.time_ns() / 1000000000 - self.timet0
-                    deltaMsg = self.kafka_msg_counter - self.MsgCount
-                    self.MsgCount = self.kafka_msg_counter
-                    self.timet0 = time.time_ns() / 1000000000
-                    logMPMT = "Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
-                        os.getpid(), threading.get_ident(), str(message.topic)
-                    )
-                    print(
-                        logMPMT
-                        + " | "
-                        + str(self.kafka_msg_counter)
-                        + " messages published to Kafka, rate = {:.2f} msg/sec".format(
-                            deltaMsg / deltat
+                    if self.kafka_msg_counter % 1000 == 0:
+                        deltat = time.time_ns() / 1000000000 - self.timet0
+                        deltaMsg = self.kafka_msg_counter - self.MsgCount
+                        self.MsgCount = self.kafka_msg_counter
+                        self.timet0 = time.time_ns() / 1000000000
+                        logMPMT = "Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
+                            os.getpid(), threading.get_ident(), str(message.topic)
                         )
-                    )
+                        print(
+                            logMPMT
+                            + " | "
+                            + str(self.kafka_msg_counter)
+                            + " messages published to Kafka, rate = {:.2f} msg/sec".format(
+                                deltaMsg / deltat
+                            )
+                        )
 
-            except BufferError as e1:
-                print(
-                    "%% Local producer queue is full (%d messages awaiting delivery): try again\n"
-                    % len(self.kafka_producer)
-                )
-            except KafkaException as e2:
-                print("MQTT message not published to Kafka! Cause is ERROR:")
-                print(e2)
+                except BufferError as e1:
+                    print(
+                        "%% Local producer queue is full (%d messages awaiting delivery): try again\n"
+                        % len(self.kafka_producer)
+                    )
+                    print(e1)
+                except KafkaException as e2:
+                    print("MQTT message not published to Kafka! Cause is ERROR:")
+                    print(e2)
 
         else:
             if self.myFanInGateway_debug == True:
