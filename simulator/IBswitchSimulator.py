@@ -128,7 +128,12 @@ class IBswitchSimulator(AgentCommon):
             self.myMQTTregistered = True
             self.myAgent_uuid = data["uuid"]
             
-            self.myAgent_deregistration_request_topic = "agent-deregistration/" + str(self.myAgent_uuid) + "/request"
+            # create agent deregistration request topic list with one entry [("topic name", qos)]
+            self.myAgent_deregistration_request_topic = []
+            myAgent_deregistration_request_topic = []
+            myAgent_deregistration_request_topic.append("agent-deregistration/" + str(self.myAgent_uuid) + "/request")
+            myAgent_deregistration_request_topic.append(2)
+            self.myAgent_deregistration_request_topic.append(myAgent_deregistration_request_topic)
             
             self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
             

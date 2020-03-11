@@ -415,7 +415,7 @@ class AgentCommon:
                     raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_druid_array_id, myMQTT_ts_data)
                     self.mqtt_send_byte_batch_avro_ts_msg("{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes)
                 
-                self.mqtt_deregistration(self.myAgent_deregistration_response_topic[0], uuid)
+                self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
                 self.mqtt_close()
                 sys.exit(0)
             
