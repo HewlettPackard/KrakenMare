@@ -258,7 +258,7 @@ class FanIn(AgentCommon):
             "client.id": socket.gethostname(),
             "error_cb": self.kafka_producer_error_cb,
             "linger.ms": 1000,
-            "message.max.bytes": 256000,
+            "message.max.bytes": 2560000,
         }
 
         while test == False:
