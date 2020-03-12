@@ -124,7 +124,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.device_register_request_schema = cg.schema.schema
         self.device_register_request_schema_id = cg.schema_id
 
@@ -394,12 +393,11 @@ class AgentCommon:
     def mqtt_send_byte_batch_avro_ts_msg(self, topic, raw_bytes):
         self.client.publish(topic, raw_bytes)
     
-    def mqtt_send_tripplet_batch(self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid):
+    def mqtt_send_tripplet_batch(self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0):
         self.myByteBatchSize = byteBatchSize
         
         for eachRecord in record_list:
             if sendNumberOfMessages == self.myMessageCounter:
-                print("All " + str(sendNumberOfMessages) + " messages published.")
                 
                 #publish any left over messages
                 if byteBatchSize > 0:
@@ -408,6 +406,10 @@ class AgentCommon:
                     }
                     raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_druid_array_id, myMQTT_ts_data)
                     self.mqtt_send_byte_batch_avro_ts_msg("{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes)
+
+                totaltime = time.time() - timet0
+                rate = sendNumberOfMessages/totaltime
+                print("All " + str(sendNumberOfMessages) + " messages published. Total time " + str(totaltime) + ". Rate " + str(rate))
                 
                 self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
                 self.mqtt_close()

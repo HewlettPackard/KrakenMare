@@ -333,9 +333,8 @@ class IBswitchSimulator(AgentCommon):
 
         switchSimulatorSeedMap = self.seed_simulator_map()
                 
-        #wait for fanin-gateway
-        time.sleep(10)
-        
+        # baremetal nodes have python 3.6 hence we don't have time_ns. Here time is a floating point number
+        self.timet0 = time.time()
         # Infinite loop
         while True:
             # read JSON data describing switches in the IRU
@@ -399,7 +398,7 @@ class IBswitchSimulator(AgentCommon):
                         # print(record)
                         record_list.append(record)
                         
-                    self.mqtt_send_tripplet_batch(self.myAgent_send_ts_data_topic, record_list, self.sendNumberOfMessages, self.batch_size, self.myAgent_uuid)
+                    self.mqtt_send_tripplet_batch(self.myAgent_send_ts_data_topic, record_list, self.sendNumberOfMessages, self.batch_size, self.myAgent_uuid, self.timet0)
                     
             # Infinite loop
             time.sleep(self.sleepLoopTime)
