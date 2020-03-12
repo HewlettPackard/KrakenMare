@@ -314,7 +314,7 @@ class AgentCommon:
 
         while not self.myMQTTregistered:
             print("waiting for agent registration result...")
-            time.sleep(1)
+            time.sleep(0.1)
             """
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
@@ -344,7 +344,7 @@ class AgentCommon:
 
         while not self.myMQTTderegistered:
             print("waiting for agent deregistration result...")
-            time.sleep(1)
+            time.sleep(0.1)
             '''
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
@@ -377,7 +377,7 @@ class AgentCommon:
 
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")
-            time.sleep(1)
+            time.sleep(0.1)
             if not self.myDeviceRegistered:
                 print("re-sending device/sensor registration payload")
                 self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)

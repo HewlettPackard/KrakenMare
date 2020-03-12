@@ -241,7 +241,7 @@ class FanIn(AgentCommon):
         }
 
         while test == False:
-            time.sleep(1)
+            time.sleep(0.1)
             print("waiting for kafka producer to connect")
 
             try:
@@ -269,7 +269,7 @@ class FanIn(AgentCommon):
         }
 
         while test == False:
-            time.sleep(1)
+            time.sleep(0.1)
             print("waiting for kafka producer to connect")
 
             try:
