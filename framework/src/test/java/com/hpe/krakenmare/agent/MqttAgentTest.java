@@ -67,7 +67,10 @@ public class MqttAgentTest {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException, MqttException, GeneralSecurityException {
-		new MqttAgent().register(broker);
+		MqttAgent agent = new MqttAgent();
+		agent.register(broker);
+		agent.registerDevices(broker);
+		agent.deregister(broker);
 	}
 
 }
