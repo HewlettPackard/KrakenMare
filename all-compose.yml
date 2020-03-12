@@ -244,7 +244,12 @@ services:
       - "8883:8883"
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.fanin == true
     secrets:
       - mosquitto.certificate.pem
       - mosquitto.key
@@ -331,7 +336,12 @@ services:
       context: .
       dockerfile: ./fanin/Dockerfile
     hostname: fanin
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.fanin == true
     networks:
       - krakenmare
     secrets:
