@@ -12,6 +12,10 @@ __HOST__
 __HOST__
 [broker-3]
 __HOST__
+[fanin]
+__HOST__
+[test-tools]
+__HOST__
 [injectors]
 __HOST__
 [swarm_manager]
