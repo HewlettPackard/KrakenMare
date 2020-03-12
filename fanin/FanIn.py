@@ -44,6 +44,7 @@ class FanIn(AgentCommon):
     loggerName = None
     # All time is in seconds as float. We use time_ns to get highest resolution
     timet0 = 0
+    t0_on_first_mqtt = 0
     MsgCount = 0
 
     def __init__(
@@ -147,6 +148,9 @@ class FanIn(AgentCommon):
             if self.timet0 == 0:
                 self.timet0 = time.time_ns() / 1000000000
 
+            if self.t0_on_first_mqtt == 0:
+                self.t0_on_first_mqtt = time.time_ns() / 1000000000
+                
             if self.mqttBatching == True:
                 query_data = self.msg_serializer.decode_message(message.payload)
 
@@ -173,8 +177,9 @@ class FanIn(AgentCommon):
                         deltaMsg = self.kafka_msg_counter - self.MsgCount
                         self.MsgCount = self.kafka_msg_counter
                         self.timet0 = time.time_ns() / 1000000000
-                        logMPMT = "Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
-                            os.getpid(), threading.get_ident(), str(message.topic)
+                        elapsed = (int) ( time.time_ns() / 1000000000 - self.t0_on_first_mqtt )
+                        logMPMT = "{:d} secs | Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
+                            elapsed,os.getpid(), threading.get_ident(), str(message.topic)
                         )
                         print(
                             logMPMT
