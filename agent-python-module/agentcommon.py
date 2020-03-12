@@ -92,7 +92,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.agent_register_response_schema = cg.schema.schema
         self.agent_register_response_schema_id = cg.schema_id
 
@@ -101,7 +100,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.agent_deregister_request_schema = cg.schema.schema
         self.agent_deregister_request_schema_id = cg.schema_id
 
@@ -110,7 +108,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.agent_deregister_response_schema = cg.schema.schema
         self.agent_deregister_response_schema_id = cg.schema_id
 
@@ -119,7 +116,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.send_time_series_schema = cg.schema.schema
         self.send_time_series_schema_id = cg.schema_id
 
@@ -137,7 +133,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.device_register_response_schema = cg.schema.schema
         self.device_register_response_schema_id = cg.schema_id
         
@@ -146,7 +141,6 @@ class AgentCommon:
         while cg is None:
             cg = client.get_schema(subject)
             print("getting schema %s from schemaregistry" % subject)
-            time.sleep(1)
         self.send_time_series_druid_array = cg.schema.schema
         self.send_time_series_druid_array_id = cg.schema_id
         
