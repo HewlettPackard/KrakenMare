@@ -259,6 +259,8 @@ class FanIn(AgentCommon):
             "error_cb": self.kafka_producer_error_cb,
             "linger.ms": 1000,
             "message.max.bytes": 2560000,
+            "queue.buffering.max.messages": 2000000
+
         }
 
         while test == False:
