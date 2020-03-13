@@ -42,7 +42,7 @@ class IBswitchSimulator(AgentCommon):
         """
             Class init
         """
-        
+
         self.loggerName = "simulator.agent." + __version__ + ".log"
 
         # AgentCommon class method
@@ -51,7 +51,7 @@ class IBswitchSimulator(AgentCommon):
         self.myAgentName = "IBSwitchSimulator"
         self.myAgent_debug = debug
         self.MQTTbatching = batching
-        
+
         # Agent uid as provided by the discovery mechanism.
         # for now use the hostname and random number to insure we are always unique
         # used for Agent registration and MQTT client id
@@ -73,17 +73,17 @@ class IBswitchSimulator(AgentCommon):
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
         self.sendNumberOfMessages = self.config.get("Others", "sendNumberOfMessages")
-        
+
         if self.sendNumberOfMessages == "":
             self.sendNumberOfMessages = -1
         else:
             self.sendNumberOfMessages = int(self.sendNumberOfMessages)
-            
+
         self.myDeviceMap = {}
 
         # MQTT setup
         self.myAgent_mqtt_encryption_enabled = encrypt
-        
+
         if batching == True:
             self.batch_size = self.config.get("MQTT", "mqtt_batch_size")
             if self.batch_size == "":
@@ -92,28 +92,36 @@ class IBswitchSimulator(AgentCommon):
                 self.batch_size = int(self.batch_size)
         else:
             self.batch_size = 0
-            
+
         # topic will have added /# depending on number of subtopics, without subtopics this translates to: ibswitch/0 as standard topic
         self.myAgent_send_ts_data_topic = "ibswitch"
-        
+
         # create agent registration request topic list with one entry [("topic name", qos)]
         self.myAgent_registration_request_topic = []
         myAgent_registration_request_topic = []
-        myAgent_registration_request_topic.append("agent-registration/" + self.myAgent_uid + "/request")
+        myAgent_registration_request_topic.append(
+            "agent-registration/" + self.myAgent_uid + "/request"
+        )
         myAgent_registration_request_topic.append(2)
-        self.myAgent_registration_request_topic.append(myAgent_registration_request_topic)
-        
+        self.myAgent_registration_request_topic.append(
+            myAgent_registration_request_topic
+        )
+
         # create agent registration response topic list with one entry [("topic name", qos)]
         self.myAgent_registration_response_topic = []
         myAgent_registration_response_topic = []
-        myAgent_registration_response_topic.append("agent-registration/" + self.myAgent_uid + "/response")
+        myAgent_registration_response_topic.append(
+            "agent-registration/" + self.myAgent_uid + "/response"
+        )
         myAgent_registration_response_topic.append(2)
-        self.myAgent_registration_response_topic.append(myAgent_registration_response_topic)
-        
+        self.myAgent_registration_response_topic.append(
+            myAgent_registration_response_topic
+        )
+
         self.myDevice_registration_response_topic = False
-        
+
         super().__init__(configFile, debug)
-        
+
         self.setMqttNumberOfPublishingTopics(int(numberOfTopics))
 
     # defines self.myMQTTregistered and self.myAgent_uuid
@@ -127,48 +135,62 @@ class IBswitchSimulator(AgentCommon):
             print("registration-result with KrakenMare UUID: %s" % data["uuid"])
             self.myMQTTregistered = True
             self.myAgent_uuid = data["uuid"]
-            
+
             # create agent deregistration request topic list with one entry [("topic name", qos)]
             self.myAgent_deregistration_request_topic = []
             myAgent_deregistration_request_topic = []
-            myAgent_deregistration_request_topic.append("agent-deregistration/" + str(self.myAgent_uuid) + "/request")
+            myAgent_deregistration_request_topic.append(
+                "agent-deregistration/" + str(self.myAgent_uuid) + "/request"
+            )
             myAgent_deregistration_request_topic.append(2)
-            self.myAgent_deregistration_request_topic.append(myAgent_deregistration_request_topic)
-            
-            self.myDevice_registration_request_topic = "device-registration/" + str(self.myAgent_uuid) + "/request"
-            
+            self.myAgent_deregistration_request_topic.append(
+                myAgent_deregistration_request_topic
+            )
+
+            self.myDevice_registration_request_topic = (
+                "device-registration/" + str(self.myAgent_uuid) + "/request"
+            )
+
             # create new device response topic list with one entry [("topic name", qos)]
             self.myDevice_registration_response_topic = []
             myDevice_registration_response_topic = []
-            myDevice_registration_response_topic.append("device-registration/" + str(self.myAgent_uuid) + "/response")
+            myDevice_registration_response_topic.append(
+                "device-registration/" + str(self.myAgent_uuid) + "/response"
+            )
             myDevice_registration_response_topic.append(2)
-            self.myDevice_registration_response_topic.append(myDevice_registration_response_topic)
-            
+            self.myDevice_registration_response_topic.append(
+                myDevice_registration_response_topic
+            )
+
             # create new agent de-registration response topic list with one entry [("topic name", qos)]
             self.myAgent_deregistration_response_topic = []
             myAgent_deregistration_response_topic = []
-            myAgent_deregistration_response_topic.append("agent-deregistration/" + str(self.myAgent_uuid) + "/response")
+            myAgent_deregistration_response_topic.append(
+                "agent-deregistration/" + str(self.myAgent_uuid) + "/response"
+            )
             myAgent_deregistration_response_topic.append(2)
-            self.myAgent_deregistration_response_topic.append(myAgent_deregistration_response_topic)
-        
+            self.myAgent_deregistration_response_topic.append(
+                myAgent_deregistration_response_topic
+            )
+
             # add device registration response topic to enable re-subscription on mqtt re-connect (defined in the AgentCommon class).
             userdata.append(myDevice_registration_response_topic)
             userdata.append(myAgent_deregistration_response_topic)
-        
-        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name 
+
+        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name
         elif message.topic == self.myDevice_registration_response_topic[0][0]:
             print("message: %s " % message.payload)
             data = self.msg_serializer.decode_message(message.payload)
             self.myDeviceRegistered = True
             print("Devices registered")
-        
-        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name 
+
+        # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name
         elif message.topic == self.myAgent_deregistration_response_topic[0][0]:
             self.myMQTTderegistered = True
             print("message: %s " % message.payload)
             data = self.msg_serializer.decode_message(message.payload)
             print(str(data))
-        
+
         else:
             print(
                 "Unknown topic: "
@@ -332,7 +354,7 @@ class IBswitchSimulator(AgentCommon):
                         )
 
         switchSimulatorSeedMap = self.seed_simulator_map()
-                
+
         # baremetal nodes have python 3.6 hence we don't have time_ns. Here time is a floating point number
         self.timet0 = time.time()
         # Infinite loop
@@ -397,9 +419,16 @@ class IBswitchSimulator(AgentCommon):
                         ]
                         # print(record)
                         record_list.append(record)
-                        
-                    self.mqtt_send_triplet_batch(self.myAgent_send_ts_data_topic, record_list, self.sendNumberOfMessages, self.batch_size, self.myAgent_uuid, self.timet0)
-                    
+
+                    self.mqtt_send_triplet_batch(
+                        self.myAgent_send_ts_data_topic,
+                        record_list,
+                        self.sendNumberOfMessages,
+                        self.batch_size,
+                        self.myAgent_uuid,
+                        self.timet0,
+                    )
+
             # Infinite loop
             time.sleep(self.sleepLoopTime)
 
@@ -422,8 +451,10 @@ class IBswitchSimulator(AgentCommon):
         )
 
         # register myself
-        self.mqtt_registration(self.myAgent_registration_request_topic[0], self.myRegistrationData)
-        
+        self.mqtt_registration(
+            self.myAgent_registration_request_topic[0], self.myRegistrationData
+        )
+
         # register my devices/sensors
         self.myDeviceMap = self.create_my_device_map()
         self.mqtt_device_registration(

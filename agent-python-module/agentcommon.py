@@ -32,9 +32,9 @@ from schema_registry.serializers import MessageSerializer
 # START AgentCommon class
 class AgentCommon:
     loggerName = None
-    
-    #myMQTTregistered = False
-    #myMQTTderegistered = False
+
+    # myMQTTregistered = False
+    # myMQTTderegistered = False
     myDeviceRegistered = False
     myByteBatch = []
     myCurrentSubtopic = 0
@@ -48,7 +48,7 @@ class AgentCommon:
         """
 
         self.myAgentCommonDebug = debug
-        
+
         self.loggerName = "agentcommon." + __version__ + ".log"
 
         self.config = self.checkConfigurationFile(
@@ -134,7 +134,7 @@ class AgentCommon:
             print("getting schema %s from schemaregistry" % subject)
         self.device_register_response_schema = cg.schema.schema
         self.device_register_response_schema_id = cg.schema_id
-        
+
         subject = "com.hpe.krakenmare.message.agent.SendTimeSeriesDruidArray"
         cg = None
         while cg is None:
@@ -142,10 +142,10 @@ class AgentCommon:
             print("getting schema %s from schemaregistry" % subject)
         self.send_time_series_druid_array = cg.schema.schema
         self.send_time_series_druid_array_id = cg.schema_id
-        
+
     def setMqttNumberOfPublishingTopics(self, mqttNumberOfPublishingTopics):
         self.myAgentMqttNumberOfPublishingTopics = mqttNumberOfPublishingTopics
-        
+
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
     ):
@@ -240,13 +240,13 @@ class AgentCommon:
         )
         self.client.on_message = self.mqtt_on_message
         self.client.on_connect = self.mqtt_on_connect
-        
+
         if self.myAgentCommonDebug == True:
             self.client.on_subscribe = self.mqtt_on_subscribe
             self.client.on_log = self.mqtt_on_log
             self.client.on_disconnect = self.mqtt_on_disconnect
             self.client.on_publish = self.mqtt_on_publish
-            
+
         if encrypt == True:
             self.client.tls_set(
                 ca_certs=self.mqtt_ca_certs,
@@ -267,7 +267,7 @@ class AgentCommon:
                 + ") to mqtt broker:"
                 + self.mqtt_broker
             )
-            
+
             self.client.connect(self.mqtt_broker, self.mqtt_port)
 
         # subscribe to registration response topic
@@ -275,7 +275,7 @@ class AgentCommon:
         while result != mqtt.MQTT_ERR_SUCCESS and topicList != False:
             if self.myAgentCommonDebug == True:
                 print(topicList)
-                
+
             (result, mid) = self.client.subscribe(topicList)
 
         # start listening loop
@@ -304,10 +304,15 @@ class AgentCommon:
 
         # use highest QoS for now
         print("sending registration payload: --%s--" % raw_bytes)
-        
-        MQTTMessageInfo = self.client.publish(requestTopic[0], raw_bytes, requestTopic[1], True)
-        print("mqtt published with publishing code: " + mqtt.connack_string(MQTTMessageInfo.rc))
-        
+
+        MQTTMessageInfo = self.client.publish(
+            requestTopic[0], raw_bytes, requestTopic[1], True
+        )
+        print(
+            "mqtt published with publishing code: "
+            + mqtt.connack_string(MQTTMessageInfo.rc)
+        )
+
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
@@ -328,16 +333,23 @@ class AgentCommon:
         return self.myMQTTregistered
 
     def mqtt_deregistration(self, requestTopic, uuid):
-        
-        DeregistrationData={"uuid": uuid,} 
+
+        DeregistrationData = {"uuid": uuid}
 
         # publish registration data
-        raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.agent_deregister_request_schema_id, DeregistrationData)
+        raw_bytes = self.msg_serializer.encode_record_with_schema_id(
+            self.agent_deregister_request_schema_id, DeregistrationData
+        )
 
         # use QoS from requestTopic second entry, e.g. requestTopic[1]
         print("sending deregistration payload: --%s--" % raw_bytes)
-        MQTTMessageInfo = self.client.publish(requestTopic[0], raw_bytes, requestTopic[1], True)
-        print("mqtt published with publishing code: " + mqtt.connack_string(MQTTMessageInfo.rc))
+        MQTTMessageInfo = self.client.publish(
+            requestTopic[0], raw_bytes, requestTopic[1], True
+        )
+        print(
+            "mqtt published with publishing code: "
+            + mqtt.connack_string(MQTTMessageInfo.rc)
+        )
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
@@ -345,16 +357,16 @@ class AgentCommon:
         while not self.myMQTTderegistered:
             print("waiting for agent deregistration result...")
             time.sleep(0.1)
-            '''
+            """
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
                 self.client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
-            '''
+            """
         print(
             "deregistered with uid '%s' and km-uuid '%s'"
             % (self.myAgent_uid, self.myAgent_uuid)
         )
-        
+
         return self.myMQTTderegistered
 
     # this method takes care of device/sensor registration after succesfull agent registration
@@ -389,70 +401,103 @@ class AgentCommon:
             self.send_time_series_schema_id, record
         )
         self.client.publish(topic, raw_bytes)
-        
+
     def mqtt_send_byte_batch_avro_ts_msg(self, topic, raw_bytes):
         self.client.publish(topic, raw_bytes)
-    
-    def mqtt_send_triplet_batch(self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0):
+
+    def mqtt_send_triplet_batch(
+        self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0
+    ):
         self.myByteBatchSize = byteBatchSize
-        
+
         for eachRecord in record_list:
             if sendNumberOfMessages == self.myMessageCounter:
-                
-                #publish any left over messages
+
+                # publish any left over messages
                 if byteBatchSize > 0:
-                    myMQTT_ts_data = {
-                        "tripletBatch": self.myByteBatch
-                    }
-                    raw_bytes = self.msg_serializer.encode_record_with_schema_id(self.send_time_series_druid_array_id, myMQTT_ts_data)
-                    self.mqtt_send_byte_batch_avro_ts_msg("{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes)
+                    myMQTT_ts_data = {"tripletBatch": self.myByteBatch}
+                    raw_bytes = self.msg_serializer.encode_record_with_schema_id(
+                        self.send_time_series_druid_array_id, myMQTT_ts_data
+                    )
+                    self.mqtt_send_byte_batch_avro_ts_msg(
+                        "{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes
+                    )
 
                 totaltime = time.time() - timet0
-                rate = sendNumberOfMessages/totaltime
-                print("All " + str(sendNumberOfMessages) + " messages published. Total time " + str(totaltime) + ". Rate " + str(rate))
-                
-                self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
+                rate = sendNumberOfMessages / totaltime
+                print(
+                    "All "
+                    + str(sendNumberOfMessages)
+                    + " messages published. Total time "
+                    + str(totaltime)
+                    + ". Rate "
+                    + str(rate)
+                )
+
+                self.mqtt_deregistration(
+                    self.myAgent_deregistration_request_topic[0], uuid
+                )
                 self.mqtt_close()
                 sys.exit(0)
-            
-            #print(str(eachRecord))
-            if self.myAgentCommonDebug == True:
-                print(str(self.myMessageCounter) + ":Publishing via mqtt (topic:%s)" % (topic + "/" + str(self.myCurrentSubtopic)))
-            
-            if self.myMessageCounter%10000 == 0:
-                print(str(self.myMessageCounter) + " messages published via mqtt (on %d subtopics from : %s)" % (self.myAgentMqttNumberOfPublishingTopics, topic))
 
-            #self.mqtt_send_single_avro_ts_msg("{:s}/{:d}".format(self.myAgent_send_ts_data_topic, current_subtopic), eachRecord)
-            #current_subtopic = (current_subtopic+1) if current_subtopic < self.myAgentMqttNumberOfPublishingTopics else 1
-            
+            # print(str(eachRecord))
+            if self.myAgentCommonDebug == True:
+                print(
+                    str(self.myMessageCounter)
+                    + ":Publishing via mqtt (topic:%s)"
+                    % (topic + "/" + str(self.myCurrentSubtopic))
+                )
+
+            if self.myMessageCounter % 10000 == 0:
+                print(
+                    str(self.myMessageCounter)
+                    + " messages published via mqtt (on %d subtopics from : %s)"
+                    % (self.myAgentMqttNumberOfPublishingTopics, topic)
+                )
+
+            # self.mqtt_send_single_avro_ts_msg("{:s}/{:d}".format(self.myAgent_send_ts_data_topic, current_subtopic), eachRecord)
+            # current_subtopic = (current_subtopic+1) if current_subtopic < self.myAgentMqttNumberOfPublishingTopics else 1
+
             # assemble ts data
             myMQTT_ts_data_triplet = {
-                    "timestamp": eachRecord["timestamp"],
-                    "sensorUuid": eachRecord["sensorUuid"],
-                    "sensorValue": eachRecord["sensorValue"],
-                    }
-            
-            if (byteBatchSize > 0):
+                "timestamp": eachRecord["timestamp"],
+                "sensorUuid": eachRecord["sensorUuid"],
+                "sensorValue": eachRecord["sensorValue"],
+            }
+
+            if byteBatchSize > 0:
                 self.myByteBatch.append(myMQTT_ts_data_triplet)
                 self.myMessageCounter += 1
             else:
-                self.myByteBatch.append(self.msg_serializer.encode_record_with_schema_id(self.send_time_series_schema_id, myMQTT_ts_data_triplet))
-            
-            #print(sys.getsizeof(byte_batch))
-            #print(byte_batch)
-                                                                     
+                self.myByteBatch.append(
+                    self.msg_serializer.encode_record_with_schema_id(
+                        self.send_time_series_schema_id, myMQTT_ts_data_triplet
+                    )
+                )
+
+            # print(sys.getsizeof(byte_batch))
+            # print(byte_batch)
+
             if byteBatchSize == 0:
-                self.mqtt_send_byte_batch_avro_ts_msg("{:s}/{:d}".format(topic, self.myCurrentSubtopic), self.myByteBatch.pop())
-                
+                self.mqtt_send_byte_batch_avro_ts_msg(
+                    "{:s}/{:d}".format(topic, self.myCurrentSubtopic),
+                    self.myByteBatch.pop(),
+                )
+
                 if self.myAgentMqttNumberOfPublishingTopics > 1:
-                    self.myCurrentSubtopic = (self.myCurrentSubtopic+1) if self.myCurrentSubtopic < self.myAgentMqttNumberOfPublishingTopics-1 else 0
-                    
+                    self.myCurrentSubtopic = (
+                        (self.myCurrentSubtopic + 1)
+                        if self.myCurrentSubtopic
+                        < self.myAgentMqttNumberOfPublishingTopics - 1
+                        else 0
+                    )
+
                 self.myMessageCounter += 1
 
                 self.myByteBatch = []
             elif sys.getsizeof(self.myByteBatch) >= byteBatchSize:
                 if self.myAgentCommonDebug == True:
-                    
+
                     print(
                         "Number of msg sent in one batch: "
                         + str(self.myMessageCounter - self.myNumber_of_msg_send)
@@ -481,7 +526,7 @@ class AgentCommon:
                     )
 
                 self.myByteBatch = []
-                
+
     # close client method
     def mqtt_close(self):
         self.client.loop_stop()
