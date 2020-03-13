@@ -398,7 +398,7 @@ class IBswitchSimulator(AgentCommon):
                         # print(record)
                         record_list.append(record)
                         
-                    self.mqtt_send_tripplet_batch(self.myAgent_send_ts_data_topic, record_list, self.sendNumberOfMessages, self.batch_size, self.myAgent_uuid, self.timet0)
+                    self.mqtt_send_triplet_batch(self.myAgent_send_ts_data_topic, record_list, self.sendNumberOfMessages, self.batch_size, self.myAgent_uuid, self.timet0)
                     
             # Infinite loop
             time.sleep(self.sleepLoopTime)

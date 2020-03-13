@@ -393,7 +393,7 @@ class AgentCommon:
     def mqtt_send_byte_batch_avro_ts_msg(self, topic, raw_bytes):
         self.client.publish(topic, raw_bytes)
     
-    def mqtt_send_tripplet_batch(self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0):
+    def mqtt_send_triplet_batch(self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0):
         self.myByteBatchSize = byteBatchSize
         
         for eachRecord in record_list:
