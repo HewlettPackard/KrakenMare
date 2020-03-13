@@ -65,7 +65,8 @@ class FanIn(AgentCommon):
 
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
-        self.kafkaProducerTopic = self.config.get("Kafka", "kafkaProducerTopic")
+        self.kafkaProducerTopic = self.config.get(
+            "Kafka", "kafkaProducerTopic")
         self.myFanIn_mqtt_encryption_enabled = encrypt
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
@@ -81,7 +82,8 @@ class FanIn(AgentCommon):
             addValue.append(int(value[1]))
             self.processID = os.getpid()
             self.threadID = threading.get_ident()
-            self.logMPMT = "P-{:d} | T-{:d} |".format(self.processID, self.threadID)
+            self.logMPMT = "P-{:d} | T-{:d} |".format(
+                self.processID, self.threadID)
             print(
                 "MULTIPROC {:s} Starting FanIn Gateway in its process for {:s}".format(
                     self.logMPMT, TopicForThisProcess
@@ -99,12 +101,14 @@ class FanIn(AgentCommon):
             self.myFanInGatewayName = "FanIn-test"
 
         addValue = []
-        value = self.config.get("MQTT", "mqttRegistrayionResultTopic").split(":")
+        value = self.config.get(
+            "MQTT", "mqttRegistrayionResultTopic").split(":")
         addValue.append(value[0])
         addValue.append(int(value[1]))
         self.mqttTopicList.append(addValue)
 
-        self.bootstrapServerStr = self.kafka_broker + ":" + str(self.kafka_port)
+        self.bootstrapServerStr = self.kafka_broker + \
+            ":" + str(self.kafka_port)
 
         # Register to the framework
         self.myFanInGateway_id = -1
@@ -150,9 +154,10 @@ class FanIn(AgentCommon):
 
             if self.t0_on_first_mqtt == 0:
                 self.t0_on_first_mqtt = time.time_ns() / 1000000000
-                
+
             if self.mqttBatching == True:
-                query_data = self.msg_serializer.decode_message(message.payload)
+                query_data = self.msg_serializer.decode_message(
+                    message.payload)
 
             else:
                 query_data.append(message.payload)
@@ -170,16 +175,18 @@ class FanIn(AgentCommon):
                     self.kafka_msg_counter += 1
 
                     if self.myFanInGateway_debug == True:
-                        print(str(self.kafka_msg_counter) + ":published to Kafka")
+                        print(str(self.kafka_msg_counter) +
+                              ":published to Kafka")
 
                     if self.kafka_msg_counter % 1000 == 0:
                         deltat = time.time_ns() / 1000000000 - self.timet0
                         deltaMsg = self.kafka_msg_counter - self.MsgCount
                         self.MsgCount = self.kafka_msg_counter
                         self.timet0 = time.time_ns() / 1000000000
-                        elapsed = (int) ( time.time_ns() / 1000000000 - self.t0_on_first_mqtt )
+                        elapsed = (int)(time.time_ns() /
+                                        1000000000 - self.t0_on_first_mqtt)
                         logMPMT = "{:d} secs | Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
-                            elapsed,os.getpid(), threading.get_ident(), str(message.topic)
+                            elapsed, os.getpid(), threading.get_ident(), str(message.topic)
                         )
                         print(
                             logMPMT
@@ -212,7 +219,8 @@ class FanIn(AgentCommon):
 
     # Kafka error printer
     def kafka_producer_error_cb(self, err):
-        logMPMT = "P-{:d} | T-{:d} |".format(os.getpid(), threading.get_ident())
+        logMPMT = "P-{:d} | T-{:d} |".format(os.getpid(),
+                                             threading.get_ident())
         print("{:s} KAFKA_PROD_CALLBACK_ERR : {:s}".format(logMPMT, str(err)))
 
     def kafka_producer_on_delivery(self, err, msg):
@@ -394,7 +402,8 @@ def main():
 
         i = 0
         while i < numberOfMqttTopics:
-            topics_list.append(rootTopic + "/" + str(i) + ":" + str(rootTopicQOS))
+            topics_list.append(rootTopic + "/" + str(i) +
+                               ":" + str(rootTopicQOS))
             i += 1
 
         def fanin_mp_launcher(
@@ -410,7 +419,8 @@ def main():
             signal.signal(signal.SIGINT, myFanInMP.signal_handler)
             myFanInMP.run()
 
-        print("MULTIPROC-MAIN - List of topics = {:s}".format(str(topics_list)))
+        print(
+            "MULTIPROC-MAIN - List of topics = {:s}".format(str(topics_list)))
         for onetopic in topics_list:
             print(
                 "MULTIPROC-MAIN - Forking FanIn Gateway process for {:s}".format(
@@ -427,7 +437,7 @@ def main():
                 },
             )
             NewP.start()
-            time.sleep(2)
+            time.sleep(0.1)
 
         print(
             "MULTIPROC-MAIN - All processes launched, now main process will wait forever as Signals across Processes & threads is not handled."
