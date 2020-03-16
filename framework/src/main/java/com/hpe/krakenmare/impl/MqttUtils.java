@@ -13,6 +13,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
+import com.google.common.base.Strings;
 import com.hpe.krakenmare.Main;
 import com.hpe.krakenmare.core.Agent;
 
@@ -97,6 +98,10 @@ public class MqttUtils {
 		}
 		connOpts.setAutomaticReconnect(true);
 		connOpts.setCleanSession(false);
+		String maxInflightStr = Main.getProperty("km.framework.max_inflight");
+		if (!Strings.isNullOrEmpty(maxInflightStr)) {
+			connOpts.setMaxInflight(Integer.parseInt(maxInflightStr));
+		}
 		return connOpts;
 	}
 
