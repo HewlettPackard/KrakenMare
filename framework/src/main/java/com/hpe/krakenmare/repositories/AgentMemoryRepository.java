@@ -3,12 +3,14 @@ package com.hpe.krakenmare.repositories;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.krakenmare.api.EntityNotFoundException;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 
@@ -56,8 +58,12 @@ public class AgentMemoryRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent get(UUID uuid) {
-		return agents.stream().filter(a -> a.getUuid().equals(uuid)).findFirst().get();
+	public Agent get(UUID uuid) throws EntityNotFoundException {
+		Optional<Agent> opt = agents.stream().filter(a -> a.getUuid().equals(uuid)).findFirst();
+		if (!opt.isPresent()) {
+			throw new EntityNotFoundException(uuid);
+		}
+		return opt.get();
 	}
 
 }

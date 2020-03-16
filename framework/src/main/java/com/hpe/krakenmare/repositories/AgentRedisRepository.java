@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hpe.krakenmare.api.EntityNotFoundException;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.rest.ObjectMapperContextResolver;
@@ -85,9 +86,12 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent get(UUID uuid) {
+	public Agent get(UUID uuid) throws EntityNotFoundException {
 		String agentKey = agentDataKey + ":" + uuid;
 		String json = jedis.hget(agentsKey, agentKey);
+		if (json == null) {
+			throw new EntityNotFoundException(uuid);
+		}
 		return fromJson(json);
 	}
 

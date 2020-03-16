@@ -16,6 +16,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.krakenmare.api.EntityNotFoundException;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.core.Device;
@@ -37,7 +38,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 	}
 
 	@Override
-	DeviceListResponse process(DeviceList sensorList) {
+	DeviceListResponse process(DeviceList sensorList) throws EntityNotFoundException {
 		UUID agentUuid = sensorList.getUuid();
 		List<Device> devices = sensorList.getDevices();
 

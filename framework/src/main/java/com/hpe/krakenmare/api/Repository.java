@@ -15,7 +15,7 @@ public interface Repository<T> {
 
 	boolean delete(T entity);
 
-	T get(UUID uuid);
+	T get(UUID uuid) throws EntityNotFoundException;
 
 	List<T> getAll();
 

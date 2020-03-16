@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.krakenmare.api.FrameworkException;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 
@@ -45,7 +46,7 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 		}
 	}
 
-	abstract R process(P payload);
+	abstract R process(P payload) throws FrameworkException;
 
 	abstract void afterProcess(P payload, R response) throws Exception;
 

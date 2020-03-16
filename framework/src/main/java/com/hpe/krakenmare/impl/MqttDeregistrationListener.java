@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hpe.krakenmare.api.EntityNotFoundException;
 import com.hpe.krakenmare.api.Repository;
 import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.message.agent.DeregisterRequest;
@@ -29,13 +30,13 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 
 	// TODO: error handling (agent not found...)
 	// TODO: atomicity? repo.delete(UUID)?
-	private boolean deregisterAgent(UUID agentUuid) {
+	private boolean deregisterAgent(UUID agentUuid) throws EntityNotFoundException {
 		Agent agent = repository.get(agentUuid);
 		return repository.delete(agent);
 	}
 
 	@Override
-	DeregisterResponse process(DeregisterRequest payload) {
+	DeregisterResponse process(DeregisterRequest payload) throws EntityNotFoundException {
 		UUID uuid = payload.getUuid();
 		boolean success = deregisterAgent(uuid);
 		if (success) {
