@@ -59,7 +59,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public Agent create(Agent payload) {
+	public synchronized Agent create(Agent payload) {
 		long id = jedis.incr(counterKey);
 		UUID uuid = UUID.randomUUID();
 		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
@@ -67,26 +67,26 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public boolean save(Agent agent) {
+	public synchronized boolean save(Agent agent) {
 		String agentKey = agentDataKey + ":" + agent.getUuid();
 		return jedis.hset(agentsKey, agentKey, toJson(agent)) == 1;
 	}
 
 	@Override
-	public Agent update(Agent agent) {
+	public synchronized Agent update(Agent agent) {
 		save(agent);
 		return agent;
 	}
 
 	@Override
-	public boolean delete(Agent agent) {
+	public synchronized boolean delete(Agent agent) {
 		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		String agentKey = agentDataKey + ":" + agent.getUuid();
 		return jedis.hdel(agentsKey, agentKey) == 1;
 	}
 
 	@Override
-	public Agent get(UUID uuid) throws EntityNotFoundException {
+	public synchronized Agent get(UUID uuid) throws EntityNotFoundException {
 		String agentKey = agentDataKey + ":" + uuid;
 		String json = jedis.hget(agentsKey, agentKey);
 		if (json == null) {
@@ -96,12 +96,12 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public long count() {
+	public synchronized long count() {
 		return jedis.hlen(agentsKey);
 	}
 
 	@Override
-	public List<Agent> getAll() {
+	public synchronized List<Agent> getAll() {
 		return jedis.hgetAll(agentsKey)
 				.values()
 				.stream()
@@ -110,7 +110,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public void reset() {
+	public synchronized void reset() {
 		jedis.del(counterKey, agentsKey, agentDataKey);
 	}
 
