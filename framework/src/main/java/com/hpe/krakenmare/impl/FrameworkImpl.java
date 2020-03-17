@@ -26,11 +26,15 @@ public class FrameworkImpl implements Framework {
 
 	private final Producer<String, byte[]> kafkaProducer = KafkaUtils.createByteArrayProducer("framework-manager");
 
-	private final CollectdTransformStream collectdStream = new CollectdTransformStream();
+	private CollectdTransformStream collectdStream = null;
 
 	public void startFramework() throws InterruptedException, MqttException, GeneralSecurityException {
 		mqttListener.start();
-		collectdStream.start();
+
+		if (Boolean.parseBoolean(Main.getProperty("km.runCollectdStream"))) {
+			collectdStream = new CollectdTransformStream();
+			collectdStream.start();
+		}
 
 		MqttRegistrationListener.registerNew(mqttListener, kafkaProducer, agents);
 		MqttDeviceListListener.registerNew(mqttListener, kafkaProducer, agents);
@@ -38,7 +42,10 @@ public class FrameworkImpl implements Framework {
 	}
 
 	public void stopFramework() {
-		collectdStream.close();
+		if (collectdStream != null) {
+			collectdStream.close();
+			collectdStream = null;
+		}
 		mqttListener.stop();
 		kafkaProducer.close();
 	}
