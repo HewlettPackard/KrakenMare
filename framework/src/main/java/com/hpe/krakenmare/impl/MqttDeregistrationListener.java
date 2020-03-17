@@ -52,6 +52,7 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = serializer.serialize(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, response);
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
+		mqttResponse.setQos(MqttUtils.getPublishQos());
 		String respTopic = MqttUtils.getDeregistrationResponseTopic(response.getAgentUuid());
 
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);

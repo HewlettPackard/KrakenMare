@@ -22,7 +22,6 @@ public class FrameworkMqttClient {
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
 	final static String clientId = FrameworkMqttClient.class.getSimpleName();
-	final static int qos = 2;
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
@@ -52,7 +51,7 @@ public class FrameworkMqttClient {
 				LOG.error("Error while subscribing to topic '" + topicFilter + "': " + messageListener, exception);
 			}
 		};
-		client.subscribe(topicFilter, qos, null, callback, messageListener);
+		client.subscribe(topicFilter, MqttUtils.getSubscribeQos(), null, callback, messageListener);
 	}
 
 	public synchronized void start() throws GeneralSecurityException {

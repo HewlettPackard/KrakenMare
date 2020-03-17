@@ -39,6 +39,7 @@ public class MqttAgent extends Agent {
 	public final static Logger LOG = LoggerFactory.getLogger(MqttAgent.class);
 
 	private final static String NAME = MqttAgent.class.getSimpleName();
+	private final static int QOS = 2;
 
 	private final KafkaAvroSerializer avroSer = KafkaUtils.getAvroValueSerializer();
 	private final KafkaAvroDeserializer avroDes = KafkaUtils.getAvroValueDeserializer();
@@ -77,6 +78,7 @@ public class MqttAgent extends Agent {
 
 			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);
+			message.setQos(QOS);
 			mqtt.publish(myAgentTopic, message);
 			LOG.info("Message published");
 
@@ -155,6 +157,7 @@ public class MqttAgent extends Agent {
 
 			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);
+			message.setQos(QOS);
 			mqtt.publish(myAgentTopic, message);
 			LOG.info("Message published");
 
@@ -194,6 +197,7 @@ public class MqttAgent extends Agent {
 
 			LOG.info("Publishing message '" + req + "' to topic '" + myAgentTopic + "'");
 			MqttMessage message = new MqttMessage(payload);
+			message.setQos(QOS);
 			mqtt.publish(myAgentTopic, message);
 			LOG.info("Message published");
 

@@ -25,6 +25,14 @@ public class MqttUtils {
 	private static final String DEREGISTRATION_TOPIC = Main.getProperty("km.agent-deregistration.mqtt.topic");
 	private static final String SENSOR_LIST_TOPIC = Main.getProperty("km.device-registration.mqtt.topic");
 
+	public static int getSubscribeQos() {
+		return 2;
+	}
+
+	public static int getPublishQos() {
+		return 2;
+	}
+
 	/* Registration */
 
 	public static String getRegistrationRequestTopic() {
@@ -146,4 +154,5 @@ public class MqttUtils {
 		sc.init(null, trustAllCerts, new java.security.SecureRandom());
 		SSLContext.setDefault(sc);
 	}
+
 }

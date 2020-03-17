@@ -51,6 +51,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = serializer.serialize(KafkaUtils.AGENT_REGISTRATION_TOPIC, response);
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
+		mqttResponse.setQos(MqttUtils.getPublishQos());
 		String respTopic = MqttUtils.getRegistrationResponseTopic(response.getUid());
 
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);

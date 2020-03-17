@@ -69,6 +69,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
 		byte[] respPayload = serializer.serialize(KafkaUtils.DEVICE_REGISTRATION_TOPIC, response);
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
+		mqttResponse.setQos(MqttUtils.getPublishQos());
 		String respTopic = MqttUtils.getSensorListResponseTopic(response.getUuid());
 
 		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
