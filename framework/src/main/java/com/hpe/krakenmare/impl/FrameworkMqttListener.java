@@ -44,15 +44,17 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	public void messageArrived(String topic, MqttMessage message) {
 		executor.execute(() -> {
 			// LOG.info("Message received on topic '" + topic + "': " + message);
-			LOG.info("Message received on topic '" + topic + "' (#" + counter.incrementAndGet() + ")");
-			// try {
-			// @SuppressWarnings("unchecked")
-			// P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
-			// R response = process(payload);
-			// afterProcess(payload, response);
-			// } catch (Exception e) {
-			// LOG.error("Exception occured during message handling", e);
-			// }
+			int c = counter.incrementAndGet();
+			LOG.info("Message received on topic '" + topic + "' (#" + c + ")");
+			try {
+				@SuppressWarnings("unchecked")
+				P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
+				R response = process(payload);
+				// afterProcess(payload, response);
+				LOG.info("Message processed (#" + c + ")");
+			} catch (Exception e) {
+				LOG.error("Exception occured during message handling (#" + c + ")", e);
+			}
 		});
 	}
 
