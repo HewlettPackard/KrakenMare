@@ -403,7 +403,7 @@ class AgentCommon:
                 count = count + 1
                 if count > 300:
                     print("fatal: device registration timeout")
-                    system.exit(300)
+                    sys.exit(300)
                 
         # self.client.loop_stop()
 
