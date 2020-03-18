@@ -328,11 +328,11 @@ class AgentCommon:
                 print("fatal: agent registration timeout")
                 sys.exit(300)
                 
-            """
+            
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
                 self.client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
-            """
+            
         print(
             "registered with uid '%s' and km-uuid '%s'"
             % (self.myAgent_uid, self.myAgent_uuid)
