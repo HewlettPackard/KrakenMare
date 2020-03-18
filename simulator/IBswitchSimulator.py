@@ -462,9 +462,6 @@ class IBswitchSimulator(AgentCommon):
             self.myDevice_registration_response_topic,
             self.myDeviceMap,
         )
-
-        self.mqtt_close()
-        sys.exit()
         
         # start sending data
         self.send_data()
