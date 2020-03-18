@@ -317,9 +317,17 @@ class AgentCommon:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
 
+        print("waiting for agent registration result...")
+        count = 0
+        
         while not self.myMQTTregistered:
-            print("waiting for agent registration result...")
-            time.sleep(0.1)
+
+            sleep(0.1)
+            count = count + 1
+            if count > 300:
+                print("fatal: agent registration timeout")
+                system.exit(300)
+                
             """
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
@@ -389,11 +397,14 @@ class AgentCommon:
 
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")
-            time.sleep(0.1)
-            if not self.myDeviceRegistered:
-                print("re-sending device/sensor registration payload")
-                self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
-
+            count = 0
+            while not self.myDeviceRegistered:
+                sleep(0.1)
+                count = count + 1
+                if count > 300:
+                    print("fatal: device registration timeout")
+                    system.exit(300)
+                
         # self.client.loop_stop()
 
     def mqtt_send_single_avro_ts_msg(self, topic, record):
