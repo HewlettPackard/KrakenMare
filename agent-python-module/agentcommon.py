@@ -328,11 +328,11 @@ class AgentCommon:
                 print("fatal: agent registration timeout")
                 sys.exit(300)
                 
-            
+            '''
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
-                self.client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
-            
+                MQTTMessageInfo = self.client.publish(requestTopic[0], raw_bytes, requestTopic[1], True)
+            '''
         print(
             "registered with uid '%s' and km-uuid '%s'"
             % (self.myAgent_uid, self.myAgent_uuid)
@@ -393,17 +393,30 @@ class AgentCommon:
 
         # use highest QoS for now
         print("sending device/sensor registration payload: --%s--" % raw_bytes)
-        self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
+        MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
 
+        print(
+            "mqtt device registration message published with publishing code: "
+            + mqtt.connack_string(MQTTMessageInfo.rc)
+        )
+        
+        if MQTTMessageInfo.is_published() == False:
+            print("Waiting for device registration message to be published.")
+            MQTTMessageInfo.wait_for_publish()
+
+        count = 0
         while not self.myDeviceRegistered:
             print("waiting for device registration result...")
-            count = 0
-            while not self.myDeviceRegistered:
-                time.sleep(0.1)
-                count = count + 1
-                if count > 300:
-                    print("fatal: device registration timeout")
-                    sys.exit(300)
+            time.sleep(0.1)
+            count = count + 1
+            
+            if not self.myMQTTregistered:
+                print("re-sending device registration payload")
+                MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
+            
+            if count > 300:
+                print("fatal: device registration timeout")
+                sys.exit(300)
                 
         # self.client.loop_stop()
 
