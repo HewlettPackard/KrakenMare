@@ -361,14 +361,21 @@ class AgentCommon:
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
-
+            
+        count = 0
+        
         while not self.myMQTTderegistered:
             print("waiting for agent deregistration result...")
             time.sleep(0.1)
+            count = count + 1
+            if count > 300:
+                print("fatal: agent registration timeout")
+                sys.exit(300)
+                
             """
-            if not self.myMQTTregistered:
+            if not self.myMQTTderegistered:
                 print("re-sending registration payload")
-                self.client.publish(self.myAgent_registration_request_topic, raw_bytes, 2, True)
+                MQTTMessageInfo = self.client.publish(requestTopic[0], raw_bytes, requestTopic[1], True)
             """
         print(
             "deregistered with uid '%s' and km-uuid '%s'"
