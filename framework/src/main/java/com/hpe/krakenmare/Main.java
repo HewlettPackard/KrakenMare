@@ -2,9 +2,12 @@ package com.hpe.krakenmare;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Properties;
 
+import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -77,16 +80,16 @@ public class Main {
 		final FrameworkImpl framework = new FrameworkImpl();
 		framework.startFramework();
 
-		// LOG.info("Starting web server...");
-		// final App app = new App(framework);
-		// final String baseUri = PROPERTIES.getProperty("application.baseUri");
-		// final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), app);
+		LOG.info("Starting web server...");
+		final App app = new App(framework);
+		final String baseUri = PROPERTIES.getProperty("application.baseUri");
+		final HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), app);
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// LOG.info("Stopping web server...");
-				// server.shutdownNow();
+				LOG.info("Stopping web server...");
+				server.shutdownNow();
 				LOG.info("Stopping framework...");
 				framework.stopFramework();
 			}
