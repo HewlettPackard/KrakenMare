@@ -322,7 +322,7 @@ class AgentCommon:
         
         while not self.myMQTTregistered:
 
-            sleep(0.1)
+            time.sleep(0.1)
             count = count + 1
             if count > 300:
                 print("fatal: agent registration timeout")
@@ -399,7 +399,7 @@ class AgentCommon:
             print("waiting for device registration result...")
             count = 0
             while not self.myDeviceRegistered:
-                sleep(0.1)
+                time.sleep(0.1)
                 count = count + 1
                 if count > 300:
                     print("fatal: device registration timeout")
