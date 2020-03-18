@@ -454,7 +454,9 @@ class IBswitchSimulator(AgentCommon):
         self.mqtt_registration(
             self.myAgent_registration_request_topic[0], self.myRegistrationData
         )
-
+        
+        sys.exit()
+        
         # register my devices/sensors
         self.myDeviceMap = self.create_my_device_map()
         self.mqtt_device_registration(
