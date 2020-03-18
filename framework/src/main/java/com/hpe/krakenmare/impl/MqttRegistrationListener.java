@@ -32,7 +32,7 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 	private Agent registerNewAgent(Agent agent) {
 		agent = repository.create(agent);
 		repository.save(agent);
-		LOG.info("New agent registered: '" + agent.getName() + "', '" + agent.getUuid() + "'");
+		LOG.info("New agent registered: '" + agent.getName() + "', '" + agent.getId() + "', '" + agent.getUuid() + "'");
 		return agent;
 	}
 
