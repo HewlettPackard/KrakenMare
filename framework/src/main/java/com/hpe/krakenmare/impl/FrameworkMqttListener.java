@@ -2,6 +2,7 @@ package com.hpe.krakenmare.impl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
@@ -31,6 +32,7 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	protected final KafkaAvroDeserializer deserializer = KafkaUtils.getAvroValueDeserializer();
 
 	private final static ExecutorService executor = Executors.newFixedThreadPool(32);
+	private final AtomicInteger counter = new AtomicInteger(0);
 
 	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		this.repository = repository;
@@ -41,15 +43,16 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	@Override
 	public void messageArrived(String topic, MqttMessage message) {
 		executor.execute(() -> {
-			LOG.info("Message received on topic '" + topic + "': " + message);
-			try {
-				@SuppressWarnings("unchecked")
-				P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
-				R response = process(payload);
-				afterProcess(payload, response);
-			} catch (Exception e) {
-				LOG.error("Exception occured during message handling", e);
-			}
+			// LOG.info("Message received on topic '" + topic + "': " + message);
+			LOG.info("Message received on topic '" + topic + "' (#" + counter.incrementAndGet() + ")");
+			// try {
+			// @SuppressWarnings("unchecked")
+			// P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
+			// R response = process(payload);
+			// afterProcess(payload, response);
+			// } catch (Exception e) {
+			// LOG.error("Exception occured during message handling", e);
+			// }
 		});
 	}
 
