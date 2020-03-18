@@ -45,7 +45,7 @@ if you want to deploy: the swarm_manager must be the one running `./setup.sh`
 Default values in vars.yml:
 * docker_mirror_registry_port : 5000
 * docker_registry_port : 5001
-* proxy : http://web-proxy.corp.hpecorp.net:8080
+* proxy : http://web-proxy.bbn.hpecorp.net:8080
 * ansible_python_interpreter : '/usr/bin/python3'
 * RHEL_Version: rh8rc4_x86_64
 * iso_server: 16.16.184.151

@@ -23,7 +23,7 @@ TBD: See https://docs.docker.com/network/proxy/ to improve the proxy support
 
 ```bash
 [Service]
-Environment="HTTP_PROXY=http://web-proxy.corp.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.corp.hpecorp.net:8080" 
+Environment="HTTP_PROXY=http://web-proxy.bbn.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.bbn.hpecorp.net:8080" 
 
 ```
 - also add a file /etc/docker/daemon.json
