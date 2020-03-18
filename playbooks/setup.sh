@@ -24,7 +24,7 @@ DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
 
 
-PROXY=http://grewebcachevip.bastion.europe.hp.com:8080
+PROXY=http://web-proxy.bbn.hpecorp.net:8080
 project_name=krakenmare
 
 #Usage function
