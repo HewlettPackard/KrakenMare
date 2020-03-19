@@ -55,10 +55,12 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		mqttResponse.setQos(MqttUtils.getPublishQos());
 		String respTopic = MqttUtils.getDeregistrationResponseTopic(response.getAgentUuid());
 
-		LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
+		// LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
+		LOG.debug("Sending MQTT message to topic '" + respTopic + "'");
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
-		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "': " + respPayload);
+		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "': " + respPayload);
+		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "'");
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, respPayload);
 		kafkaProducer.send(record);
 	}

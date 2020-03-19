@@ -65,7 +65,8 @@ public class FrameworkMqttClient {
 			client.setCallback(new MqttCallback() {
 				@Override
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
-					LOG.debug("Message received on topic '" + topic + "': " + message);
+					// LOG.debug("Message received on topic '" + topic + "': " + message);
+					LOG.info("Message received on topic '" + topic + "'");
 				}
 
 				@Override
