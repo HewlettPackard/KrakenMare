@@ -417,9 +417,9 @@ class AgentCommon:
             time.sleep(0.1)
             count = count + 1
             
-            if not self.myMQTTregistered:
-                print("re-sending device registration payload")
-                MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
+            # if not self.myMQTTregistered:
+            #     print("re-sending device registration payload")
+            #     MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
             
             if count > 300:
                 print("fatal: device registration timeout")
