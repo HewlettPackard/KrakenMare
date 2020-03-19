@@ -478,6 +478,12 @@ class AgentCommon:
                 sys.exit(0)
 
             # print(str(eachRecord))
+            if self.myAgentCommonDebug == True:
+                print(
+                    str(self.myMessageCounter)
+                    + ":Publishing via mqtt (topic:%s)"
+                    % (topic + "/" + str(self.myCurrentSubtopic))
+                )
 
             if self.myMessageCounter % 10000 == 0:
                 print(
