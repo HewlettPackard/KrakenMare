@@ -319,7 +319,7 @@ class AgentCommon:
 
         print("waiting for agent registration result...")
         count = 0
-        
+
         while not self.myMQTTregistered:
 
             time.sleep(0.1)
@@ -327,12 +327,12 @@ class AgentCommon:
             if count > 300:
                 print("fatal: agent registration timeout")
                 sys.exit(300)
-                
-            '''
+
+            """
             if not self.myMQTTregistered:
                 print("re-sending registration payload")
                 MQTTMessageInfo = self.client.publish(requestTopic[0], raw_bytes, requestTopic[1], True)
-            '''
+            """
         print(
             "registered with uid '%s' and km-uuid '%s'"
             % (self.myAgent_uid, self.myAgent_uuid)
@@ -343,6 +343,12 @@ class AgentCommon:
     def mqtt_deregistration(self, requestTopic, uuid):
 
         DeregistrationData = {"uuid": uuid}
+
+        result = -1
+        while result != mqtt.MQTT_ERR_SUCCESS:
+            (result, mid) = self.client.subscribe(
+                self.myAgent_deregistration_response_topic
+            )
 
         # publish registration data
         raw_bytes = self.msg_serializer.encode_record_with_schema_id(
@@ -361,17 +367,17 @@ class AgentCommon:
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for message to be published.")
             MQTTMessageInfo.wait_for_publish()
-            
+
         count = 0
-        
+
         while not self.myMQTTderegistered:
             print("waiting for agent deregistration result...")
             time.sleep(0.1)
             count = count + 1
             if count > 300:
-                print("fatal: agent registration timeout")
+                print("fatal: agent deregistration timeout")
                 sys.exit(300)
-                
+
             """
             if not self.myMQTTderegistered:
                 print("re-sending registration payload")
@@ -406,7 +412,7 @@ class AgentCommon:
             "mqtt device registration message published with publishing code: "
             + mqtt.connack_string(MQTTMessageInfo.rc)
         )
-        
+
         if MQTTMessageInfo.is_published() == False:
             print("Waiting for device registration message to be published.")
             MQTTMessageInfo.wait_for_publish()
@@ -416,15 +422,15 @@ class AgentCommon:
             print("waiting for device registration result...")
             time.sleep(0.1)
             count = count + 1
-            
+
             # if not self.myMQTTregistered:
             #     print("re-sending device registration payload")
             #     MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
-            
+
             if count > 300:
                 print("fatal: device registration timeout")
                 sys.exit(300)
-                
+
         # self.client.loop_stop()
 
     def mqtt_send_single_avro_ts_msg(self, topic, record):
@@ -465,7 +471,9 @@ class AgentCommon:
                     + str(rate)
                 )
 
-                self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
+                self.mqtt_deregistration(
+                    self.myAgent_deregistration_request_topic[0], uuid
+                )
                 self.mqtt_close()
                 sys.exit(0)
 
