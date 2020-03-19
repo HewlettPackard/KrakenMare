@@ -464,7 +464,9 @@ class IBswitchSimulator(AgentCommon):
         )
         
         # start sending data
-        self.send_data()
+        # self.send_data()
+        time.sleep(10)
+        self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
 
 
 # END IBswitchSimulator class
