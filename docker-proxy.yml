@@ -16,9 +16,6 @@ services:
   broker-3:
     <<: *proxy
   
-  simulator:
-    <<: *proxy
-    
   fanin:
     <<: *proxy
  
@@ -38,12 +35,6 @@ services:
   test-tools:
     <<: *proxy
 
-  collectd:
-    <<: *proxy
-
-  datapipes-monitor:
-    <<: *proxy
-
   zookeeper:
     <<: *proxy
 
@@ -57,9 +48,6 @@ services:
     <<: *proxy
 
   config-schemaregistry:
-    <<: *proxy
-
-  redfish:
     <<: *proxy
 
   config-druid:

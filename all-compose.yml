@@ -3,13 +3,11 @@
 #  zookeeper
 #  kafka broker 1-3
 #  mosquitto
-#  simulator
 #  druid
 #  grafana
 #  schema registry
 #  framework
 #  redis
-#  collectd
 #
 
 # Docker compose version
@@ -314,22 +312,6 @@ services:
       - zookeeper_kafka
       - krakenmare
 
-  simulator:
-    image: ${REGISTRY_FULL_PATH}simulator
-    build:
-      context: .
-      dockerfile: simulator/Dockerfile
-    hostname: simulator
-    <<: *deploy
-    networks:
-      - krakenmare
-    secrets:
-      - schemaregistry.certificate.pem
-      - schemaregistry.key
-      - mosquitto.certificate.pem
-      - mosquitto.key
-      - km-ca-1.crt
-      
   fanin:
     image: ${REGISTRY_FULL_PATH}fanin:latest
     build:
@@ -463,7 +445,12 @@ services:
       MQTT_SERVER: "ssl://mosquitto:8883"
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
       SCHEMA_REGISTRY: "https://schemaregistry:8081"
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.framework == true
     secrets:
       - mosquitto.certificate.pem
       - mosquitto.key
@@ -476,55 +463,12 @@ services:
     hostname: redis
     ports:
       - "6379:6379"
-    <<: *deploy
-    networks:
-      - krakenmare
-
-# No hostname is asserted. We want the docker host's name for this container
-  collectd:
-    image: ${REGISTRY_FULL_PATH}collectd
-    build:
-      context: collectd
-      dockerfile: Dockerfile
     deploy:
       restart_policy:
         condition: none
       placement:
         constraints:
-          - node.labels.injectors == true
-    secrets:
-      - client.certificate.pem
-      - client.key
-      - km-ca-1.crt
-    networks:
-      - krakenmare
-
-  influxdb:
-    # image: influxdb:latest
-    image : influxdb:1.7.6
-    hostname: influxdb
-    ports:
-      - "8086:8086"
-    environment:
-# https://docs.docker.com/samples/library/influxdb/
-      INFLUXDB_DB: datapipes
-    <<: *deploy
-    networks:
-      - krakenmare
-
-  datapipes-monitor:
-    image: ${REGISTRY_FULL_PATH}datapipes-monitor
-    build:
-      context: datapipes-monitor
-      dockerfile: Dockerfile
-    hostname: datapipesmonitor
-    ports:
-      - "7575:7575"
-    <<: *deploy
-    secrets:
-      - mosquitto.certificate.pem
-      - mosquitto.key
-      - km-ca-1.crt
+          - node.labels.framework == true
     networks:
       - krakenmare
 
@@ -567,33 +511,6 @@ services:
     networks:
       - zookeeper_kafka
       - krakenmare
-      
-  redfish:
-    image: ${REGISTRY_FULL_PATH}redfish
-    build:
-      context: .
-      dockerfile: ./redfish/Dockerfile
-      args:
-        REDFISHIP: "$REDFISHIP"
-        REDFISHACC: "$REDFISHACC"
-        REDFISHPWD: "$REDFISHPWD"
-    hostname: redfish
-    <<: *deploy
-    secrets:
-      - km-ca-1.crt
-      - km-ca-1.key
-      - km-ca-1.srl
-      - schemaregistry.certificate.pem
-      - schemaregistry.key
-    networks:
-      - zookeeper_kafka
-      - krakenmare
-    secrets:
-      - schemaregistry.certificate.pem
-      - schemaregistry.key
-      - mosquitto.certificate.pem
-      - mosquitto.key
-      - km-ca-1.crt
 
   config-druid:
     image: ${REGISTRY_FULL_PATH}config-druid
