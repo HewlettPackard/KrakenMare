@@ -3,6 +3,7 @@ package com.hpe.krakenmare.impl;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
@@ -31,8 +32,9 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	protected final KafkaAvroSerializer serializer = KafkaUtils.getAvroValueSerializer();
 	protected final KafkaAvroDeserializer deserializer = KafkaUtils.getAvroValueDeserializer();
 
-	private final static ExecutorService executor = Executors.newFixedThreadPool(32);
+	private final static ExecutorService executor = Executors.newFixedThreadPool(128);
 	private final AtomicInteger counter = new AtomicInteger(0);
+	private final AtomicLong firstReceived = new AtomicLong(0);
 
 	public FrameworkMqttListener(Repository<Agent> repository, IMqttAsyncClient mqtt, Producer<String, byte[]> kafkaProducer) {
 		this.repository = repository;
@@ -46,14 +48,17 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 			// LOG.info("Message received on topic '" + topic + "': " + message);
 			int c = counter.incrementAndGet();
 			long start = System.currentTimeMillis();
+
+			firstReceived.compareAndSet(0, start);
 			LOG.info("Message received on topic '" + topic + "' (#" + c + ")");
+
 			try {
 				@SuppressWarnings("unchecked")
 				P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
 				R response = process(payload);
 				afterProcess(payload, response);
 				long stop = System.currentTimeMillis();
-				LOG.info("Message processed (#" + c + ", " + (stop - start) + "ms)");
+				LOG.info("Message processed on topic '" + topic + "' (#" + c + ", " + (start - firstReceived.get()) + "ms, " + (stop - start) + "ms)");
 			} catch (Exception e) {
 				LOG.error("Exception occured during message handling (#" + c + ")", e);
 			}
