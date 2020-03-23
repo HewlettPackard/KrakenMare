@@ -22,13 +22,13 @@ public class AgentMemoryRepository implements Repository<Agent> {
 	private final List<Agent> agents = new ArrayList<>();
 
 	@Override
-	public void reset() {
+	public synchronized void reset() {
 		index.set(0);
 		agents.clear();
 	}
 
 	@Override
-	public Agent create(Agent payload) {
+	public synchronized Agent create(Agent payload) {
 		long id = index.getAndIncrement();
 		UUID uuid = UUID.randomUUID();
 		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
@@ -36,29 +36,29 @@ public class AgentMemoryRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public boolean save(Agent agent) {
+	public synchronized boolean save(Agent agent) {
 		return agents.add(agent);
 	}
 
 	@Override
-	public boolean delete(Agent agent) {
+	public synchronized boolean delete(Agent agent) {
 		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		return agents.remove(agent);
 	}
 
 	@Override
-	public List<Agent> getAll() {
+	public synchronized List<Agent> getAll() {
 		return agents;
 	}
 
 	@Override
-	public Agent update(Agent agent) {
+	public synchronized Agent update(Agent agent) {
 		// no-op
 		return agent;
 	}
 
 	@Override
-	public Agent get(UUID uuid) throws EntityNotFoundException {
+	public synchronized Agent get(UUID uuid) throws EntityNotFoundException {
 		Optional<Agent> opt = agents.stream().filter(a -> a.getUuid().equals(uuid)).findFirst();
 		if (!opt.isPresent()) {
 			throw new EntityNotFoundException(uuid);
