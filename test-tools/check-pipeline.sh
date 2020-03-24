@@ -35,16 +35,16 @@ run_me broker-3       kafkacat -b broker-3:9094 -L                || exit 1
 run_me redis          redis-cli -h redis ping                     || exit 1
 run_me framework      curl -s framework:8080/agents               || exit 1
 run_me mosquitto  timeout 10 mosquitto_sub -h mosquitto  -p 8883 --cafile /run/secrets/km-ca-1.crt --cert /run/secrets/mosquitto.certificate.pem --key /run/secrets/mosquitto.key --keyform pem -t '\$'SYS/broker/version -C 1 || exit 1
-run_me influx         curl -s influxdb:8086/ping                  || exit 1
-run_me kafka-avro-console kafka-avro-console-consumer --bootstrap-server broker-1:29092 --topic fabric --property schema.registry.url=https://schemaregistry:8081 --consumer.config /run/secrets/client-sasl_ssl.conf --max-messages=1 || exit 1
+#run_me influx         curl -s influxdb:8086/ping                  || exit 1
+#run_me kafka-avro-console kafka-avro-console-consumer --bootstrap-server broker-1:29092 --topic fabric --property schema.registry.url=https://schemaregistry:8081 --consumer.config /run/secrets/client-sasl_ssl.conf --max-messages=1 || exit 1
 run_me druid_coord    curl -s http://druid:8081/status/health     || exit 1
 run_me druid_broker   curl -s http://druid:8082/status/health     || exit 1
 run_me druid_histo    curl -s http://druid:8083/status/health     || exit 1
 run_me druid_overlord curl -s http://druid:8090/status/health     || exit 1
 run_me druid_middle   curl -s http://druid:8091/status/health     || exit 1
-run_me druid_perfquery  'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_perfquery.json http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
-run_me druid_collectd   'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_collectd.json   http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
-run_me influxdb       timeout 10 'curl -G "http://influxdb:8086/query?pretty=true" --data-urlencode "db=datapipes" --data-urlencode "q=show diagnostics"' || exit 1
+#run_me druid_perfquery  'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_perfquery.json http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
+#run_me druid_collectd   'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_collectd.json   http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
+#run_me influxdb       timeout 10 'curl -G "http://influxdb:8086/query?pretty=true" --data-urlencode "db=datapipes" --data-urlencode "q=show diagnostics"' || exit 1
 run_me ssl-broker-1   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-1:19092 || exit 1
 run_me ssl-broker-2   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-2:19093 || exit 1
 run_me ssl-broker-3   kafkacat -L -X ssl.ca.location=/run/secrets/km-ca-1.crt -X ssl.certificate.location=/run/secrets/client.certificate.pem -X ssl.key.location=/run/secrets/client.key -X ssl.key.password=krakenmare -X security.protocol=ssl -b broker-3:19094 || exit 1
