@@ -31,7 +31,7 @@ RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/a
 FROM ubuntu:18.04
 
 RUN apt-get update && apt-get upgrade -y && apt-get -y install software-properties-common
-RUN apt-get update && apt-get install -y netcat wget python3.7 python3.7-dev
+RUN apt-get update && apt-get install -y netcat wget python3.7 python3.7-dev curl jq
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 RUN apt-get update && apt-get install -y python3-pip
 # Runtime deps from the build deps above
@@ -43,6 +43,7 @@ RUN pip3 install paho-mqtt confluent-kafka configparser colorlog python-schema-r
 
 COPY ./fanin/FanIn.py ./fanin/entrypoint.sh fanin/version.py fanin/FanIn.cfg fanin/KrakenMareLogger.py /fanin/
 COPY ./agent-python-module/agentcommon.py /fanin
+COPY ./test-schemas/check_schemas.sh /fanin
 
 WORKDIR /fanin
 ENV PYTHONUNBUFFERED=1
