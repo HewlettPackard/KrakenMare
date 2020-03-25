@@ -55,3 +55,6 @@ services:
 
   config-kafka:
     <<: *proxy
+
+  mosquitto:
+    <<: *proxy

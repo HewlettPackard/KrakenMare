@@ -237,12 +237,13 @@ services:
       - krakenmare
 
   mosquitto:
-    image: eclipse-mosquitto:latest
+    image: ${REGISTRY_FULL_PATH}eclipse-mosquitto
+    build:
+      context: mosquitto
+      dockerfile: Dockerfile
     hostname: mosquitto
     ports:
       - "8883:8883"
-    volumes:
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     deploy:
       restart_policy:
         condition: none
