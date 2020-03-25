@@ -8,6 +8,7 @@
 #  schema registry
 #  framework
 #  redis
+#  simulator
 #
 
 # Docker compose version
@@ -541,6 +542,22 @@ services:
       - kafka.client.truststore.pfx
     networks:
       - zookeeper_kafka
+
+  simulator:
+    image: ${REGISTRY_FULL_PATH}simulator
+    build:
+      context: .
+      dockerfile: simulator/Dockerfile
+    hostname: simulator
+    <<: *deploy
+    networks:
+      - krakenmare
+    secrets:
+      - schemaregistry.certificate.pem
+      - schemaregistry.key
+      - mosquitto.certificate.pem
+      - mosquitto.key
+      - km-ca-1.crt
 
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, schema registry) plus druid (needs zk)
