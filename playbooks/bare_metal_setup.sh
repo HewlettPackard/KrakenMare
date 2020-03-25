@@ -2,8 +2,8 @@
 
 ## Export proxy HPE
 
-export http_proxy=http://grewebcachevip.bastion.europe.hp.com:8080
-export https_proxy=http://grewebcachevip.bastion.europe.hp.com:8080
+export http_proxy=http://web-proxy.bbn.hpecorp.net:8080
+export https_proxy=http://web-proxy.bbn.hpecorp.net:8080
 
 ## Setup repo
 echo "Mounting repo from 16.16.184.151"
