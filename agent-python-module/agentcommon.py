@@ -465,9 +465,7 @@ class AgentCommon:
                     + str(rate)
                 )
 
-                self.mqtt_deregistration(
-                    self.myAgent_deregistration_request_topic[0], uuid
-                )
+                #self.mqtt_deregistration(self.myAgent_deregistration_request_topic[0], uuid)
                 self.mqtt_close()
                 sys.exit(0)
 
