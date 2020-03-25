@@ -3,6 +3,7 @@ package com.hpe.krakenmare.impl;
 import java.util.UUID;
 
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -59,9 +60,9 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
 
 		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "': " + respPayload);
-		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "'");
-		// ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, respPayload);
-		// kafkaProducer.send(record);
+		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "'");
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, respPayload);
+		kafkaProducer.send(record);
 	}
 
 }
