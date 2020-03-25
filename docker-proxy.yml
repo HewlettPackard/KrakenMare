@@ -58,3 +58,6 @@ services:
 
   mosquitto:
     <<: *proxy
+
+  simulator:
+    <<: *proxy
