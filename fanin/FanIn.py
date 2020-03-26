@@ -66,6 +66,14 @@ class FanIn(AgentCommon):
         self.kafka_broker = self.config.get("Kafka", "kafka_broker")
         self.kafka_port = int(self.config.get("Kafka", "kafka_port"))
         self.kafkaProducerTopic = self.config.get("Kafka", "kafkaProducerTopic")
+        self.kafka_security_protocol = self.config.get("Kafka", "kafka_security.protocol")
+        self.kafka_sasl_mechanisms = self.config.get("Kafka", "kafka_sasl.mechanisms")
+        self.kafka_sasl_username = self.config.get("Kafka", "kafka_sasl.username")
+        self.kafka_sasl_password = self.config.get("Kafka", "kafka_sasl.password")
+        self.kafka_ssl_ca_location = self.config.get("Kafka", "kafka_ssl.ca.location")
+        self.kafka_ssl_certificate_location = self.config.get("Kafka", "kafka_ssl.certificate.location")
+        self.kafka_ssl_key_location = self.config.get("Kafka", "kafka_ssl.key.location")
+        self.kafka_ssl_key_password = self.config.get("Kafka", "kafka_ssl.key.password")
         self.myFanIn_mqtt_encryption_enabled = encrypt
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
@@ -243,6 +251,14 @@ class FanIn(AgentCommon):
             "bootstrap.servers": self.bootstrapServerStr,
             "client.id": socket.gethostname() + "topicCheck",
             "error_cb": self.kafka_producer_error_cb,
+            "security.protocol": self.kafka_security_protocol,
+            "sasl.mechanisms": self.kafka_sasl_mechanisms,
+            "sasl.username": self.kafka_sasl_username,
+            "sasl.password": self.kafka_sasl_password,
+            "ssl.ca.location": self.kafka_ssl_ca_location,
+            "ssl.certificate.location": self.kafka_ssl_certificate_location,
+            "ssl.key.location": self.kafka_ssl_key_location,
+            "ssl.key.password": self.kafka_ssl_key_password
         }
 
         while test == False:
@@ -265,8 +281,16 @@ class FanIn(AgentCommon):
 
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
-            "client.id": socket.gethostname(),
+            "client.id": socket.gethostname() + "topicCheck",
             "error_cb": self.kafka_producer_error_cb,
+            "security.protocol": self.kafka_security_protocol,
+            "sasl.mechanisms": self.kafka_sasl_mechanisms,
+            "sasl.username": self.kafka_sasl_username,
+            "sasl.password": self.kafka_sasl_password,
+            "ssl.ca.location": self.kafka_ssl_ca_location,
+            "ssl.certificate.location": self.kafka_ssl_certificate_location,
+            "ssl.key.location": self.kafka_ssl_key_location,
+            "ssl.key.password": self.kafka_ssl_key_password,
             "linger.ms": 1000,
             "message.max.bytes": 2560000,
             "queue.buffering.max.messages": 2000000,
