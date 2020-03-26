@@ -237,6 +237,10 @@ if [ "$deploy" == "1" ]; then
 fi
 
 if [ "$export" == "1" ]; then
+    #make sure upstream image we don't build are available in the mirror registry
+    echo "Pull required images..."
+    docker-compose pull
+
     cd /tmp/
     echo "Saving ansible docker image..."
     docker save ansible:latest -o ansible-docker-image.tar
