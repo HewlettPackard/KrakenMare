@@ -13,7 +13,7 @@ function count () {
 c=$(count)
 
 try=0
-while [ "$c" -eq "-1" ];
+while [ "$c" == "-1" ];
 do
     echo "initial access to schemaregistry failed, retrying in 10 secs..."
     sleep 10
@@ -26,17 +26,10 @@ do
     fi
 done
 
-#as long as number of schemas is 0 loop...
-while [ "$c" == "0" ];
-do
-    sleep 10
-    c=$(count)
-done
-
 #now that it is not zero, just wait it stabilizes value for 10 seconds
 while : ; do
     cprev=$c
-    sleep 20
+    sleep 10
     c=$(count)
     [[ "$c" != "$cprev" ]] || break
 done
