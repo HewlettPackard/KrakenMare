@@ -41,9 +41,6 @@ services:
   schemaregistry:
     <<: *proxy
 
-  schemaregistrydruid:
-    <<: *proxy
-
   config-zookeeper:
     <<: *proxy
 

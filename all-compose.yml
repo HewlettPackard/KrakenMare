@@ -388,11 +388,12 @@ services:
     hostname: schemaregistry
     ports:
       - "8081:8081"
+      - "8085:8085"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "SASL_SSL://broker-1:29092,SASL_SSL://broker-2:29093,SASL_SSL://broker-3:29094"
-      SCHEMA_REGISTRY_LISTENERS: "https://0.0.0.0:8081"
+      SCHEMA_REGISTRY_LISTENERS: "https://0.0.0.0:8081,http://0.0.0.0:8085"
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.scram.ScramLoginModule required  username=\"schemaregistry\" password=\"schemaregistry-secret\";"
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: SCRAM-SHA-256
@@ -415,24 +416,6 @@ services:
         target: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
       - source: kafka.schemaregistry.keystore.pfx
         target: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
-    <<: *deploy
-    networks:
-      - zookeeper_kafka
-      - krakenmare
-
-  schemaregistrydruid:
-    image: ${REGISTRY_FULL_PATH}schemaregistry
-    build:
-      context: schemaregistry
-      dockerfile: Dockerfile
-    hostname: schemaregistrydruid
-    ports:
-      - "8085:8085"
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schemaregistrydruid
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://broker-1:9092,PLAINTEXT://broker-2:9093,PLAINTEXT://broker-3:9094"
-      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8085"
     <<: *deploy
     networks:
       - zookeeper_kafka

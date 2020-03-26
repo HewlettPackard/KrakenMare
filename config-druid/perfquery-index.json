@@ -6,7 +6,7 @@
       "type": "avro_stream",
       "avroBytesDecoder": {
         "type": "schema_registry",
-        "url": "http://schemaregistrydruid:8085"
+        "url": "http://schemaregistry:8085"
       },
       "parseSpec": {
         "format": "avro",
