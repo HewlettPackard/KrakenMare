@@ -249,7 +249,7 @@ class FanIn(AgentCommon):
 
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
-            "client.id": socket.gethostname() + "topicCheck",
+            "client.id": socket.gethostname(),
             "error_cb": self.kafka_producer_error_cb,
             "security.protocol": self.kafka_security_protocol,
             "sasl.mechanisms": self.kafka_sasl_mechanisms,
@@ -262,13 +262,13 @@ class FanIn(AgentCommon):
         }
 
         while test == False:
-            time.sleep(0.1)
+            time.sleep(1)
             print("waiting for kafka producer to connect")
 
             try:
                 # shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
                 kafka_producer = KafkaProducer(conf)
-                kafka_producer.list_topics(topic=myTopic, timeout=0.2)
+                kafka_producer.list_topics(topic=myTopic, timeout=1)
                 test = True
             except KafkaException as e:
                 # print(e.args[0])
@@ -281,7 +281,7 @@ class FanIn(AgentCommon):
 
         conf = {
             "bootstrap.servers": self.bootstrapServerStr,
-            "client.id": socket.gethostname() + "topicCheck",
+            "client.id": socket.gethostname(),
             "error_cb": self.kafka_producer_error_cb,
             "security.protocol": self.kafka_security_protocol,
             "sasl.mechanisms": self.kafka_sasl_mechanisms,
@@ -297,13 +297,13 @@ class FanIn(AgentCommon):
         }
 
         while test == False:
-            time.sleep(0.1)
+            time.sleep(2)
             print("waiting for kafka producer to connect")
 
             try:
                 # shouldn't be used directly: self.kafka_client = kafka.KafkaClient(self.kafka_broker)
                 self.kafka_producer = KafkaProducer(conf)
-                self.kafka_producer.list_topics(timeout=0.2)
+                self.kafka_producer.list_topics(timeout=1)
                 test = True
             except KafkaException as e:
                 print(e.args[0])
@@ -455,7 +455,7 @@ def main():
                 },
             )
             NewP.start()
-            time.sleep(0.1)
+            time.sleep(1)
 
         print(
             "MULTIPROC-MAIN - All processes launched, now main process will wait forever as Signals across Processes & threads is not handled."
