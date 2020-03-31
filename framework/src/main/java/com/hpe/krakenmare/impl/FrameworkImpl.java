@@ -14,14 +14,16 @@ import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.repositories.AgentRedisRepository;
 
 import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 public class FrameworkImpl implements Framework {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkImpl.class);
 
-	private final Jedis jedis = new Jedis(HostAndPort.parseString(Main.getProperty("redis.server")));
-	private final AgentRedisRepository agents = new AgentRedisRepository(jedis);
+	private static final HostAndPort hp = HostAndPort.parseString(Main.getProperty("redis.server"));
+	private final JedisPool pool = new JedisPool(new JedisPoolConfig(), hp.getHost(), hp.getPort());
+	private final AgentRedisRepository agents = new AgentRedisRepository(pool);
 	private final FrameworkMqttClient mqttListener = new FrameworkMqttClient();
 
 	private final Producer<String, byte[]> kafkaProducer = KafkaUtils.createByteArrayProducer("framework-manager");
@@ -48,6 +50,7 @@ public class FrameworkImpl implements Framework {
 		}
 		mqttListener.stop();
 		kafkaProducer.close();
+		pool.close();
 	}
 
 	@Override

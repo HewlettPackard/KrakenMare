@@ -3,6 +3,7 @@ package com.hpe.krakenmare.repositories;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import com.hpe.krakenmare.core.Agent;
 import com.hpe.krakenmare.rest.ObjectMapperContextResolver;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 public class AgentRedisRepository implements Repository<Agent> {
 
@@ -42,53 +44,65 @@ public class AgentRedisRepository implements Repository<Agent> {
 		}
 	}
 
-	private final Jedis jedis;
+	private final JedisPool jpool;
 	private final String counterKey = "myCounterKey";
 	private final String agentsKey = "myAgentsKey";
 	private final String agentDataKey = "myAgentDataKey";
 
-	public AgentRedisRepository(Jedis jedis) {
+	public AgentRedisRepository(JedisPool jedis) {
 		this(jedis, false);
 	}
 
-	public AgentRedisRepository(Jedis jedis, boolean reset) {
-		this.jedis = jedis;
+	public AgentRedisRepository(JedisPool jedis, boolean reset) {
+		this.jpool = jedis;
 		if (reset) {
 			reset();
 		}
 	}
 
 	@Override
-	public synchronized Agent create(Agent payload) {
-		long id = jedis.incr(counterKey);
+	public Agent create(Agent payload) {
+		long id = -1;
+		try (Jedis jedis = jpool.getResource()) {
+			id = jedis.incr(counterKey);
+		}
 		UUID uuid = UUID.randomUUID();
 		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
 		return new Agent(id, payload.getUid(), uuid, payload.getName(), Collections.emptyList());
 	}
 
 	@Override
-	public synchronized boolean save(Agent agent) {
+	public boolean save(Agent agent) {
 		String agentKey = agentDataKey + ":" + agent.getUuid();
-		return jedis.hset(agentsKey, agentKey, toJson(agent)) == 1;
+		String json = toJson(agent);
+		try (Jedis jedis = jpool.getResource()) {
+			return jedis.hset(agentsKey, agentKey, json) == 1;
+		}
 	}
 
 	@Override
-	public synchronized Agent update(Agent agent) {
+	public Agent update(Agent agent) {
 		save(agent);
 		return agent;
 	}
 
 	@Override
-	public synchronized boolean delete(Agent agent) {
+	public boolean delete(Agent agent) {
 		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		String agentKey = agentDataKey + ":" + agent.getUuid();
-		return jedis.hdel(agentsKey, agentKey) == 1;
+		try (Jedis jedis = jpool.getResource()) {
+			return jedis.hdel(agentsKey, agentKey) == 1;
+		}
 	}
 
 	@Override
-	public synchronized Agent get(UUID uuid) throws EntityNotFoundException {
+	public Agent get(UUID uuid) throws EntityNotFoundException {
 		String agentKey = agentDataKey + ":" + uuid;
-		String json = jedis.hget(agentsKey, agentKey);
+
+		String json = null;
+		try (Jedis jedis = jpool.getResource()) {
+			json = jedis.hget(agentsKey, agentKey);
+		}
 		if (json == null) {
 			throw new EntityNotFoundException(uuid);
 		}
@@ -96,22 +110,29 @@ public class AgentRedisRepository implements Repository<Agent> {
 	}
 
 	@Override
-	public synchronized long count() {
-		return jedis.hlen(agentsKey);
+	public long count() {
+		try (Jedis jedis = jpool.getResource()) {
+			return jedis.hlen(agentsKey);
+		}
 	}
 
 	@Override
-	public synchronized List<Agent> getAll() {
-		return jedis.hgetAll(agentsKey)
-				.values()
+	public List<Agent> getAll() {
+		Map<String, String> result = null;
+		try (Jedis jedis = jpool.getResource()) {
+			result = jedis.hgetAll(agentsKey);
+		}
+		return result.values()
 				.stream()
 				.map(AgentRedisRepository::fromJson)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public synchronized void reset() {
-		jedis.del(counterKey, agentsKey, agentDataKey);
+	public void reset() {
+		try (Jedis jedis = jpool.getResource()) {
+			jedis.del(counterKey, agentsKey, agentDataKey);
+		}
 	}
 
 }
