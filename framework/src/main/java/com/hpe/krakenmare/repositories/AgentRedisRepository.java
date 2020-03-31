@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -60,12 +61,15 @@ public class AgentRedisRepository implements Repository<Agent> {
 		}
 	}
 
+	private <T> T jedis(Function<Jedis, T> f) {
+		try (Jedis jedis = jpool.getResource()) {
+			return f.apply(jedis);
+		}
+	}
+
 	@Override
 	public Agent create(Agent payload) {
-		long id = -1;
-		try (Jedis jedis = jpool.getResource()) {
-			id = jedis.incr(counterKey);
-		}
+		long id = jedis(j -> j.incr(counterKey));
 		UUID uuid = UUID.randomUUID();
 		LOG.info("Creating new agent: id='{}', uid='{}', uuid='{}', name='{}'", id, payload.getUid(), uuid, payload.getName());
 		return new Agent(id, payload.getUid(), uuid, payload.getName(), Collections.emptyList());
@@ -75,9 +79,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 	public boolean save(Agent agent) {
 		String agentKey = agentDataKey + ":" + agent.getUuid();
 		String json = toJson(agent);
-		try (Jedis jedis = jpool.getResource()) {
-			return jedis.hset(agentsKey, agentKey, json) == 1;
-		}
+		return jedis(j -> (j.hset(agentsKey, agentKey, json) == 1));
 	}
 
 	@Override
@@ -90,19 +92,15 @@ public class AgentRedisRepository implements Repository<Agent> {
 	public boolean delete(Agent agent) {
 		LOG.info("Deleting agent: id='{}', uid='{}', uuid='{}', name='{}'", agent.getId(), agent.getUid(), agent.getUuid(), agent.getName());
 		String agentKey = agentDataKey + ":" + agent.getUuid();
-		try (Jedis jedis = jpool.getResource()) {
-			return jedis.hdel(agentsKey, agentKey) == 1;
-		}
+
+		return jedis(j -> (j.hdel(agentsKey, agentKey) == 1));
 	}
 
 	@Override
 	public Agent get(UUID uuid) throws EntityNotFoundException {
 		String agentKey = agentDataKey + ":" + uuid;
 
-		String json = null;
-		try (Jedis jedis = jpool.getResource()) {
-			json = jedis.hget(agentsKey, agentKey);
-		}
+		String json = jedis(j -> j.hget(agentsKey, agentKey));
 		if (json == null) {
 			throw new EntityNotFoundException(uuid);
 		}
@@ -111,17 +109,12 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public long count() {
-		try (Jedis jedis = jpool.getResource()) {
-			return jedis.hlen(agentsKey);
-		}
+		return jedis(j -> j.hlen(agentsKey));
 	}
 
 	@Override
 	public List<Agent> getAll() {
-		Map<String, String> result = null;
-		try (Jedis jedis = jpool.getResource()) {
-			result = jedis.hgetAll(agentsKey);
-		}
+		Map<String, String> result = jedis(j -> j.hgetAll(agentsKey));
 		return result.values()
 				.stream()
 				.map(AgentRedisRepository::fromJson)
@@ -130,9 +123,7 @@ public class AgentRedisRepository implements Repository<Agent> {
 
 	@Override
 	public void reset() {
-		try (Jedis jedis = jpool.getResource()) {
-			jedis.del(counterKey, agentsKey, agentDataKey);
-		}
+		jedis(j -> j.del(counterKey, agentsKey, agentDataKey));
 	}
 
 }
