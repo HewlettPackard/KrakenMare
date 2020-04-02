@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.apache.avro.util.Utf8;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
@@ -62,11 +61,7 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 		DeviceListResponse response = new DeviceListResponse(agentUuid, uuids);
 		sendMqttResponse(topic, response);
 
-		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.DEVICE_REGISTRATION_TOPIC + "': " + respPayload);
-		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.DEVICE_REGISTRATION_TOPIC + "'");
-		byte[] respPayload = serializer.serialize(null, response);
-		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.DEVICE_REGISTRATION_TOPIC, payload.getUuid().toString(), respPayload);
-		kafkaProducer.send(record);
+		sendKafkaMessage(KafkaUtils.DEVICE_REGISTRATION_TOPIC, agentUuid, agent);
 
 		return response;
 	}

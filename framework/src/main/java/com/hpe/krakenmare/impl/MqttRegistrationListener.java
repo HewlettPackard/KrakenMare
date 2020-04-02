@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.apache.avro.util.Utf8;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
@@ -47,12 +46,6 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 		String topic = MqttUtils.getRegistrationResponseTopic(payload.getUid());
 		RegisterResponse response = new RegisterResponse(new Utf8(uid), true, new Utf8("Registration succeed"), uuid, Collections.emptyMap());
 		sendMqttResponse(topic, response);
-
-		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "': " + respPayload);
-		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "'");
-		byte[] respPayload = serializer.serialize(null, response);
-		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, response.getUuid().toString(), respPayload);
-		kafkaProducer.send(record);
 
 		return response;
 	}

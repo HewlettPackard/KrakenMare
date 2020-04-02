@@ -27,7 +27,6 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		super(repository, mqtt, kafkaProducer);
 	}
 
-	// TODO: error handling (agent not found...)
 	// TODO: atomicity? repo.delete(UUID)?
 	private boolean deregisterAgent(UUID agentUuid) throws EntityNotFoundException {
 		Agent agent = repository.get(agentUuid);
@@ -53,6 +52,8 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		byte[] respPayload = serializer.serialize(null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, payload.getUuid().toString(), respPayload);
 		kafkaProducer.send(record);
+
+		sendKafkaMessage(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, uuid, response);
 
 		return response;
 	}

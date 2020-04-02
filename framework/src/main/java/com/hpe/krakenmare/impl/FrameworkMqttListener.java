@@ -1,5 +1,6 @@
 package com.hpe.krakenmare.impl;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -7,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -76,6 +78,14 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 
 		LOG.debug("Sending MQTT message to topic '" + topic + "'");
 		mqtt.publish(topic, mqttResponse, mqttResponse, new PublishCallback());
+	}
+
+	// do not use R type, we want to be able to send anything
+	protected void sendKafkaMessage(String topic, UUID key, Object response) {
+		LOG.debug("Sending Kafka message to topic '" + topic + "'");
+		byte[] respPayload = serializer.serialize(/* ignored */ null, response);
+		ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, (key == null) ? null : key.toString(), respPayload);
+		kafkaProducer.send(record);
 	}
 
 	// uses the userContext to carry the MqttMessage sent
