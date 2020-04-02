@@ -11,7 +11,9 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +69,18 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 
 	abstract R process(P payload) throws FrameworkException;
 
-	abstract void afterProcess(P payload, R response) throws Exception;
+	abstract String getMqttResponseTopic(P payload);
+
+	protected void afterProcess(P payload, R response) throws MqttPersistenceException, MqttException {
+		// we don't care about the Kafka topic (null) because we are using RecordNameStrategy for VALUE_SUBJECT_NAME_STRATEGY
+		byte[] respPayload = serializer.serialize(null, response);
+		MqttMessage mqttResponse = new MqttMessage(respPayload);
+		mqttResponse.setQos(MqttUtils.getPublishQos());
+		String respTopic = getMqttResponseTopic(payload);
+
+		LOG.debug("Sending MQTT message to topic '" + respTopic + "'");
+		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
+	}
 
 	// uses the userContext to carry the MqttMessage sent
 	static class PublishCallback implements IMqttActionListener {

@@ -1,6 +1,5 @@
 package com.hpe.krakenmare.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,19 +63,17 @@ public class MqttDeviceListListener extends FrameworkMqttListener<DeviceList, De
 	}
 
 	@Override
-	void afterProcess(DeviceList payload, DeviceListResponse response) throws IOException, MqttPersistenceException, MqttException {
-		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
-		byte[] respPayload = serializer.serialize(KafkaUtils.DEVICE_REGISTRATION_TOPIC, response);
-		MqttMessage mqttResponse = new MqttMessage(respPayload);
-		mqttResponse.setQos(MqttUtils.getPublishQos());
-		String respTopic = MqttUtils.getSensorListResponseTopic(response.getUuid());
+	String getMqttResponseTopic(DeviceList payload) {
+		return MqttUtils.getSensorListResponseTopic(payload.getUuid());
+	}
 
-		// LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
-		LOG.debug("Sending MQTT message to topic '" + respTopic + "'");
-		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
+	@Override
+	protected void afterProcess(DeviceList payload, DeviceListResponse response) throws MqttPersistenceException, MqttException {
+		super.afterProcess(payload, response);
 
 		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.DEVICE_REGISTRATION_TOPIC + "': " + respPayload);
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.DEVICE_REGISTRATION_TOPIC + "'");
+		byte[] respPayload = serializer.serialize(null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.DEVICE_REGISTRATION_TOPIC, payload.getUuid().toString(), respPayload);
 		kafkaProducer.send(record);
 	}

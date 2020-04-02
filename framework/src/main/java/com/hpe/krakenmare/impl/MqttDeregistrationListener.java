@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,19 +48,17 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 	}
 
 	@Override
-	void afterProcess(DeregisterRequest payload, DeregisterResponse response) throws Exception {
-		// TODO: we can likely factorize this serialization into super class FrameworkMqttListener
-		byte[] respPayload = serializer.serialize(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, response);
-		MqttMessage mqttResponse = new MqttMessage(respPayload);
-		mqttResponse.setQos(MqttUtils.getPublishQos());
-		String respTopic = MqttUtils.getDeregistrationResponseTopic(response.getAgentUuid());
+	String getMqttResponseTopic(DeregisterRequest payload) {
+		return MqttUtils.getDeregistrationResponseTopic(payload.getUuid());
+	}
 
-		// LOG.debug("Sending MQTT message to topic '" + respTopic + "': " + mqttResponse);
-		LOG.debug("Sending MQTT message to topic '" + respTopic + "'");
-		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
+	@Override
+	protected void afterProcess(DeregisterRequest payload, DeregisterResponse response) throws MqttPersistenceException, MqttException {
+		super.afterProcess(payload, response);
 
 		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "': " + respPayload);
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "'");
+		byte[] respPayload = serializer.serialize(null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, payload.getUuid().toString(), respPayload);
 		kafkaProducer.send(record);
 	}
