@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -81,7 +82,7 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 	}
 
 	// do not use R type, we want to be able to send anything
-	protected void sendKafkaMessage(String topic, UUID key, Object response) {
+	protected void sendKafkaMessage(String topic, UUID key, SpecificRecord response) {
 		LOG.debug("Sending Kafka message to topic '" + topic + "'");
 		byte[] respPayload = serializer.serialize(/* ignored */ null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, (key == null) ? null : key.toString(), respPayload);
