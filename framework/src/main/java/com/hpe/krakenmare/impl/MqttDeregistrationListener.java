@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,7 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 	}
 
 	@Override
-	DeregisterResponse process(DeregisterRequest payload) throws EntityNotFoundException {
+	DeregisterResponse process(DeregisterRequest payload) throws EntityNotFoundException, MqttException {
 		UUID uuid = payload.getUuid();
 		boolean success = deregisterAgent(uuid);
 		if (success) {
@@ -44,23 +43,18 @@ public class MqttDeregistrationListener extends FrameworkMqttListener<Deregister
 		} else {
 			LOG.warn("Unable to deleted agent: " + uuid);
 		}
-		return new DeregisterResponse(uuid, success);
-	}
 
-	@Override
-	String getMqttResponseTopic(DeregisterRequest payload) {
-		return MqttUtils.getDeregistrationResponseTopic(payload.getUuid());
-	}
-
-	@Override
-	protected void afterProcess(DeregisterRequest payload, DeregisterResponse response) throws MqttPersistenceException, MqttException {
-		super.afterProcess(payload, response);
+		String topic = MqttUtils.getDeregistrationResponseTopic(payload.getUuid());
+		DeregisterResponse response = new DeregisterResponse(uuid, success);
+		sendMqttResponse(topic, response);
 
 		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "': " + respPayload);
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_DEREGISTRATION_TOPIC + "'");
 		byte[] respPayload = serializer.serialize(null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_DEREGISTRATION_TOPIC, payload.getUuid().toString(), respPayload);
 		kafkaProducer.send(record);
+
+		return response;
 	}
 
 }

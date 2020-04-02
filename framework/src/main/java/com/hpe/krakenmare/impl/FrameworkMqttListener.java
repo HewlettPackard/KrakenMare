@@ -56,9 +56,8 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 
 			try {
 				@SuppressWarnings("unchecked")
-				P payload = (P) deserializer.deserialize(null /* ignored */, message.getPayload());
-				R response = process(payload);
-				afterProcess(payload, response);
+				P payload = (P) deserializer.deserialize(/* ignored */ null, message.getPayload());
+				process(payload);
 				long stop = System.currentTimeMillis();
 				LOG.info("Message processed on topic '" + topic + "' (#" + c + ", " + (start - firstReceived.get()) + "ms, " + (stop - start) + "ms)");
 			} catch (Exception e) {
@@ -67,19 +66,16 @@ public abstract class FrameworkMqttListener<P extends SpecificRecordBase, R exte
 		});
 	}
 
-	abstract R process(P payload) throws FrameworkException;
+	abstract R process(P payload) throws FrameworkException, MqttException;
 
-	abstract String getMqttResponseTopic(P payload);
-
-	protected void afterProcess(P payload, R response) throws MqttPersistenceException, MqttException {
+	protected void sendMqttResponse(String topic, R response) throws MqttPersistenceException, MqttException {
 		// we don't care about the Kafka topic (null) because we are using RecordNameStrategy for VALUE_SUBJECT_NAME_STRATEGY
-		byte[] respPayload = serializer.serialize(null, response);
+		byte[] respPayload = serializer.serialize(/* ignored */ null, response);
 		MqttMessage mqttResponse = new MqttMessage(respPayload);
 		mqttResponse.setQos(MqttUtils.getPublishQos());
-		String respTopic = getMqttResponseTopic(payload);
 
-		LOG.debug("Sending MQTT message to topic '" + respTopic + "'");
-		mqtt.publish(respTopic, mqttResponse, mqttResponse, new PublishCallback());
+		LOG.debug("Sending MQTT message to topic '" + topic + "'");
+		mqtt.publish(topic, mqttResponse, mqttResponse, new PublishCallback());
 	}
 
 	// uses the userContext to carry the MqttMessage sent

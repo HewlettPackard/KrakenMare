@@ -37,29 +37,24 @@ public class MqttRegistrationListener extends FrameworkMqttListener<RegisterRequ
 	}
 
 	@Override
-	RegisterResponse process(RegisterRequest payload) {
+	RegisterResponse process(RegisterRequest payload) throws MqttPersistenceException, MqttException {
 		String name = payload.getName().toString();
 		String uid = payload.getUid().toString();
 		Agent agent = new Agent(-1l, new Utf8(uid), null, new Utf8(name), Collections.emptyList());
 		agent = registerNewAgent(agent);
 		UUID uuid = agent.getUuid();
-		return new RegisterResponse(new Utf8(uid), true, new Utf8("Registration succeed"), uuid, Collections.emptyMap());
-	}
 
-	@Override
-	String getMqttResponseTopic(RegisterRequest payload) {
-		return MqttUtils.getRegistrationResponseTopic(payload.getUid());
-	}
-
-	@Override
-	protected void afterProcess(RegisterRequest payload, RegisterResponse response) throws MqttPersistenceException, MqttException {
-		super.afterProcess(payload, response);
+		String topic = MqttUtils.getRegistrationResponseTopic(payload.getUid());
+		RegisterResponse response = new RegisterResponse(new Utf8(uid), true, new Utf8("Registration succeed"), uuid, Collections.emptyMap());
+		sendMqttResponse(topic, response);
 
 		// LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "': " + respPayload);
 		LOG.debug("Sending Kafka message to topic '" + KafkaUtils.AGENT_REGISTRATION_TOPIC + "'");
 		byte[] respPayload = serializer.serialize(null, response);
 		ProducerRecord<String, byte[]> record = new ProducerRecord<>(KafkaUtils.AGENT_REGISTRATION_TOPIC, response.getUuid().toString(), respPayload);
 		kafkaProducer.send(record);
+
+		return response;
 	}
 
 }
