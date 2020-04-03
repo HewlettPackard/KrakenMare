@@ -414,9 +414,7 @@ class IBswitchSimulator(AgentCommon):
                         record = {}
                         record["timestamp"] = timestamp
                         record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
-                        record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][
-                            ibmetric
-                        ]
+                        record["sensorValue"] = float(i)
                         # print(record)
                         record_list.append(record)
 
@@ -430,6 +428,7 @@ class IBswitchSimulator(AgentCommon):
                     )
 
             # Infinite loop
+            i += 1
             time.sleep(self.sleepLoopTime)
 
     def signal_handler(self, signal, frame):
