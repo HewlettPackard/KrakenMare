@@ -410,13 +410,16 @@ class IBswitchSimulator(AgentCommon):
                         switchSimulatorSeedMap[cmc][switchGUID]["PortXmitDiscards"] += 2
 
                     # Assign the simulator values to the record to be serialized
-                    for ibmetric in ibmetrics:
-                        record = {}
-                        record["timestamp"] = timestamp
-                        record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
-                        record["sensorValue"] = float(i)
-                        # print(record)
-                        record_list.append(record)
+                    record = {}
+                    record["timestamp"] = timestamp
+                    record["sensorUuid"] = self.myAgent_uuid
+                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
+                    record_list.append(record)
+                    record = {}
+                    record["timestamp"] = timestamp
+                    record["sensorUuid"] = self.myAgent_uuid
+                    record["sensorValue"] = float(self.myBatchCounter*1000)
+                    record_list.append(record)
 
                     self.mqtt_send_triplet_batch(
                         self.myAgent_send_ts_data_topic,

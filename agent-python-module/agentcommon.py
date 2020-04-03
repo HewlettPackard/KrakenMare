@@ -500,7 +500,7 @@ class AgentCommon:
             myMQTT_ts_data_triplet = {
                 "timestamp": eachRecord["timestamp"],
                 "sensorUuid": eachRecord["sensorUuid"],
-                "sensorValue": float((self.myCurrentSubtopic+1)*self.myBatchCounter),
+                "sensorValue": eachRecord["sensorValue"]
             }
 
             if byteBatchSize > 0:
