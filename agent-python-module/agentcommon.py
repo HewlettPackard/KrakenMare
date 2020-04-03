@@ -40,6 +40,7 @@ class AgentCommon:
     myCurrentSubtopic = 0
     myNumber_of_msg_send = 0
     myMessageCounter = 0
+    myBatchCounter = 0
 
     def __init__(self, configFile, debug):
         """
@@ -499,7 +500,7 @@ class AgentCommon:
             myMQTT_ts_data_triplet = {
                 "timestamp": eachRecord["timestamp"],
                 "sensorUuid": eachRecord["sensorUuid"],
-                "sensorValue": eachRecord["sensorValue"],
+                "sensorValue": float((self.myCurrentSubtopic+1)*self.myBatchCounter),
             }
 
             if byteBatchSize > 0:
@@ -545,6 +546,7 @@ class AgentCommon:
                     )
                     self.myNumber_of_msg_send = self.myMessageCounter
 
+                self.myBatchCounter += 1
                 myMQTT_ts_data = {"tripletBatch": self.myByteBatch}
 
                 raw_bytes = self.msg_serializer.encode_record_with_schema_id(
