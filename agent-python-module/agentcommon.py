@@ -534,6 +534,7 @@ class AgentCommon:
 
                 self.myByteBatch = []
             elif sys.getsizeof(self.myByteBatch) >= byteBatchSize:
+                self.myBatchCounter += 1
                 if self.myAgentCommonDebug == True:
 
                     print(
@@ -546,7 +547,7 @@ class AgentCommon:
                     )
                     self.myNumber_of_msg_send = self.myMessageCounter
 
-                self.myBatchCounter += 1
+                print(str(self.myByteBatch[0]["sensorUuid"]) + ",",str(self.myBatchCounter))
                 myMQTT_ts_data = {"tripletBatch": self.myByteBatch}
 
                 raw_bytes = self.msg_serializer.encode_record_with_schema_id(

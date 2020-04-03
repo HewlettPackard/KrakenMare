@@ -413,12 +413,13 @@ class IBswitchSimulator(AgentCommon):
                     record = {}
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
-                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
+#                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
+                    record["sensorValue"] = float(self.myBatchCounter)
                     record_list.append(record)
                     record = {}
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
-                    record["sensorValue"] = float(self.myBatchCounter*1000)
+                    record["sensorValue"] = float(self.myBatchCounter)
                     record_list.append(record)
 
                     self.mqtt_send_triplet_batch(

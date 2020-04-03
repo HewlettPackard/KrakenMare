@@ -165,8 +165,10 @@ class FanIn(AgentCommon):
             else:
                 query_data.append(message.payload)
 
+            print(str(query_data["tripletBatch"][1]["timestamp"]) + ", " + str(query_data["tripletBatch"][1]["sensorUuid"]) + ", " + str(query_data["tripletBatch"][1]["sensorValue"]))
             for data in query_data["tripletBatch"]:
                 try:
+#                    print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
                     raw_bytes = self.msg_serializer.encode_record_with_schema_id(
                         self.send_time_series_schema_id, data
                     )
