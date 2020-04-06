@@ -92,7 +92,7 @@ class IBswitchSimulator(AgentCommon):
                 self.batch_size = int(self.batch_size)
         else:
             self.batch_size = 0
-
+        
         # topic will have added /# depending on number of subtopics, without subtopics this translates to: ibswitch/0 as standard topic
         self.myAgent_send_ts_data_topic = "ibswitch"
 
@@ -122,6 +122,7 @@ class IBswitchSimulator(AgentCommon):
 
         super().__init__(configFile, debug)
 
+        #set number of topics in parent class and set self.myBatchCounter for each topic
         self.setMqttNumberOfPublishingTopics(int(numberOfTopics))
 
     # defines self.myMQTTregistered and self.myAgent_uuid
@@ -414,12 +415,12 @@ class IBswitchSimulator(AgentCommon):
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
 #                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
-                    record["sensorValue"] = float(self.myBatchCounter)
+                    record["sensorValue"] = float(self.myBatchCounter[self.myCurrentSubtopic])
                     record_list.append(record)
                     record = {}
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
-                    record["sensorValue"] = float(self.myBatchCounter)
+                    record["sensorValue"] = float(self.myBatchCounter[self.myCurrentSubtopic])
                     record_list.append(record)
 
                     self.mqtt_send_triplet_batch(

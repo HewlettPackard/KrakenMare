@@ -134,6 +134,9 @@ class FanIn(AgentCommon):
 
         super().__init__(configFile, debug)
 
+        #message counter per uuid
+        self.myMQTTtopicCounterPerUUID = {}
+
     def resetLogLevel(self, logLevel):
         """
                 Resets the log level 
@@ -150,6 +153,7 @@ class FanIn(AgentCommon):
             print("mqtt_on_message start")
 
         query_data = []
+        k = 0
 
         if message.topic == self.mqttTopicList[0][0]:
 
@@ -165,7 +169,23 @@ class FanIn(AgentCommon):
             else:
                 query_data.append(message.payload)
 
-            print(str(query_data["tripletBatch"][1]["timestamp"]) + ", " + str(query_data["tripletBatch"][1]["sensorUuid"]) + ", " + str(query_data["tripletBatch"][1]["sensorValue"]))
+            # check, if I know agent UUID and adjust my MQTT topic counter accordingly
+            try:
+                # if current batch count is -1 smaller then SEND count do nothing since this is ok
+                if not self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] == (int(query_data["tripletBatch"][1]["sensorValue"]) - 1):
+                    print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(query_data["tripletBatch"][1]["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is:" +  str(int(query_data["tripletBatch"][1]["sensorValue"]) - self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]]))
+                
+                self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] = int(query_data["tripletBatch"][1]["sensorValue"])
+                                    
+                if self.myFanInGateway_debug == True:
+                    logMPMT = str("P-{:d} : ".format(os.getpid()))
+                    print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(query_data["tripletBatch"][1]["sensorUuid"]) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]]))
+            except:
+                self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] = int(query_data["tripletBatch"][1]["sensorValue"])
+                if int(query_data["tripletBatch"][1]["sensorValue"]) != 1:
+                    print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(query_data["tripletBatch"][1]["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is: " +  str(int(query_data["tripletBatch"][1]["sensorValue"])-1))
+                
+            #print(str(query_data["tripletBatch"][1]["timestamp"]) + ", " + str(query_data["tripletBatch"][1]["sensorUuid"]) + ", " + str(query_data["tripletBatch"][1]["sensorValue"]))
             for data in query_data["tripletBatch"]:
                 try:
 #                    print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
@@ -178,6 +198,7 @@ class FanIn(AgentCommon):
                         on_delivery=self.kafka_producer_on_delivery,
                     )
                     self.kafka_msg_counter += 1
+                    k += 1
 
                     if self.myFanInGateway_debug == True:
                         print(str(self.kafka_msg_counter) + ":published to Kafka")
@@ -215,6 +236,10 @@ class FanIn(AgentCommon):
                     print("MQTT message not published to Kafka! Cause is ERROR:")
                     print(e2)
 
+            self.mqttMsgTimer = time.time()
+            
+            if not k == 47:
+                print("Msg processed: " + str(k))
         else:
             if self.myFanInGateway_debug == True:
                 print("Not ibswitch topic")
@@ -353,12 +378,21 @@ class FanIn(AgentCommon):
         # start listening to data
         # self.mqtt_subscription()
         regularLog = 300
+        logMPMT = str("P-{:d} : ".format(os.getpid()))
+        done = False
+        self.mqttMsgTimer = time.time()
         while True:
             time.sleep(0.05)
             self.kafka_producer.poll(0)
             regularLog -= 1
             if regularLog <= 0:
                 regularLog = 300
+            
+            if self.mqttMsgTimer+10 < time.time() and done == False:
+                for uuid in self.myMQTTtopicCounterPerUUID:
+                    print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(uuid) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[uuid]))
+                done = True
+                
         self.mqtt_close
         print("FanIn terminated")
 
