@@ -391,7 +391,7 @@ class FanIn(AgentCommon):
             if self.mqttMsgTimer+10 < time.time() and done == False:
                 for uuid in self.myMQTTtopicCounterPerUUID:
                     print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(uuid) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[uuid]))
-                done = True
+                    done = True
                 
         self.mqtt_close
         print("FanIn terminated")
