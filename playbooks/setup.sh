@@ -18,7 +18,8 @@ unset $setupRegistry;
 unset $restartDocker;
 unset $no_cache
 unset $stop;
-unset $export;
+unset $importImages;
+unset $exportImages;
 dockerpull="--pull";
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
@@ -82,8 +83,8 @@ do
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ansible=1;;# To setup registry you have to setup the node first
          s     ) stop=1                    ;;
-         e     ) export=1; setupRegistry=1; ansible=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
-         I     ) import=1; setupRegistry=1; ansible=1; pull=1;;
+         e     ) exportImages=1; setupRegistry=1; ansible=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
+         I     ) importImages=1; setupRegistry=1; ansible=1; pull=1;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
      esac
 done
@@ -143,7 +144,7 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 
 if [  "$ansible" == "1"  ]; then
 
-     if [ "$import" == "1" ]; then
+     if [ "$importImages" == "1" ]; then
          cd $KM_HOME/docker-registry
          echo "Extracting registries content tarball..."
          tar -xf registries-content.tar
@@ -188,7 +189,7 @@ if [  "$ansible" == "1"  ]; then
 
          docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
 
-         if [ "$import" == "1" ]; then
+         if [ "$importImages" == "1" ]; then
               # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
               docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
          else
@@ -236,7 +237,7 @@ if [ "$deploy" == "1" ]; then
     eval $cmd || exit 1
 fi
 
-if [ "$export" == "1" ]; then
+if [ "$exportImages" == "1" ]; then
     #make sure upstream image we don't build are available in the mirror registry
     echo "Pull required images..."
     docker-compose pull
