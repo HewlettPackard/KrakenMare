@@ -48,7 +48,7 @@ class FanIn(AgentCommon):
     MsgCount = 0
 
     def __init__(
-        self, configFile, debug, encrypt, TopicForThisProcess=False, batching=False
+        self, configFile, debug, encrypt, TopicForThisProcess=False, batching=False, mqttcounter=False
     ):
         """
                 Class init
@@ -78,6 +78,7 @@ class FanIn(AgentCommon):
         self.mqtt_broker = self.config.get("MQTT", "mqtt_broker")
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         self.mqttBatching = batching
+        self.enableMQTTbatchCount = mqttcounter
 
         # create topic list: [ ("topicName1", int(qos1)),("topicName2", int(qos2)) ]
         #                    [ ("ibswitch", 0), ("redfish", 0)]
@@ -169,24 +170,24 @@ class FanIn(AgentCommon):
             else:
                 query_data.append(message.payload)
 
-            # check, if I know agent UUID and adjust my MQTT topic counter accordingly
-            try:
-                # if current batch count is -1 smaller then SEND count do nothing since this is ok
-                if not self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] == (int(query_data["tripletBatch"][1]["sensorValue"]) - 1):
-                    print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(query_data["tripletBatch"][1]["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is:" +  str(int(query_data["tripletBatch"][1]["sensorValue"]) - self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]]))
-                
-                self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] = int(query_data["tripletBatch"][1]["sensorValue"])
-                                    
-                if self.myFanInGateway_debug == True:
-                    logMPMT = str("P-{:d} : ".format(os.getpid()))
-                    print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(query_data["tripletBatch"][1]["sensorUuid"]) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]]))
-            except:
-                self.myMQTTtopicCounterPerUUID[query_data["tripletBatch"][1]["sensorUuid"]] = int(query_data["tripletBatch"][1]["sensorValue"])
-                if int(query_data["tripletBatch"][1]["sensorValue"]) != 1:
-                    print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(query_data["tripletBatch"][1]["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is: " +  str(int(query_data["tripletBatch"][1]["sensorValue"])-1))
-                
-            #print(str(query_data["tripletBatch"][1]["timestamp"]) + ", " + str(query_data["tripletBatch"][1]["sensorUuid"]) + ", " + str(query_data["tripletBatch"][1]["sensorValue"]))
             for data in query_data["tripletBatch"]:
+                # check, if I know agent UUID and adjust my MQTT topic counter accordingly
+                if (self.enableMQTTbatchCount == True):
+                    try:
+                        # if current batch count is -1 smaller then SEND count do nothing since this is ok
+                        if not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] == (int(data["sensorValue"]) - 1)) and not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] - int(data["sensorValue"]) == 0):
+                            print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is:" +  str(int(data["sensorValue"]) - self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
+                        
+                        self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
+                                            
+                        if self.myFanInGateway_debug == True:
+                            logMPMT = str("P-{:d} : ".format(os.getpid()))
+                            print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(data["sensorUuid"]) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
+                    except:
+                        self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
+                        if int(data["sensorValue"]) != 1:
+                            print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is: " +  str(int(data["sensorValue"])-1))
+                    
                 try:
 #                    print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
                     raw_bytes = self.msg_serializer.encode_record_with_schema_id(
@@ -428,6 +429,13 @@ def main():
         help="specify this option in order to enable MQTT batch processing",
     )
     parser.add_option(
+        "--enableMQTTbatchesCounter",
+        action="store_true",
+        default=False,
+        dest="checkmqtt",
+        help="specify this option in order to enable the special processing of MQTT batches requiring special data from the simulator encoding a batch counter into the MQTT batch",
+    )
+    parser.add_option(
         "--numberOfTopic",
         dest="numberOfTopic",
         default=False,
@@ -462,7 +470,7 @@ def main():
             i += 1
 
         def fanin_mp_launcher(
-            debugP=False, encryptP=False, topic_to_listen="", batchingP=False
+            debugP=False, encryptP=False, topic_to_listen="", batchingP=False, mqttcounterE=False
         ):
             myFanInMP = FanIn(
                 "FanIn.cfg",
@@ -470,6 +478,7 @@ def main():
                 encrypt=encryptP,
                 TopicForThisProcess=str(topic_to_listen),
                 batching=batchingP,
+                mqttcounter=mqttcounterE
             )
             signal.signal(signal.SIGINT, myFanInMP.signal_handler)
             myFanInMP.run()
@@ -488,6 +497,7 @@ def main():
                     "encryptP": option_dict["encrypt"],
                     "topic_to_listen": onetopic,
                     "batchingP": option_dict["batching"],
+                    "mqttcounterE": option_dict["checkmqtt"],
                 },
             )
             NewP.start()

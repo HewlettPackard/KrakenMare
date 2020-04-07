@@ -12,6 +12,6 @@ echo "hello from fanin... starting waiting for services..."
 /fanin/check_schemas.sh || exit 1
 
 cd /fanin
-python3.7 FanIn.py --encrypt --batching --numberOfTopic=2
-#--debug --multiproc --batching --numberOfTopic=1
+python3.7 FanIn.py --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter
+#--debug --multiproc --batching --numberOfTopic=1 --enableMQTTbatchesCounter
 sleep infinity
