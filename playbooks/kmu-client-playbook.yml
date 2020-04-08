@@ -52,48 +52,11 @@
 # End of variables
 
   tasks:
-  - name: Mount repo from {{iso_server}}:{{ iso_source_path }} to {{iso_mount_point}}
-    mount:
-      path: "{{ iso_mount_point }}"
-      src: "{{iso_server}}:{{ iso_source_path }}"
-      state: mounted
-      fstype: nfs
-
-  - name: Create /etc/yum.repos.d/ if it doesn't exist
-    file:
-      path: "{{ item }}"
-      state: directory
-      owner: root
-      group: root
-      mode: 0775
-    with_items:
-      - /etc/yum.repos.d/
-
-  - name: Add repository to yum (1/2)
-    yum_repository:
-      name: AppStream
-      description: Repo AppStream from {{RHEL_Version}}
-      baseurl: file://{{ iso_mount_point }}/{{RHEL_Version}}/AppStream
-      file: dvd
-      enabled: yes
-      gpgcheck: no
-
-  - name: Add repository to yum (2/2)
-    yum_repository:
-      name: BaseOS
-      description: Repo BaseOS from {{RHEL_Version}}
-      baseurl: file://{{ iso_mount_point }}/{{RHEL_Version}}/BaseOS
-      file: dvd
-      enabled: yes
-      gpgcheck: no
-
-
-  - name: Install yum-utils,wget,git and tmux
+  - name: Install yum-utils,wget and tmux
     yum:
       name:
         - yum-utils
         - wget
-        - git
         - tmux
         - python3-pip
         
@@ -185,9 +148,6 @@
     systemd:
       state: restarted
       name: chronyd
-
-
-
 
 
 # Send instructions on nodes before killing docker services on host machine
