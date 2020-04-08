@@ -96,9 +96,12 @@ if [ -z $1 ];then
 fi
 
 if [ ! -f $DEFAULT_INVENTORY_FILE ]; then
-     echo "" >&2; echo "$DEFAULT_INVENTORY_FILE does not exists, help available at $0 -h" >&2; 
-     echo "" >&2;
-     exit 3;
+    this_host=`hostname`
+    echo "" >&2;
+    echo "***" >&2
+    echo "$DEFAULT_INVENTORY_FILE does not exists, building one for $this_host" >&2;
+    echo "***" >&2
+    sed "s/__HOST__/${this_host}/g" hosts-CI > hosts
 fi
 
 #Registry vars
