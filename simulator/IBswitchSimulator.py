@@ -46,6 +46,7 @@ class IBswitchSimulator(AgentCommon):
         numberOfTopics,
         batching=False,
         sleepLoopTime=False,
+        sendNumberOfMessages=False
     ):
         """
             Class init
@@ -85,7 +86,12 @@ class IBswitchSimulator(AgentCommon):
 
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
-        self.sendNumberOfMessages = self.config.get("Others", "sendNumberOfMessages")
+
+        # set sendNumberOfMessages from cfg file or use command line provided value
+        if sendNumberOfMessages == False:
+            self.sendNumberOfMessages = self.config.get("Others", "sendNumberOfMessages")
+        else:
+            self.sendNumberOfMessages = sendNumberOfMessages
 
         if self.sendNumberOfMessages == "":
             self.sendNumberOfMessages = -1
@@ -517,6 +523,13 @@ def main():
         help="specify this option in order to overwrite sleepLoopTime value in the cfg file.",
     )
     parser.add_option(
+        "--sendNumberOfMessages",
+        dest="sendNumberOfMessages",
+        default=False,
+        help="specify this option in order to overwrite sendNumberOfMessages value in the cfg file.",
+    )
+
+    parser.add_option(
         "--encrypt",
         action="store_true",
         default=False,
@@ -553,6 +566,7 @@ def main():
         numberOfTopics=numberOfMqttTopics,
         batching=option_dict["batching"],
         sleepLoopTime=option_dict["sleepLoopTime"],
+        sendNumberOfMessages=option_dict["sendNumberOfMessages"]
     )
     signal.signal(signal.SIGINT, myIBswitchSimulator.signal_handler)
     myIBswitchSimulator.run()
