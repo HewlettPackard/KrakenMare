@@ -38,7 +38,7 @@ class IBswitchSimulator(AgentCommon):
     myMQTTderegistered = False
     loggerName = None
 
-    def __init__(self, configFile, debug, encrypt, numberOfTopics, batching=False):
+    def __init__(self, configFile, debug, encrypt, numberOfTopics, batching=False, sleepLoopTime=False):
         """
             Class init
         """
@@ -69,7 +69,12 @@ class IBswitchSimulator(AgentCommon):
             "useSensorTemplate": False,
         }
 
-        self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
+        # set sleepLoopTime from cfg file or use command line provided value
+        if sleepLoopTime == False:
+            self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
+        else:
+            self.sleepLoopTime = int(sleepLoopTime)
+            
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
         self.sendNumberOfMessages = self.config.get("Others", "sendNumberOfMessages")
@@ -493,6 +498,12 @@ def main():
         help="specify this option in order to publish to multiple topics (# of topics (need to be able to divide 16 by this,e.g. --numberOfTopic=2), defaults to 1",
     )
     parser.add_option(
+        "--sleepLoopTime",
+        dest="sleepLoopTime",
+        default=False,
+        help="specify this option in order to overwrite sleepLoopTime value in the cfg file.",
+    )
+    parser.add_option(
         "--encrypt",
         action="store_true",
         default=False,
@@ -528,6 +539,7 @@ def main():
         encrypt=option_dict["encrypt"],
         numberOfTopics=numberOfMqttTopics,
         batching=option_dict["batching"],
+        sleepLoopTime=option_dict["sleepLoopTime"],
     )
     signal.signal(signal.SIGINT, myIBswitchSimulator.signal_handler)
     myIBswitchSimulator.run()

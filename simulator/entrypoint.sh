@@ -8,7 +8,7 @@
 
 cd /simulator
 
-python3 IBswitchSimulator.py --encrypt --batching --numberOfTopic=2 
-#--debug
+python3 IBswitchSimulator.py --encrypt --batching --numberOfTopic=2 --sleepLoopTime=0
+#--debug --encrypt --batching --numberOfTopic=2 --sleepLoopTime=0
 sleep infinity
 
