@@ -73,7 +73,7 @@ class IBswitchSimulator(AgentCommon):
         if sleepLoopTime == False:
             self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         else:
-            self.sleepLoopTime = int(sleepLoopTime)
+            self.sleepLoopTime = float(sleepLoopTime)
             
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
