@@ -38,7 +38,15 @@ class IBswitchSimulator(AgentCommon):
     myMQTTderegistered = False
     loggerName = None
 
-    def __init__(self, configFile, debug, encrypt, numberOfTopics, batching=False, sleepLoopTime=False):
+    def __init__(
+        self,
+        configFile,
+        debug,
+        encrypt,
+        numberOfTopics,
+        batching=False,
+        sleepLoopTime=False,
+    ):
         """
             Class init
         """
@@ -74,7 +82,7 @@ class IBswitchSimulator(AgentCommon):
             self.sleepLoopTime = float(self.config.get("Others", "sleepLoopTime"))
         else:
             self.sleepLoopTime = float(sleepLoopTime)
-            
+
         self.seedOutputDir = self.config.get("Others", "seedOutputDir")
         self.device_json_dir = self.config.get("Others", "deviceJSONdir")
         self.sendNumberOfMessages = self.config.get("Others", "sendNumberOfMessages")
@@ -97,7 +105,7 @@ class IBswitchSimulator(AgentCommon):
                 self.batch_size = int(self.batch_size)
         else:
             self.batch_size = 0
-        
+
         # topic will have added /# depending on number of subtopics, without subtopics this translates to: ibswitch/0 as standard topic
         self.myAgent_send_ts_data_topic = "ibswitch"
 
@@ -127,7 +135,7 @@ class IBswitchSimulator(AgentCommon):
 
         super().__init__(configFile, debug)
 
-        #set number of topics in parent class and set self.myBatchCounter for each topic
+        # set number of topics in parent class and set self.myBatchCounter for each topic
         self.setMqttNumberOfPublishingTopics(int(numberOfTopics))
 
     # defines self.myMQTTregistered and self.myAgent_uuid
@@ -419,13 +427,17 @@ class IBswitchSimulator(AgentCommon):
                     record = {}
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
-#                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
-                    record["sensorValue"] = float(self.myBatchCounter[self.myCurrentSubtopic])
+                    #                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
+                    record["sensorValue"] = float(
+                        self.myBatchCounter[self.myCurrentSubtopic]
+                    )
                     record_list.append(record)
                     record = {}
                     record["timestamp"] = timestamp
                     record["sensorUuid"] = self.myAgent_uuid
-                    record["sensorValue"] = float(self.myBatchCounter[self.myCurrentSubtopic])
+                    record["sensorValue"] = float(
+                        self.myBatchCounter[self.myCurrentSubtopic]
+                    )
                     record_list.append(record)
 
                     self.mqtt_send_triplet_batch(
@@ -463,7 +475,7 @@ class IBswitchSimulator(AgentCommon):
         self.mqtt_registration(
             self.myAgent_registration_request_topic[0], self.myRegistrationData
         )
-        
+
         # register my devices/sensors
         self.myDeviceMap = self.create_my_device_map()
         self.mqtt_device_registration(
@@ -471,10 +483,11 @@ class IBswitchSimulator(AgentCommon):
             self.myDevice_registration_response_topic,
             self.myDeviceMap,
         )
-        
+
         # start sending data
         self.send_data()
-        
+
+
 # END IBswitchSimulator class
 ################################################################################
 
