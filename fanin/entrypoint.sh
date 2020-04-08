@@ -12,6 +12,10 @@ echo "hello from fanin... starting waiting for services..."
 /fanin/check_schemas.sh || exit 1
 
 cd /fanin
-python3.7 FanIn.py --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter
+# setting the --enableMQTTbatchesCounter will print ATTENTION warnings if some
+# messages are lost. This only works when using and exclusively using the IBswitch simulator
+# injectors
+python3.7 FanIn.py --encrypt --batching --numberOfTopic=2
+# python3.7 FanIn.py --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter
 #--debug --multiproc --batching --numberOfTopic=1 --enableMQTTbatchesCounter
 sleep infinity
