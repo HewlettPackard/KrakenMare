@@ -190,7 +190,7 @@ if [  "$ansible" == "1"  ]; then
          #f527a4303e4f        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
          #d925eb8ce317        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 
-         docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop
+         docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop &> /dev/null
 
          if [ "$importImages" == "1" ]; then
               # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
