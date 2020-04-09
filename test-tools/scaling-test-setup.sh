@@ -1,4 +1,6 @@
 #!/bin/bash
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
 #
 # Setup for scaling test. Run on ONE instance only and only once.
 #

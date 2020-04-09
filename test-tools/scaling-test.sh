@@ -1,4 +1,6 @@
 #!/bin/bash
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
 #
 # Use kafka-producer-perf-test to emulate Fan-In that does no aggregation (16 byte) and one that does a full aggregation (8 MB).
 # Adjust recordsize to match test and set num-records to run a reasonable amount of time

@@ -1,3 +1,5 @@
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
 FROM ubuntu:18.04
 # Test env deps
 RUN apt-get update && apt-get upgrade -y
