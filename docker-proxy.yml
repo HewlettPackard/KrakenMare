@@ -23,7 +23,7 @@ services:
       args:
          http_proxy: ${http_proxy}
          https_proxy: ${https_proxy}
-         MAVEN_OPTS: -Dhttps.proxyHost=web-proxy.bbn.hpecorp.net -Dhttps.proxyPort=8080
+         MAVEN_OPTS: -Dhttps.proxyHost=${http_proxy_host} -Dhttps.proxyPort=${http_proxy_port}
 
   druid:
     <<: *proxy

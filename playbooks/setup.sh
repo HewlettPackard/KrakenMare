@@ -28,9 +28,10 @@ dockerpull="--pull";
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
 
-export http_proxy=http://web-proxy.bbn.hpecorp.net:8080
+export http_proxy_host=web-proxy.bbn.hpecorp.net
+export http_proxy_port=8080
+export http_proxy=http://${http_proxy_host}:${http_proxy_port}
 export https_proxy=http://web-proxy.bbn.hpecorp.net:8080
-
 
 project_name=krakenmare
 
@@ -222,7 +223,7 @@ if [ "$stop" == "1" ]; then
     echo "Check if prior krakenmare stack is completely gone"
     docker stack rm  $project_name ## No exit to prevent an error like "nothing to remove"
     #wait until that the stack is stopped
-    until (( $(docker network ls | grep -c krakenmare) == 0 ))
+    until (( $(docker network ls | grep -c krakenmare_krakenmare ) == 0 ))
     do
       sleep 3
       echo -n "."
