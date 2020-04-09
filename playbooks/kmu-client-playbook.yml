@@ -78,18 +78,6 @@
       dest: /tmp/containerd.io-{{ container_io_version }}.rpm
       src: /playbooks/download-cache/containerd.io-{{ container_io_version }}.rpm
 
-
-  - name: Install the containerd rpm 
-    yum:
-      name: /tmp/containerd.io-{{ container_io_version }}.rpm
-      state: present
-
-  - name: Install docker-ce
-    yum:
-      name: docker-ce
-      state: latest
-      disable_gpg_check: yes
-
   - name : Setup HPE proxy for Docker Registry  in  /etc/systemd/system/docker.service.d/http-proxy.conf
     blockinfile:
       path: /etc/systemd/system/docker.service.d/http-proxy.conf
@@ -128,16 +116,6 @@
       append: yes
 
 ## Docker-compose
-  - name: Copy docker-compose from Ansible Control Node
-    copy:
-      src: /playbooks/download-cache/docker-compose-{{ docker_compose_version }}
-      dest: /usr/local/bin/docker-compose
-
-  - name: Allow execution of /usr/local/bin/docker-compose
-    file:
-      path: /usr/local/bin/docker-compose
-      mode : "u+x,o+x"
-
   - name: modifying chrony.conf (Synchronize time)
     lineinfile:
       path: /etc/chrony.conf
