@@ -1,4 +1,5 @@
 #!/bin/bash
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
 
 /tmp/wait-for --timeout=240 zookeeper:2181 || exit 1
 /tmp/wait-for --timeout=240 broker-1:29092 || exit 1

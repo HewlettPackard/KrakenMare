@@ -1,3 +1,5 @@
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
 # Create a minimal image for all config containers.  Use ubuntu:18.04 plus wait-for and it's required tools wget and netcat
 FROM ubuntu:18.04 as configbase
 # Test env deps
