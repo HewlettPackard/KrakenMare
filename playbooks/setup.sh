@@ -1,10 +1,13 @@
 #!/bin/bash
 
+export KAFKA_XMS=512m
+export KAFKA_XMX=512m
+export KM_FM_XMS=128m
+export KM_FM_XMS=128m
 
 # Change directory
 cd $(dirname $0) || exit 1
 KM_HOME=$(pwd)
-
 
 #TEMPLATE
 TOOL_NAME=`basename $0`
