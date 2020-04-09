@@ -1,4 +1,6 @@
 #!/bin/bash
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
 
 function count () {
     n0=`curl -s --cacert /run/secrets/km-ca-1.crt --cert /run/secrets/schemaregistry.certificate.pem --key /run/secrets/schemaregistry.key -X GET https://schemaregistry:8081/subjects/ | jq . | grep -c com`
