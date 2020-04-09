@@ -4,8 +4,8 @@
   vars_files:
     - vars.yml
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
 
   tasks:
 

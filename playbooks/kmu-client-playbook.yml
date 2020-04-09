@@ -7,8 +7,8 @@
     - vars.yml
 
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
 
 # End of variables
@@ -45,9 +45,8 @@
     - vars.yml
 
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
-
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
 # End of variables
 
@@ -97,7 +96,7 @@
       create: yes
       block: |
         [Service]
-        Environment="HTTP_PROXY={{ proxy }}" "HTTPS_PROXY={{ proxy }}" "NO_PROXY={{ docker_mirror_registry_address }}"
+        Environment="HTTP_PROXY={{ http_proxy }}" "HTTPS_PROXY={{ https_proxy }}" "NO_PROXY={{ docker_mirror_registry_address }}"
 
   - name: Create /etc/docker/ if it doesn't exist
     file:
@@ -161,8 +160,8 @@
     - vars.yml
 
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
 
 # End of variables

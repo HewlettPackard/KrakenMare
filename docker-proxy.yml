@@ -2,9 +2,8 @@ version: '3.4'
 x-proxy: &proxy
   build:
     args:
-      http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-      https_proxy: http://web-proxy.bbn.hpecorp.net:8080
-      ftp_proxy: http://web-proxy.bbn.hpecorp.net:8080
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
 
 services:
   broker-1:
@@ -22,8 +21,8 @@ services:
   framework:
     build:
       args:
-         http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-         https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+         http_proxy: ${http_proxy}
+         https_proxy: ${https_proxy}
          MAVEN_OPTS: -Dhttps.proxyHost=web-proxy.bbn.hpecorp.net -Dhttps.proxyPort=8080
 
   druid:

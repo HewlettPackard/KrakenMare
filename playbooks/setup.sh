@@ -28,8 +28,10 @@ dockerpull="--pull";
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
 
+export http_proxy=http://web-proxy.bbn.hpecorp.net:8080
+export https_proxy=http://web-proxy.bbn.hpecorp.net:8080
 
-PROXY=http://web-proxy.bbn.hpecorp.net:8080
+
 project_name=krakenmare
 
 #Usage function
@@ -161,13 +163,13 @@ if [  "$ansible" == "1"  ]; then
          cd $KM_HOME
      else
          #Build ansible
-         docker build $no_cache $dockerpull --build-arg http_proxy=$PROXY --build-arg https_proxy=$PROXY --tag ansible . || exit 1
+         docker build $no_cache $dockerpull --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --tag ansible . || exit 1
      fi
 
      mkdir -p $KM_HOME/download-cache || exit 1
 
      #The last task restarts docker and therefore exits brutally, FIXME
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
@@ -179,8 +181,8 @@ if [  "$ansible" == "1"  ]; then
           echo "[warning] add -R flag to force this step if needed (requires privileges)"
           echo "***"
      fi
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --forks 100 
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml  --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100 
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100
 
      if [ "$setupRegistry" == "1"  ]; then
 

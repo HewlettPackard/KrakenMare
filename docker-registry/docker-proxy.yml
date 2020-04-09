@@ -2,5 +2,5 @@ version: '3'
 services:
   registry-mirror:
     environment:
-      http_proxy: http://web-proxy.bbn.hpecorp.net:8080
-      https_proxy: http://web-proxy.bbn.hpecorp.net:8080
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}

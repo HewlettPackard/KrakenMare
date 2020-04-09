@@ -11,8 +11,8 @@
 
 
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
 
   tasks:
@@ -36,8 +36,8 @@
     ip_manager :  "{{ hostvars[swarm_manager_name]['ansible_facts']['default_ipv4']['address'] }}"
 
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
   tasks:
 
@@ -60,8 +60,8 @@
   vars:
     label_list : "{{ hostvars[inventory_hostname]['groups'] }}"
   environment:
-    http_proxy: "{{ proxy }}"
-    https_proxy: "{{ proxy }}"
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
 
 
   tasks:
