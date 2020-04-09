@@ -1,4 +1,5 @@
 #!/bin/bash
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP.
 
 /tmp/wait-for --timeout=240 druid:8090 || exit 1
 
