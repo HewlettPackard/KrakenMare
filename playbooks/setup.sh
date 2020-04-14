@@ -1,13 +1,23 @@
 #!/bin/bash
 
-export KAFKA_XMS=512m
-export KAFKA_XMX=512m
-export KM_FM_XMS=128m
-export KM_FM_XMS=128m
-
 # Change directory
 cd $(dirname $0) || exit 1
 KM_HOME=$(pwd)
+
+if [ -f ~/km.conf ]; then
+    source ~/km.conf || exit 1
+    echo "using settings from ~/km.conf"
+else
+    (	echo ""
+	echo "***"
+	echo "copy $KM_HOME/km.conf to ${HOME}"
+	echo "and edit to match your setup"
+	echo "then restart..."
+	echo "***"
+	echo ""
+    ) >&2
+    exit 1
+fi
 
 #TEMPLATE
 TOOL_NAME=`basename $0`
@@ -27,14 +37,6 @@ dockerpull="--pull";
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
-
-export http_proxy_host=web-proxy.bbn.hpecorp.net
-export http_proxy_port=8080
-export http_proxy=http://${http_proxy_host}:${http_proxy_port}
-export https_proxy=http://web-proxy.bbn.hpecorp.net:8080
-export time_server=ntp.hpe.net
-export dns_list='"16.110.135.51","16.110.135.52"'
-export dns_search='"emea.hpqcorp.net"'
 
 project_name=krakenmare
 
