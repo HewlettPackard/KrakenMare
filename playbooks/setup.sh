@@ -173,7 +173,7 @@ if [  "$ansible" == "1"  ]; then
      mkdir -p $KM_HOME/download-cache || exit 1
 
      #The last task restarts docker and therefore exits brutally, FIXME
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} time_server=${time_server} dns_search="'"'"${dns_search}"'"'" dns_list="'"'"${dns_list}"'"'"" --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
@@ -185,8 +185,8 @@ if [  "$ansible" == "1"  ]; then
           echo "[warning] add -R flag to force this step if needed (requires privileges)"
           echo "***"
      fi
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100 
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy}" --forks 100
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100 
+     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100
 
      if [ "$setupRegistry" == "1"  ]; then
 

@@ -10,32 +10,9 @@
     http_proxy: "{{ http_proxy }}"
     https_proxy: "{{ https_proxy }}"
 
-
 # End of variables
 
   tasks:
-  - name: Download docker-ce repository to yum
-    get_url:
-      url: https://download.docker.com/linux/centos/docker-ce.repo
-      dest: /playbooks/download-cache/docker-ce.repo
-      force: no
-
-    
-  - name: Download the containerd.io-{{ container_io_version }}.{{ ansible_architecture }} rpm from a remote repo
-    get_url:
-      url:  https://download.docker.com/linux/centos/7/{{ ansible_architecture }}/stable/Packages/containerd.io-{{ container_io_version }}.{{ ansible_architecture }}.rpm
-      dest: /playbooks/download-cache/containerd.io-{{ container_io_version }}.rpm
-      force: no
-
-  - name: Download docker-compose
-    get_url:
-    #Example: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64
-
-      url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
-      dest: /playbooks/download-cache/docker-compose-{{ docker_compose_version }}
-      force: no
-
-
 - name: Ansible setup for the scalability analysis
   hosts: swarm_manager,swarm_nodes
   gather_facts: no
@@ -56,7 +33,6 @@
       name:
         - yum-utils
         - wget
-        - tmux
         - python3-pip
         
       state: latest
@@ -66,18 +42,7 @@
       name: 
         - docker
       executable: pip-3
-
-
-  - name: Add docker-ce repository to yum
-    copy:
-      dest: /etc/yum.repos.d/docker-ce.repo
-      src: /playbooks/download-cache/docker-ce.repo
-
-  - name: Copy containerd.rpm from Ansible Control Node
-    copy:
-      dest: /tmp/containerd.io-{{ container_io_version }}.rpm
-      src: /playbooks/download-cache/containerd.io-{{ container_io_version }}.rpm
-
+      
   - name : Setup HPE proxy for Docker Registry  in  /etc/systemd/system/docker.service.d/http-proxy.conf
     blockinfile:
       path: /etc/systemd/system/docker.service.d/http-proxy.conf
