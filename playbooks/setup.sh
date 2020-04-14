@@ -32,6 +32,9 @@ export http_proxy_host=web-proxy.bbn.hpecorp.net
 export http_proxy_port=8080
 export http_proxy=http://${http_proxy_host}:${http_proxy_port}
 export https_proxy=http://web-proxy.bbn.hpecorp.net:8080
+export time_server=ntp.hpe.net
+export dns_list='"16.110.135.51","16.110.135.52"'
+export dns_search='"emea.hpqcorp.net"'
 
 project_name=krakenmare
 

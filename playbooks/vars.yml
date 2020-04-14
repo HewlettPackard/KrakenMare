@@ -1,9 +1,6 @@
 docker_mirror_registry_address : "{{ hostvars[inventory_hostname]['groups']['registry'][0] }}"
 docker_mirror_registry_port : 5000
 docker_registry_port : 5001
-container_io_version : 1.2.5-3.1.el7
-docker_compose_version : 1.24.0
-
 ansible_python_interpreter : '/usr/bin/python3'
 
 #generated with :
@@ -11,9 +8,3 @@ ansible_python_interpreter : '/usr/bin/python3'
 # ansible all -i localhost, -m debug -a "msg={{ 'kmu' | password_hash('sha512', 'SALT') }}"
 password: $6$SALT$Wa/AELdu4Dldnl.NGK5MNMQNobyfR.tqJhy91aRf5xjVt5zD.sTmZJuevosCb7g4cMoJ3wdRReoAB2fakVJgP/
 
-#Chrony configuration
-time_server: ntp.hpecorp.net
-
-#
-dns_list: '"16.110.135.51","16.110.135.52"'
-dns_search: '"emea.hpqcorp.net"'
