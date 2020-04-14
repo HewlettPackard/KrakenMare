@@ -56,7 +56,7 @@ deploy-dev: &deploy-dev
   dependencies: []
   script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
-    - bash -x playbooks/setup.sh -sarbd
+    - bash -x playbooks/setup.sh -sarbd -c ../km-gre.conf
     - du -sh /tmp/registry-*
   except:
     - master
@@ -70,7 +70,7 @@ stop-dev:
     action: stop
   dependencies: []
   script:
-    - bash -x playbooks/setup.sh -s
+    - bash -x playbooks/setup.sh -s -c ../km-gre.conf
   when: manual
 
 deploy-master: &deploy-master
@@ -84,7 +84,7 @@ deploy-master: &deploy-master
   before_script:
     - sed "s/__HOST__/`hostname`/g" playbooks/hosts-CI > playbooks/hosts
   script:
-    - bash -x playbooks/setup.sh -sarbd
+    - bash -x playbooks/setup.sh -sarbd -c ../km-gre.conf
   only:
     - master
   except:
@@ -94,7 +94,7 @@ full-rebuild-deploy:
   <<: *deploy-master
   script:
     - docker image prune --force
-    - bash -x playbooks/setup.sh -sarbdF
+    - bash -x playbooks/setup.sh -sarbdF -c ../km-gre.conf
   only:
     - schedules
   except: []

@@ -58,26 +58,6 @@ usage () {
 }
 
 
-if [ -f "$kmconf" ]; then
-    source "$kmconf" || exit 1
-    echo ""
-    echo "***"
-    echo "using settings from $kmconf"
-    echo "***"
-    echo ""
-else
-    (	echo ""
-	echo "***"
-	echo "copy $KM_HOME/km.conf to ${kmconf}"
-	echo "and edit to match your setup"
-	echo "then restart..."
-	echo "***"
-	echo ""
-    ) >&2
-    exit 1
-fi
-
-
 registry_content () {
      echo $registry will be used as registry node
      
@@ -116,6 +96,29 @@ done
 if [ -z $1 ];then
      usage $0; exit 1;
 fi
+
+
+
+if [ -f "$kmconf" ]; then
+    source "$kmconf" || exit 1
+    echo ""
+    echo "***"
+    echo "using settings from $kmconf"
+    echo "***"
+    echo ""
+else
+    (	echo ""
+	echo "***"
+	echo "copy $KM_HOME/km.conf to ${kmconf}"
+	echo "and edit to match your setup"
+	echo "then restart..."
+	echo "***"
+	echo ""
+    ) >&2
+    exit 1
+fi
+
+
 
 if [ ! -f $DEFAULT_INVENTORY_FILE ]; then
     this_host=`hostname`
