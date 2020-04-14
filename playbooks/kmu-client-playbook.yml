@@ -104,8 +104,8 @@
         {
           "insecure-registries" : ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}","http://{{ docker_mirror_registry_address }}:{{ docker_registry_port }}"],
           "registry-mirrors": ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
-          "dns" : ["16.110.135.51", "16.110.135.52"],
-          "dns-search" : ["emea.hpqcorp.net"]
+          "dns" : [{{ dns_list }}],
+          "dns-search" : [{{ dns_search }}]
         }
 ##KMU user
   - name: Add the user 'kmu'
