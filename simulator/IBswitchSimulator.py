@@ -2,9 +2,19 @@
 # -*- coding: utf-8 -*-
 
 """
-@license: This Source Code Form is subject to the terms of the
-@organization: Hewlett-Packard Enterprise (HPE)
-@author: Torsten Wilde
+(C) Copyright 2020 Hewlett Packard Enterprise Development LP.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
 """
 
 # import from OS
@@ -99,7 +109,8 @@ class IBswitchSimulator(AgentCommon):
             self.sendNumberOfMessages = int(self.sendNumberOfMessages)
 
         self.myDeviceMap = {}
-
+        self.myDeviceSensorUUIDsMap = {}
+        
         # MQTT setup
         self.myAgent_mqtt_encryption_enabled = encrypt
 
@@ -150,9 +161,14 @@ class IBswitchSimulator(AgentCommon):
 
         # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name
         if message.topic == self.myAgent_registration_response_topic[0][0]:
-            print("message: %s " % message.payload)
+            if self.myAgent_debug == True:
+                print("message: %s " % message.payload)
+                
             data = self.msg_serializer.decode_message(message.payload)
-            print("registration-result with KrakenMare UUID: %s" % data["uuid"])
+            
+            if self.myAgent_debug == True:
+                print("registration-result with KrakenMare UUID: %s" % data["uuid"])
+            
             self.myMQTTregistered = True
             self.myAgent_uuid = data["uuid"]
 
@@ -199,8 +215,18 @@ class IBswitchSimulator(AgentCommon):
 
         # since we transmit topic lists, this one has only one entry, and in this entry the first item is the topic name
         elif message.topic == self.myDevice_registration_response_topic[0][0]:
-            print("message: %s " % message.payload)
+            
+            if self.myAgent_debug == True:
+                print("message: %s " % message.payload)
+            
             data = self.msg_serializer.decode_message(message.payload)
+            
+            #set myDeviceSensorUUIDsMap with registred uuids
+            if data["uuid"] == self.myAgent_uuid:
+                print("processing my device and sensor registration")
+                self.myDeviceSensorUUIDsMap = data["deviceUuids"]
+                #print(self.myDeviceSensorUUIDsMap)
+            
             self.myDeviceRegistered = True
             print("Devices registered")
 
@@ -345,30 +371,19 @@ class IBswitchSimulator(AgentCommon):
             for switch in query_data["Switch"]:
                 switch_guid = str(switch["Node_GUID"])
 
-                # device UUID
-                device_uuid[cmc][switch_guid] = uuid.UUID(
-                    hashlib.md5(
-                        (str(self.myAgent_uuid) + switch_guid).encode()
-                    ).hexdigest()
-                )
-
+                # set device UUID from registration
+                device_uuid[cmc][switch_guid] = self.myDeviceSensorUUIDsMap[switch_guid]["uuid"]
+                
                 sensor_uuid[cmc][switch_guid] = {}
 
                 for ibmetric in ibmetrics:
 
-                    # sensor UUIID
-                    sensor_uuid[cmc][switch_guid][ibmetric] = uuid.UUID(
-                        hashlib.md5(
-                            (
-                                str(self.myAgent_uuid)
-                                + str(device_uuid[cmc][switch_guid])
-                                + ibmetric
-                            ).encode()
-                        ).hexdigest()
-                    )
+                    # set sensor UUIID from registration
+                    sensor_uuid[cmc][switch_guid][ibmetric] = self.myDeviceSensorUUIDsMap[switch_guid]["sensorUuids"][switch_guid+"-"+ibmetric]
+                    
                     if ibmetric in ["SymbolErrorCounter", "PortXmitData"]:
                         print(
-                            ibmetric
+                            switch_guid+"-"+ibmetric
                             + ":"
                             + str(sensor_uuid[cmc][switch_guid][ibmetric])
                         )
@@ -429,22 +444,26 @@ class IBswitchSimulator(AgentCommon):
                     elif x > 0.79:
                         switchSimulatorSeedMap[cmc][switchGUID]["PortXmitDiscards"] += 2
 
-                    # Assign the simulator values to the record to be serialized
-                    record = {}
-                    record["timestamp"] = timestamp
-                    record["sensorUuid"] = self.myAgent_uuid
-                    #                    record["sensorValue"] = -float(self.myBatchCounter*1000+self.myCurrentSubtopic)
-                    record["sensorValue"] = float(
-                        self.myBatchCounter[self.myCurrentSubtopic]
-                    )
-                    record_list.append(record)
-                    record = {}
-                    record["timestamp"] = timestamp
-                    record["sensorUuid"] = self.myAgent_uuid
-                    record["sensorValue"] = float(
-                        self.myBatchCounter[self.myCurrentSubtopic]
-                    )
-                    record_list.append(record)
+                                        # Assign the simulator values to the record to be serialized
+                    for ibmetric in ibmetrics:
+                        record = {}
+                        
+                        # Assign the simulator values to the record to be serialized
+                        """ Original
+                        record["timestamp"] = timestamp
+                        record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
+                        record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
+                        """
+
+                        # Set MQTT batch count to each batch for scalability and performance testing                        
+                        record = {}
+                        record["timestamp"] = timestamp
+                        record["sensorUuid"] = self.myAgent_uuid
+                        record["sensorValue"] = float(
+                            self.myBatchCounter[self.myCurrentSubtopic]
+                        )
+                        
+                        record_list.append(record)
 
                     self.mqtt_send_triplet_batch(
                         self.myAgent_send_ts_data_topic,
