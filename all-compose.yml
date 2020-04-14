@@ -438,7 +438,7 @@ services:
       BOOTSTRAP_SERVERS: "broker-1:9092,broker-2:9093,broker-3:9094"
       SCHEMA_REGISTRY: "https://schemaregistry:8081"
       KM_FM_XMX: ${KM_FM_XMX}
-      KM_FM_XMS: ${KM_FM_XMX:-1g}
+      KM_FM_XMS: ${KM_FM_XMX}
     deploy:
       restart_policy:
         condition: none
