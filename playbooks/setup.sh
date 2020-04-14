@@ -22,17 +22,18 @@ fi
 #TEMPLATE
 TOOL_NAME=`basename $0`
 #unset args
-unset $ansible;
-unset $build;
-unset $push;
-unset $deploy;
-unset $proxy;
-unset $setupRegistry;
-unset $restartDocker;
-unset $no_cache
-unset $stop;
-unset $importImages;
-unset $exportImages;
+unset ansible;
+unset build;
+unset push;
+unset deploy;
+unset proxy;
+unset setupRegistry;
+unset restartDocker;
+unset no_cache
+unset stop;
+unset importImages;
+unset exportImages;
+unset kmconf
 dockerpull="--pull";
 #DEFAULT ARGS
 DEFAULT_INVENTORY_FILE=hosts;
