@@ -4,21 +4,6 @@
 cd $(dirname $0) || exit 1
 KM_HOME=$(pwd)
 
-if [ -f ~/km.conf ]; then
-    source ~/km.conf || exit 1
-    echo "using settings from ~/km.conf"
-else
-    (	echo ""
-	echo "***"
-	echo "copy $KM_HOME/km.conf to ${HOME}"
-	echo "and edit to match your setup"
-	echo "then restart..."
-	echo "***"
-	echo ""
-    ) >&2
-    exit 1
-fi
-
 #TEMPLATE
 TOOL_NAME=`basename $0`
 #unset args
@@ -40,6 +25,8 @@ DEFAULT_INVENTORY_FILE=hosts;
 MIRROR_REGISTRY_PORT=5001;
 
 project_name=krakenmare
+kmconf=~/km.conf
+
 
 #Usage function
 usage () {
@@ -55,6 +42,7 @@ usage () {
      echo "-f: do not force pulling newer image from dockerhub"
      echo "-d: to Deploy"
      echo "-i: to specify the inventory file (DEFAULT is ${DEFAULT_INVENTORY_FILE})"
+     echo "-c: to specify the km.conf file (DEFAULT is $kmconf)"
      echo "-R: to restart the docker daemon locally (requires root privileges, only needed when proxy/registry config changed or is initialized"
      echo "-s: to stop the stack"
      echo "-F: perform a full docker build with --no-cache (do not combine with -f)"
@@ -69,6 +57,27 @@ usage () {
      echo ""
 }
 
+
+if [ -f "$kmconf" ]; then
+    source "$kmconf" || exit 1
+    echo ""
+    echo "***"
+    echo "using settings from $kmconf"
+    echo "***"
+    echo ""
+else
+    (	echo ""
+	echo "***"
+	echo "copy $KM_HOME/km.conf to ${kmconf}"
+	echo "and edit to match your setup"
+	echo "then restart..."
+	echo "***"
+	echo ""
+    ) >&2
+    exit 1
+fi
+
+
 registry_content () {
      echo $registry will be used as registry node
      
@@ -81,11 +90,12 @@ registry_content () {
 }
 
 #Parse args
-while getopts "hfapbdrfi:FRseI" Option
+while getopts "hfapbdc:rfi:FRseI" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
          a     ) ansible=1      ;;
+	 c     ) kmconf=${OPTARG} ;;
          p     ) pull=1         ;;
          b     ) build=1        ;;
          d     ) deploy=1; stop=1 ;;
