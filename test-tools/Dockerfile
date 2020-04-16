@@ -64,7 +64,7 @@ RUN mv linux_amd64/mqtt-bench /tmp/
 RUN apt-get update && apt-get install -y npm
 RUN npm install mqtt-benchmark -g
 
-COPY ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh ./mqtt-bench.sh ./mqtt.batch /tmp/
+COPY ./km-scaling-test-rate.sh ./check-pipeline.sh ./client-plain.conf ./scaling-test.sh ./scaling-test-setup.sh ./print-schemaregistry.sh ./mqtt-bench.sh ./mqtt.batch /tmp/
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
