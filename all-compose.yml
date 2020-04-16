@@ -59,6 +59,7 @@ services:
       - "19092:19092"
       - "29092:29092"
     environment:
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-1:9092,SSL://broker-1:19092,SASL_SSL://broker-1:29092,SASL_SSL_HOST://localhost:39092'
@@ -85,7 +86,6 @@ services:
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
       KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS:-6g} -Xmx${KAFKA_XMX:-6g} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
-      # KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.host=broker-1 -Dcom.sun.management.jmxremote.port=9992 -Djava.rmi.server.hostname=broker-1 -Dcom.sun.management.jmxremote.rmi.port=9992 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - source: broker_jaas.conf
@@ -123,6 +123,7 @@ services:
       - "19093:19093"
       - "29093:29093"
     environment:
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-2:9093,SSL://broker-2:19093,SASL_SSL://broker-2:29093,SASL_SSL_HOST://localhost:39093'
@@ -186,6 +187,7 @@ services:
       - "19094:19094"
       - "29094:29094"
     environment:
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker-3:9094,SSL://broker-3:19094,SASL_SSL://broker-3:29094,SASL_SSL_HOST://localhost:39094'
