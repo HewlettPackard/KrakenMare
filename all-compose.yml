@@ -359,6 +359,8 @@ services:
       - "3306:3306"
       - "9095:9095"
       - "1527:1527"
+    environment:
+      SIZE: "micro"
     deploy:
       restart_policy:
         condition: none
@@ -366,7 +368,6 @@ services:
         constraints:
           - node.labels.broker-2 == true
     networks:
-      - zookeeper_kafka
       - krakenmare
 
   grafana:
