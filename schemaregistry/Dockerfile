@@ -1,4 +1,4 @@
-FROM confluentinc/cp-schema-registry:5.2.0
+FROM confluentinc/cp-schema-registry:5.4.0
 
 # requirement for wait-for and change to Java 11
 RUN apt-get update && apt-get install -y netcat wget sed zulu-11 && apt-get remove -y zulu-8 

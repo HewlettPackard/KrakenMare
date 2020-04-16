@@ -17,8 +17,8 @@ RUN cd / && wget --no-check-certificate https://github.com/lloyd/yajl/archive/2.
     && mv /yajl-2.1.0 /yajl && cd /yajl && ./configure && make && make install
 
 # Confluent serdes library at version to match Kafka components from Confluent
-RUN cd / && wget --no-check-certificate https://github.com/confluentinc/libserdes/archive/v5.2.0.tar.gz  -O - | tar xzf - \
-    && mv /libserdes-5.2.0 /libserdes && cd /libserdes && ./configure && make && make install
+RUN cd / && wget --no-check-certificate https://github.com/confluentinc/libserdes/archive/v5.4.0.tar.gz  -O - | tar xzf - \
+    && mv /libserdes-5.4.0 /libserdes && cd /libserdes && ./configure && make && make install
 
 # librdkafa release version 1.1.0
 RUN cd / && wget --no-check-certificate https://github.com/edenhill/librdkafka/archive/v1.1.0.tar.gz -O - | tar xzf - \
@@ -36,8 +36,8 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 RUN apt-get update && apt-get install -y nmap netcat iputils-ping jq redis-server openssl gnupg software-properties-common openjdk-11-jre-headless vim emacs less bc iperf
 
 # Confluent kafka tools
-RUN wget -qO - https://packages.confluent.io/deb/5.2/archive.key | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.2 stable main"
+RUN wget -qO - https://packages.confluent.io/deb/5.4/archive.key | apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.4 stable main"
 RUN apt-get update && apt-get install -y confluent-community-2.12
 
 # Add avrocat to work at commandline with avro files
