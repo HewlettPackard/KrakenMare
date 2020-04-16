@@ -58,7 +58,7 @@ class FanIn(AgentCommon):
     MsgCount = 0
 
     def __init__(
-        self, configFile, debug, encrypt, TopicForThisProcess=False, batching=False, mqttcounter=False
+        self, configFile, debug, encrypt, TopicForThisProcess=False, batching=False, mqttcounter=False, mqttPassthrough=False
     ):
         """
                 Class init
@@ -89,6 +89,7 @@ class FanIn(AgentCommon):
         self.mqtt_port = int(self.config.get("MQTT", "mqtt_port"))
         self.mqttBatching = batching
         self.enableMQTTbatchCount = mqttcounter
+        self.enableMQTTpassthrough = mqttPassthrough
 
         # create topic list: [ ("topicName1", int(qos1)),("topicName2", int(qos2)) ]
         #                    [ ("ibswitch", 0), ("redfish", 0)]
@@ -101,11 +102,20 @@ class FanIn(AgentCommon):
             self.processID = os.getpid()
             self.threadID = threading.get_ident()
             self.logMPMT = "P-{:d} | T-{:d} |".format(self.processID, self.threadID)
-            print(
-                "MULTIPROC {:s} Starting FanIn Gateway in its process for {:s}".format(
-                    self.logMPMT, TopicForThisProcess
+            
+            if not self.enableMQTTpassthrough:
+                print(
+                    "MULTIPROC {:s} Starting FanIn Gateway in its process for {:s}. MQTT batch pass-through is DISABLED.".format(
+                        self.logMPMT, TopicForThisProcess
+                    )
                 )
-            )
+            else:
+                print(
+                    "MULTIPROC {:s} Starting FanIn Gateway in its process for {:s}. MQTT batch pass-through is ENABLED.".format(
+                        self.logMPMT, TopicForThisProcess
+                    )
+                )
+                
             self.mqttTopicList.append(addValue)
             self.processID = os.getpid()
             self.myFanInGatewayName = "FanIn-test[" + str(self.processID) + "]"
@@ -173,47 +183,99 @@ class FanIn(AgentCommon):
 
             if self.t0_on_first_mqtt == 0:
                 self.t0_on_first_mqtt = time.time_ns() / 1000000000
-
-            if self.mqttBatching == True:
-                query_data = self.msg_serializer.decode_message(message.payload)
-
-            else:
-                query_data.append(message.payload)
-
-            for data in query_data["tripletBatch"]:
-                # check, if I know agent UUID and adjust my MQTT topic counter accordingly
-                if (self.enableMQTTbatchCount == True):
-                    try:
-                        # if current batch count is -1 smaller then SEND count do nothing since this is ok
-                        if not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] == (int(data["sensorValue"]) - 1)) and not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] - int(data["sensorValue"]) == 0):
-                            print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is:" +  str(int(data["sensorValue"]) - self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
+            
+            # if passthrough is enabled, send mqtt batch directly to kafka
+            if not self.enableMQTTpassthrough:
+                
+                if self.mqttBatching == True:
+                    query_data = self.msg_serializer.decode_message(message.payload)
+                else:
+                    query_data.append(message.payload)
+    
+                for data in query_data["tripletBatch"]:
+                    # check, if I know agent UUID and adjust my MQTT topic counter accordingly
+                    if (self.enableMQTTbatchCount == True):
+                        try:
+                            # if current batch count is -1 smaller then SEND count do nothing since this is ok
+                            if not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] == (int(data["sensorValue"]) - 1)) and not (self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] - int(data["sensorValue"]) == 0):
+                                print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is:" +  str(int(data["sensorValue"]) - self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
+                            
+                            self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
+                                                
+                            if self.myFanInGateway_debug == True:
+                                logMPMT = str("P-{:d} : ".format(os.getpid()))
+                                print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(data["sensorUuid"]) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
+                        except:
+                            self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
+                            if int(data["sensorValue"]) != 1:
+                                print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is: " +  str(int(data["sensorValue"])-1))
                         
-                        self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
-                                            
+                    try:
+    #                    print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
+                        raw_bytes = self.msg_serializer.encode_record_with_schema_id(
+                            self.send_time_series_schema_id, data
+                        )
+                        self.kafka_producer.produce(
+                            self.kafkaProducerTopic,
+                            raw_bytes,
+                            on_delivery=self.kafka_producer_on_delivery,
+                        )
+                        self.kafka_msg_counter += 1
+                        k += 1
+    
                         if self.myFanInGateway_debug == True:
-                            logMPMT = str("P-{:d} : ".format(os.getpid()))
-                            print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(data["sensorUuid"]) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[data["sensorUuid"]]))
-                    except:
-                        self.myMQTTtopicCounterPerUUID[data["sensorUuid"]] = int(data["sensorValue"])
-                        if int(data["sensorValue"]) != 1:
-                            print("ATTENTION: Missing # of MQTTbatches for agent UUID: " + str(data["sensorUuid"]) + " and topic: " + str(self.mqttTopicList[0][0]) + " is: " +  str(int(data["sensorValue"])-1))
+                            print(str(self.kafka_msg_counter) + ":published to Kafka")
+    
+                        if self.kafka_msg_counter % 1000 == 0:
+                            deltat = time.time_ns() / 1000000000 - self.timet0
+                            deltaMsg = self.kafka_msg_counter - self.MsgCount
+                            self.MsgCount = self.kafka_msg_counter
+                            self.timet0 = time.time_ns() / 1000000000
+                            elapsed = (int)(
+                                time.time_ns() / 1000000000 - self.t0_on_first_mqtt
+                            )
+                            logMPMT = "{:d} secs | Process-{:d} | Thread-{:d} | TopicMqtt-{:s}".format(
+                                elapsed,
+                                os.getpid(),
+                                threading.get_ident(),
+                                str(message.topic),
+                            )
+                            print(
+                                logMPMT
+                                + " | "
+                                + str(self.kafka_msg_counter)
+                                + " messages published to Kafka, rate = {:.2f} msg/sec".format(
+                                    deltaMsg / deltat
+                                )
+                            )
+    
+                    except BufferError as e1:
+                        print(
+                            "%% Local producer queue is full (%d messages awaiting delivery): try again\n"
+                            % len(self.kafka_producer)
+                        )
+                        print(e1)
+                    except KafkaException as e2:
+                        print("MQTT message not published to Kafka! Cause is ERROR:")
+                        print(e2)
+                        
+                if not k == 47:
+                    print("Msg processed: " + str(k))
                     
+            else:
+                #passthrough
                 try:
-#                    print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
-                    raw_bytes = self.msg_serializer.encode_record_with_schema_id(
-                        self.send_time_series_schema_id, data
-                    )
+                    # print(str(data["sensorUuid"]) + ", " + str(data["sensorValue"]))
                     self.kafka_producer.produce(
                         self.kafkaProducerTopic,
-                        raw_bytes,
+                        message.payload,
                         on_delivery=self.kafka_producer_on_delivery,
                     )
                     self.kafka_msg_counter += 1
-                    k += 1
-
+                    
                     if self.myFanInGateway_debug == True:
                         print(str(self.kafka_msg_counter) + ":published to Kafka")
-
+                        
                     if self.kafka_msg_counter % 1000 == 0:
                         deltat = time.time_ns() / 1000000000 - self.timet0
                         deltaMsg = self.kafka_msg_counter - self.MsgCount
@@ -246,11 +308,9 @@ class FanIn(AgentCommon):
                 except KafkaException as e2:
                     print("MQTT message not published to Kafka! Cause is ERROR:")
                     print(e2)
-
+                
             self.mqttMsgTimer = time.time()
             
-            if not k == 47:
-                print("Msg processed: " + str(k))
         else:
             if self.myFanInGateway_debug == True:
                 print("Not ibswitch topic")
@@ -446,6 +506,13 @@ def main():
         help="specify this option in order to enable the special processing of MQTT batches requiring special data from the simulator encoding a batch counter into the MQTT batch",
     )
     parser.add_option(
+        "--enableMQTTbatchPassthrough",
+        action="store_true",
+        default=False,
+        dest="mqttPassthrough",
+        help="specify this option in order to pass MQTT batches without de-coding/re-encoding to the kafka producer.",
+    )
+    parser.add_option(
         "--numberOfTopic",
         dest="numberOfTopic",
         default=False,
@@ -480,7 +547,7 @@ def main():
             i += 1
 
         def fanin_mp_launcher(
-            debugP=False, encryptP=False, topic_to_listen="", batchingP=False, mqttcounterE=False
+            debugP=False, encryptP=False, topic_to_listen="", batchingP=False, mqttcounterE=False, mqttPassthroughP=False
         ):
             myFanInMP = FanIn(
                 "FanIn.cfg",
@@ -488,7 +555,8 @@ def main():
                 encrypt=encryptP,
                 TopicForThisProcess=str(topic_to_listen),
                 batching=batchingP,
-                mqttcounter=mqttcounterE
+                mqttcounter=mqttcounterE,
+                mqttPassthrough=mqttPassthroughP,
             )
             signal.signal(signal.SIGINT, myFanInMP.signal_handler)
             myFanInMP.run()
@@ -508,6 +576,7 @@ def main():
                     "topic_to_listen": onetopic,
                     "batchingP": option_dict["batching"],
                     "mqttcounterE": option_dict["checkmqtt"],
+                    "mqttPassthroughP": option_dict["mqttPassthrough"],
                 },
             )
             NewP.start()
@@ -522,6 +591,8 @@ def main():
             debug=option_dict["debug"],
             encrypt=option_dict["encrypt"],
             batching=option_dict["batching"],
+            mqttcounter=option_dict["checkmqtt"],
+            mqttPassthrough=option_dict["mqttPassthrough"],
         )
         signal.signal(signal.SIGINT, myFanIn.signal_handler)
 

@@ -16,6 +16,5 @@ cd /fanin
 # messages are lost. This only works when using and exclusively using the IBswitch simulator
 # injectors
 python3.7 FanIn.py --encrypt --batching --numberOfTopic=2
-# python3.7 FanIn.py --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter
-#--debug --multiproc --batching --numberOfTopic=1 --enableMQTTbatchesCounter
+#--debug --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter --enableMQTTbatchPassthrough 
 sleep infinity
