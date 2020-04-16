@@ -294,7 +294,7 @@ class FanIn(AgentCommon):
                             logMPMT
                             + " | "
                             + str(self.kafka_msg_counter)
-                            + " messages published to Kafka, rate = {:.2f} msg/sec".format(
+                            + " MQTT batch messages published to Kafka, rate = {:.2f} msg/sec".format(
                                 deltaMsg / deltat
                             )
                         )
