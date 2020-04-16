@@ -420,7 +420,12 @@ services:
         target: /etc/schema-registry/secrets/kafka.schemaregistry.truststore.pfx
       - source: kafka.schemaregistry.keystore.pfx
         target: /etc/schema-registry/secrets/kafka.schemaregistry.keystore.pfx
-    <<: *deploy
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.labels.fanin == true
     networks:
       - zookeeper_kafka
       - krakenmare
