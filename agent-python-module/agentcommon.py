@@ -18,15 +18,11 @@ under the License.
 """
 
 # import from OS
-import json
 import time
 import os
 import sys
 import configparser
 import random
-import platform
-import threading
-import io
 import uuid
 import hashlib
 
@@ -40,6 +36,8 @@ from schema_registry.client import SchemaRegistryClient
 from schema_registry.serializers import MessageSerializer
 
 # START AgentCommon class
+
+
 class AgentCommon:
     loggerName = None
 
@@ -50,12 +48,11 @@ class AgentCommon:
     myCurrentSubtopic = 0
     myNumber_of_msg_send = 0
     myMessageCounter = 0
-    
 
     def __init__(self, configFile, debug):
         """
             Class init
-            
+
         """
 
         self.myAgentCommonDebug = debug
@@ -66,7 +63,7 @@ class AgentCommon:
             configFile, ["Daemon", "Logger", "MQTT", "Schemaregistry"]
         )
 
-        #setup batch counter for each topic
+        # setup batch counter for each topic
         self.myBatchCounter = []
 
         # MQTT setup
@@ -159,14 +156,15 @@ class AgentCommon:
 
     def setMqttNumberOfPublishingTopics(self, mqttNumberOfPublishingTopics):
         self.myAgentMqttNumberOfPublishingTopics = mqttNumberOfPublishingTopics
-        
+        self.myCurrentSubtopic = random.randrange(mqttNumberOfPublishingTopics)
+        print("starting from topic %d" % self.myCurrentSubtopic)
+
         i = 0
-        
-        #setup batch counter for each topic as an array
+
+        # setup batch counter for each topic as an array
         while i < mqttNumberOfPublishingTopics:
             self.myBatchCounter.append(1)
             i += 1
-        
 
     def checkConfigurationFile(
         self, configurationFileFullPath, sectionsToCheck, **options
@@ -232,7 +230,8 @@ class AgentCommon:
                 print("on_connect: Connection error: " + mqtt.connack_string(rc))
             else:
                 print(
-                    "on_connect: Connected with result code: " + mqtt.connack_string(rc)
+                    "on_connect: Connected with result code: " +
+                    mqtt.connack_string(rc)
                 )
 
         # Subscribing in on_connect() means that if we lose the connection and
@@ -241,7 +240,8 @@ class AgentCommon:
 
     def mqtt_on_disconnect(self, client, userdata, rc):
         if self.myAgentCommonDebug == True:
-            print("on_disconnect: DisConnected result code: " + mqtt.connack_string(rc))
+            print("on_disconnect: DisConnected result code: " +
+                  mqtt.connack_string(rc))
 
     def mqtt_on_publish(self, client, userdata, mid):
         if self.myAgentCommonDebug == True:
@@ -428,7 +428,8 @@ class AgentCommon:
 
         # use highest QoS for now
         print("sending device/sensor registration payload: --%s--" % raw_bytes)
-        MQTTMessageInfo = self.client.publish(deviceMQTTtopic, raw_bytes, 2, True)
+        MQTTMessageInfo = self.client.publish(
+            deviceMQTTtopic, raw_bytes, 2, True)
 
         print(
             "mqtt device registration message published with publishing code: "
@@ -466,6 +467,7 @@ class AgentCommon:
 
     def mqtt_send_triplet_batch(
         self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0
+
     ):
         self.myByteBatchSize = byteBatchSize
 
@@ -479,19 +481,32 @@ class AgentCommon:
                         self.send_time_series_druid_array_id, myMQTT_ts_data
                     )
                     self.mqtt_send_byte_batch_avro_ts_msg(
-                        "{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes
+                        "{:s}/{:d}".format(topic,
+                                           self.myCurrentSubtopic), raw_bytes
                     )
 
                 totaltime = time.time() - timet0
                 rate = sendNumberOfMessages / totaltime
-                
+
                 """
                 i = 0
                 while i < self.myAgentMqttNumberOfPublishingTopics:
                     if i > self.myCurrentSubtopic:
-                        print(str(self.myByteBatch[0]["sensorUuid"]) + ", " + "{:s}/{:d}".format(topic, i) + ",",str(self.myBatchCounter[i]-1))
+                        print(
+                            str(self.myByteBatch[0]["sensorUuid"])
+                            + ", "
+                            + "{:s}/{:d}".format(topic, i)
+                            + ",",
+                            str(self.myBatchCounter[i] - 1),
+                        )
                     else:
-                        print(str(self.myByteBatch[0]["sensorUuid"]) + ", " + "{:s}/{:d}".format(topic, i) + ",",str(self.myBatchCounter[i]))
+                        print(
+                            str(self.myByteBatch[0]["sensorUuid"])
+                            + ", "
+                            + "{:s}/{:d}".format(topic, i)
+                            + ",",
+                            str(self.myBatchCounter[i]),
+                        )
                     i += 1
                     
                 """
@@ -532,7 +547,7 @@ class AgentCommon:
             myMQTT_ts_data_triplet = {
                 "timestamp": eachRecord["timestamp"],
                 "sensorUuid": eachRecord["sensorUuid"],
-                "sensorValue": eachRecord["sensorValue"]
+                "sensorValue": eachRecord["sensorValue"],
             }
 
             if byteBatchSize > 0:
@@ -556,22 +571,15 @@ class AgentCommon:
 
                 self.myBatchCounter[self.myCurrentSubtopic] += 1
 
-                if self.myAgentMqttNumberOfPublishingTopics > 1:
-                    self.myCurrentSubtopic = (
-                        (self.myCurrentSubtopic + 1)
-                        if self.myCurrentSubtopic
-                        < self.myAgentMqttNumberOfPublishingTopics - 1
-                        else 0
-                    )
-
                 self.myByteBatch = []
             elif sys.getsizeof(self.myByteBatch) >= byteBatchSize:
-                
+
                 if self.myAgentCommonDebug == True:
 
                     print(
                         "Number of msg sent in one batch: "
-                        + str(self.myMessageCounter - self.myNumber_of_msg_send)
+                        + str(self.myMessageCounter -
+                              self.myNumber_of_msg_send)
                     )
                     print(
                         "Publishing to MQTT topic: "
@@ -579,17 +587,24 @@ class AgentCommon:
                     )
                     self.myNumber_of_msg_send = self.myMessageCounter
 
-                    print(str(self.myByteBatch[0]["sensorUuid"]) + ", " + "{:s}/{:d}".format(topic, self.myCurrentSubtopic) + ",",str(self.myBatchCounter[self.myCurrentSubtopic]))
-                
+                    print(
+                        str(self.myByteBatch[0]["sensorUuid"])
+                        + ", "
+                        + "{:s}/{:d}".format(topic, self.myCurrentSubtopic)
+                        + ",",
+                        str(self.myBatchCounter[self.myCurrentSubtopic]),
+                    )
+
                 myMQTT_ts_data = {"tripletBatch": self.myByteBatch}
 
                 raw_bytes = self.msg_serializer.encode_record_with_schema_id(
                     self.send_time_series_druid_array_id, myMQTT_ts_data
                 )
                 self.mqtt_send_byte_batch_avro_ts_msg(
-                    "{:s}/{:d}".format(topic, self.myCurrentSubtopic), raw_bytes
+                    "{:s}/{:d}".format(topic,
+                                       self.myCurrentSubtopic), raw_bytes
                 )
-                
+
                 self.myBatchCounter[self.myCurrentSubtopic] += 1
 
                 if self.myAgentMqttNumberOfPublishingTopics > 1:
