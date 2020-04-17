@@ -346,19 +346,18 @@ services:
       dockerfile: Dockerfile
     hostname: druid
     ports:
-# - 8081: HTTP (coordinator)
+# - 1527: jetty
+# - 8081: HTTP (coordinator/overlord)
 # - 8082: HTTP (broker)
 # - 8083: HTTP (historical)
-# - 8090: HTTP (overlord)
-# - 3306: MySQL
+# - 8091: middle manager
+# - 8888: router
+      - "1527:1527"
       - "8181:8081"
       - "8182:8082"
       - "8183:8083"
-      - "8190:8090"
-      - "8200:8200"
-      - "3306:3306"
-      - "9095:9095"
-      - "1527:1527"
+      - "8191:8091"
+      - "8888:8888"
     environment:
       SIZE: "micro"
     deploy:
