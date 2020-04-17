@@ -15,6 +15,8 @@ cd /fanin
 # setting the --enableMQTTbatchesCounter will print ATTENTION warnings if some
 # messages are lost. This only works when using and exclusively using the IBswitch simulator
 # injectors
-python3.7 FanIn.py --encrypt --batching --numberOfTopic=2
+threads=2
+taskset -c 0-$(($threads-1)) python3.7 FanIn.py --encrypt --batching --numberOfTopic=$threads --enableMQTTbatchesCounter
+# python3.7 FanIn.py --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter
 #--debug --encrypt --batching --numberOfTopic=2 --enableMQTTbatchesCounter --enableMQTTbatchPassthrough 
 sleep infinity
