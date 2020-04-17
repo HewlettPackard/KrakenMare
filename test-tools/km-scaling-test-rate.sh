@@ -10,5 +10,5 @@ while true; do
   t1=$(( `date +%s` ))
   m1=$(( `kafka-run-class kafka.tools.GetOffsetShell --broker-list  broker-1:9092  --topic fabric --time -1 | cut -f3 -d":" | paste -s -d+ - | bc` ))
   sample_rate=$(( ($m1 - $m0) / ($t1 - $t0) ))
-  echo "sample rate number of messages in KAFKA on the fabric topic: $sample_rate "
+  echo "$m1 samples: sample rate number of messages in KAFKA on the fabric topic: $sample_rate "
 done
