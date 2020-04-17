@@ -485,6 +485,7 @@ class AgentCommon:
                 totaltime = time.time() - timet0
                 rate = sendNumberOfMessages / totaltime
                 
+                """
                 i = 0
                 while i < self.myAgentMqttNumberOfPublishingTopics:
                     if i > self.myCurrentSubtopic:
@@ -493,6 +494,7 @@ class AgentCommon:
                         print(str(self.myByteBatch[0]["sensorUuid"]) + ", " + "{:s}/{:d}".format(topic, i) + ",",str(self.myBatchCounter[i]))
                     i += 1
                     
+                """
                 print(
                     "All "
                     + str(sendNumberOfMessages)
