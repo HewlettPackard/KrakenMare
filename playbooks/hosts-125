@@ -23,9 +23,6 @@ u176i126 ip_addr=172.16.7.250
 u176i127 ip_addr=172.16.7.251
 [test-tools]
 u176i125 ip_addr=172.16.7.249
-u176i126 ip_addr=172.16.7.250
-u176i127 ip_addr=172.16.7.251
-u176i065 ip_addr=172.16.7.253
 [druid]
 u176i126 ip_addr=172.16.7.250
 [framework]
