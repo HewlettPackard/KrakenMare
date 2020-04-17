@@ -177,7 +177,7 @@ class FanIn(AgentCommon):
         k = 0
 
         if message.topic == self.mqttTopicList[0][0]:
-
+            self.done = False
             if self.timet0 == 0:
                 self.timet0 = time.time_ns() / 1000000000
 
@@ -260,7 +260,7 @@ class FanIn(AgentCommon):
                         print(e2)
                         
                 if not k == 47:
-                    print("Msg processed: " + str(k))
+                    print("Samples in last processed message was: " + str(k))
                     
             else:
                 #passthrough
@@ -450,7 +450,7 @@ class FanIn(AgentCommon):
         # self.mqtt_subscription()
         regularLog = 300
         logMPMT = str("P-{:d} : ".format(os.getpid()))
-        done = False
+        self.done = False
         self.mqttMsgTimer = time.time()
         while True:
             time.sleep(0.05)
@@ -459,10 +459,10 @@ class FanIn(AgentCommon):
             if regularLog <= 0:
                 regularLog = 300
             
-            if self.mqttMsgTimer+10 < time.time() and done == False:
+            if self.mqttMsgTimer+10 < time.time() and self.done == False:
                 for uuid in self.myMQTTtopicCounterPerUUID:
                     print(logMPMT + self.mqttTopicList[0][0] + "| UUID: "+ str(uuid) + "| MQTT batch count: " + str(self.myMQTTtopicCounterPerUUID[uuid]))
-                    done = True
+                    self.done = True
                 
         self.mqtt_close
         print("FanIn terminated")

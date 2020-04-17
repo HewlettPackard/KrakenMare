@@ -48,6 +48,7 @@ class AgentCommon:
     myCurrentSubtopic = 0
     myNumber_of_msg_send = 0
     myMessageCounter = 0
+    mymqttBatchCountSenderUUID = False
 
     def __init__(self, configFile, debug):
         """
@@ -466,8 +467,7 @@ class AgentCommon:
         self.client.publish(topic, raw_bytes)
 
     def mqtt_send_triplet_batch(
-        self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0
-
+        self, topic, record_list, sendNumberOfMessages, byteBatchSize, uuid, timet0, mqttBatchCountEnabled
     ):
         self.myByteBatchSize = byteBatchSize
 
@@ -475,7 +475,7 @@ class AgentCommon:
             if sendNumberOfMessages == self.myMessageCounter:
 
                 # publish any left over messages
-                if byteBatchSize > 0:
+                if byteBatchSize > 0 and len(self.myByteBatch) > 0:
                     myMQTT_ts_data = {"tripletBatch": self.myByteBatch}
                     raw_bytes = self.msg_serializer.encode_record_with_schema_id(
                         self.send_time_series_druid_array_id, myMQTT_ts_data
@@ -484,32 +484,23 @@ class AgentCommon:
                         "{:s}/{:d}".format(topic,
                                            self.myCurrentSubtopic), raw_bytes
                     )
-
+                    self.myBatchCounter[self.myCurrentSubtopic] += 1
+                
                 totaltime = time.time() - timet0
                 rate = sendNumberOfMessages / totaltime
 
-                """
-                i = 0
-                while i < self.myAgentMqttNumberOfPublishingTopics:
-                    if i > self.myCurrentSubtopic:
+                if mqttBatchCountEnabled:
+                    i = 0
+                    while i < self.myAgentMqttNumberOfPublishingTopics:
                         print(
-                            str(self.myByteBatch[0]["sensorUuid"])
-                            + ", "
-                            + "{:s}/{:d}".format(topic, i)
-                            + ",",
-                            str(self.myBatchCounter[i] - 1),
-                        )
-                    else:
-                        print(
-                            str(self.myByteBatch[0]["sensorUuid"])
-                            + ", "
-                            + "{:s}/{:d}".format(topic, i)
-                            + ",",
-                            str(self.myBatchCounter[i]),
-                        )
-                    i += 1
+                                str(self.mymqttBatchCountSenderUUID)
+                                + ", "
+                                + "{:s}/{:d}".format(topic, i)
+                                + "," +
+                                str(self.myBatchCounter[i]-1)
+                            )
+                        i += 1
                     
-                """
                 print(
                     "All "
                     + str(sendNumberOfMessages)
@@ -549,6 +540,10 @@ class AgentCommon:
                 "sensorUuid": eachRecord["sensorUuid"],
                 "sensorValue": eachRecord["sensorValue"],
             }
+            
+            # save sender uuid set when counting send messages to prevent print bug when sendNumberOfMessages is set
+            if self.myEnableMQTTbatchesCounter and not self.mymqttBatchCountSenderUUID:
+                self.mymqttBatchCountSenderUUID = eachRecord["sensorUuid"]
 
             if byteBatchSize > 0:
                 self.myByteBatch.append(myMQTT_ts_data_triplet)

@@ -56,7 +56,8 @@ class IBswitchSimulator(AgentCommon):
         numberOfTopics,
         batching=False,
         sleepLoopTime=False,
-        sendNumberOfMessages=False
+        sendNumberOfMessages=False,
+        enableMQTTbatchesCounter=False
     ):
         """
             Class init
@@ -70,6 +71,7 @@ class IBswitchSimulator(AgentCommon):
         self.myAgentName = "IBSwitchSimulator"
         self.myAgent_debug = debug
         self.MQTTbatching = batching
+        self.myEnableMQTTbatchesCounter = enableMQTTbatchesCounter
 
         # Agent uid as provided by the discovery mechanism.
         # for now use the hostname and random number to insure we are always unique
@@ -448,20 +450,18 @@ class IBswitchSimulator(AgentCommon):
                     for ibmetric in ibmetrics:
                         record = {}
                         
-                        # Assign the simulator values to the record to be serialized
-                        """ Original
-                        record["timestamp"] = timestamp
-                        record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
-                        record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
-                        """
-
-                        # Set MQTT batch count to each batch for scalability and performance testing                        
-                        record = {}
-                        record["timestamp"] = timestamp
-                        record["sensorUuid"] = self.myAgent_uuid
-                        record["sensorValue"] = float(
-                            self.myBatchCounter[self.myCurrentSubtopic]
-                        )
+                        if not self.myEnableMQTTbatchesCounter:
+                            # Assign the simulator values to the record to be serialized
+                            record["timestamp"] = timestamp
+                            record["sensorUuid"] = sensor_uuid[cmc][switchGUID][ibmetric]
+                            record["sensorValue"] = switchSimulatorSeedMap[cmc][switchGUID][ibmetric]
+                        else:
+                            # Set MQTT batch count to each batch for scalability and performance testing                        
+                            record["timestamp"] = timestamp
+                            record["sensorUuid"] = self.myAgent_uuid
+                            record["sensorValue"] = float(
+                                self.myBatchCounter[self.myCurrentSubtopic]
+                            )
                         
                         record_list.append(record)
 
@@ -472,6 +472,7 @@ class IBswitchSimulator(AgentCommon):
                         self.batch_size,
                         self.myAgent_uuid,
                         self.timet0,
+                        self.myEnableMQTTbatchesCounter,
                     )
 
             # Infinite loop
@@ -547,7 +548,13 @@ def main():
         default=False,
         help="specify this option in order to overwrite sendNumberOfMessages value in the cfg file.",
     )
-
+    parser.add_option(
+        "--enableMQTTbatchesCounter",
+        action="store_true",
+        default=False,
+        dest="enableMQTTbatchesCounter",
+        help="specify this option in order to enable the special processing of MQTT batches requiring special data from the simulator encoding a batch counter into the MQTT batch",
+    )
     parser.add_option(
         "--encrypt",
         action="store_true",
@@ -585,7 +592,8 @@ def main():
         numberOfTopics=numberOfMqttTopics,
         batching=option_dict["batching"],
         sleepLoopTime=option_dict["sleepLoopTime"],
-        sendNumberOfMessages=option_dict["sendNumberOfMessages"]
+        sendNumberOfMessages=option_dict["sendNumberOfMessages"],
+        enableMQTTbatchesCounter=option_dict["enableMQTTbatchesCounter"]
     )
     signal.signal(signal.SIGINT, myIBswitchSimulator.signal_handler)
     myIBswitchSimulator.run()
