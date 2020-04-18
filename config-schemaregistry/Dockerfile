@@ -21,11 +21,11 @@ RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 # - jq to extract schema topic from the avro file
 FROM ubuntu:18.04
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y bash netcat python3 python3-requests openjdk-8-jre-headless curl apt-utils jq
+RUN apt-get update && apt-get install -y bash netcat python3 python3-requests openjdk-8-jre-headless curl apt-utils jq httpie
 RUN cd /tmp/ && curl -L -O https://github.com/rkluszczynski/avro-cli/releases/download/avro-cli-0.2.7/avro-cli-0.2.7.jar
 RUN cd /tmp/ && curl -L -O https://repo1.maven.org/maven2/org/apache/avro/avro-tools/1.9.1/avro-tools-1.9.1.jar
 COPY --from=configbase /tmp/wait-for /tmp/wait-for
 
-COPY *.avdl register_schema.py entrypoint.sh /tmp/
+COPY *.avdl entrypoint.sh /tmp/
 
 CMD ["/tmp/entrypoint.sh"]
