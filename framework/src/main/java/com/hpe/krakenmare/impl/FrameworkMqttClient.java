@@ -1,6 +1,8 @@
 package com.hpe.krakenmare.impl;
 
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
@@ -8,7 +10,7 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -21,7 +23,9 @@ public class FrameworkMqttClient {
 
 	public final static Logger LOG = LoggerFactory.getLogger(FrameworkMqttClient.class);
 
-	final static String clientId = FrameworkMqttClient.class.getSimpleName();
+	private final static String clientId = FrameworkMqttClient.class.getSimpleName();
+
+	private final List<Subscriber> subscribers = new ArrayList<>();
 
 	// TODO: persist to disk
 	MqttClientPersistence persistence = new MemoryPersistence();
@@ -36,7 +40,7 @@ public class FrameworkMqttClient {
 		return client;
 	}
 
-	public void addSubscriber(String topicFilter, IMqttMessageListener messageListener) throws MqttException {
+	public synchronized void addSubscriber(String topicFilter, IMqttMessageListener messageListener) throws MqttException {
 		if (client == null) {
 			throw new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED);
 		}
@@ -51,7 +55,14 @@ public class FrameworkMqttClient {
 				LOG.error("Error while subscribing to topic '" + topicFilter + "': " + messageListener, exception);
 			}
 		};
-		client.subscribe(topicFilter, MqttUtils.getSubscribeQos(), null, callback, messageListener);
+
+		Subscriber s = new Subscriber(topicFilter, callback, messageListener);
+		subscribers.add(s);
+		subscribe(s);
+	}
+
+	private void subscribe(Subscriber s) throws MqttException {
+		client.subscribe(s.topicFilter, MqttUtils.getSubscribeQos(), null, s.callback, s.messageListener);
 	}
 
 	public synchronized void start() throws GeneralSecurityException {
@@ -62,7 +73,7 @@ public class FrameworkMqttClient {
 		try {
 			String broker = MqttUtils.getBroker();
 			client = new MqttAsyncClient(broker, clientId, persistence);
-			client.setCallback(new MqttCallback() {
+			client.setCallback(new MqttCallbackExtended() {
 				@Override
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
 					// LOG.debug("Message received on topic '" + topic + "': " + message);
@@ -79,6 +90,20 @@ public class FrameworkMqttClient {
 				@Override
 				public void connectionLost(Throwable cause) {
 					LOG.warn("Connection lost", cause);
+				}
+
+				@Override
+				public void connectComplete(boolean reconnect, String serverURI) {
+					if (reconnect) {
+						LOG.info("Reconnection complete: re-registering " + subscribers.size() + " subscribers...");
+						for (Subscriber s : subscribers) {
+							try {
+								subscribe(s);
+							} catch (MqttException e) {
+								LOG.error("Unable to subscribe to '" + s.topicFilter + "'", e);
+							}
+						}
+					}
 				}
 			});
 
@@ -103,6 +128,20 @@ public class FrameworkMqttClient {
 				LOG.error("Unable to disconnect", me);
 			}
 		}
+	}
+
+	private class Subscriber {
+
+		final String topicFilter;
+		final IMqttActionListener callback;
+		final IMqttMessageListener messageListener;
+
+		public Subscriber(String topicFilter, IMqttActionListener callback, IMqttMessageListener messageListener) {
+			this.topicFilter = topicFilter;
+			this.callback = callback;
+			this.messageListener = messageListener;
+		}
+
 	}
 
 }
