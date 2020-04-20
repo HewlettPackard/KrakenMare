@@ -554,6 +554,18 @@ services:
       - mosquitto.key
       - km-ca-1.crt
 
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.2.0
+    hostname: elastic
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+    <<: *deploy
+    networks:
+      - krakenmare
+
 networks:
 # zookeeper_kafka is zookeeper and kafka components (brokers, schema registry) plus druid (needs zk)
 # it is not attachable to prevent other containers from connecting
