@@ -23,6 +23,7 @@ COPY framework/src /opt/krakenmare/framework/src
 RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests
 
 COPY framework/entrypoint.sh /opt/krakenmare/framework/entrypoint.sh
+COPY framework/src/main/resources/log.properties /opt/krakenmare/framework/log.properties
 
 EXPOSE 8080
 
