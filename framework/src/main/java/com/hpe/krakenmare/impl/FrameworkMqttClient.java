@@ -79,12 +79,6 @@ public class FrameworkMqttClient {
 				@Override
 				public void connectionLost(Throwable cause) {
 					LOG.warn("Connection lost", cause);
-					try {
-						LOG.info("Reconnecting...");
-						client.reconnect();
-					} catch (MqttException e) {
-						LOG.error("Unable to reconnect", e);
-					}
 				}
 			});
 
