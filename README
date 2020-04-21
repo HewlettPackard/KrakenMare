@@ -1,0 +1,108 @@
+SINGLE MACHINE setup... ( RAM qty=32GB, can run with 16GB but will be hard .... cpu-cores: 8 true cores, 4 is doable but hard on the system. )
+
+- install docker (check it works with "docker run hello-world")
+
+# NO NO NOnote: need /etc/docker/daemon.json for PROXY-challenged setups
+
+- install docker-compose 1.25.5
+
+- sudo curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+- make it executable
+
+- chmod +x /usr/local/bin/docker-compose
+
+- cd playbooks
+
+- cp playbooks/km.conf ~/km.conf, then edit it to match your setup
+
+###TBD SEB: add the unset proxy option in km.conf from my laptop..
+
+- create a swarm cluster
+-  docker swarm init --advertise-addr x.y.z.t (where x.y.z.t is a local IP address to attach to)
+- label your local machine with all KM labels (shell syntax)
+- for label in broker-1 broker-2 broker-3 fanin registry framework injectors test-tools supervisory_cloud; do docker node update --label-add $label=true `hostname`; done
+
+- run setup.sh -r: this will start two registry, a mirror registry and a proxy registry
+
+- run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
+
+- run setup.sh -d: this will deploy all containers to the single system.
+
+- you should see something like this in the fanin logs, showing that the simulator data injector is pushing data to the pipeline.
+
+doudou@doudou:~/wp1.3/playbooks$ docker service logs krakenmare_fanin -f
+
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | hello from fanin... starting waiting for services...
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | initial access to schemaregistry failed, retrying in 10 secs...
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 23 schemas so far
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC-MAIN - Starting
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC-MAIN - List of topics = ['ibswitch/0:0', 'ibswitch/1:0']
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC-MAIN - Forking FanIn Gateway process for ibswitch/0:0
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC P-202 | T-140469808658240 | Starting FanIn Gateway in its process for ibswitch/0:0. MQTT batch pass-through is DISABLED.
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.RegisterRequest from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC-MAIN - Forking FanIn Gateway process for ibswitch/1:0
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC P-203 | T-140469808658240 | Starting FanIn Gateway in its process for ibswitch/1:0. MQTT batch pass-through is DISABLED.
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.RegisterRequest from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.RegisterResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.DeregisterRequest from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.DeregisterResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.SendTimeSeriesDruid from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.DeviceList from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.DeviceListResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.SendTimeSeriesDruidArray from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | Connecting as kafka consumer to check for topic: fabric
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MULTIPROC-MAIN - All processes launched, now main process will wait forever as Signals across Processes & threads is not handled.
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.RegisterResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.DeregisterRequest from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | waiting for kafka producer to connect
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.DeregisterResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.SendTimeSeriesDruid from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.DeviceList from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.manager.DeviceListResponse from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | getting schema com.hpe.krakenmare.message.agent.SendTimeSeriesDruidArray from schemaregistry
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | Connecting as kafka consumer to check for topic: fabric
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | waiting for kafka producer to connect
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | waiting for kafka producer to connect
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | FanIn.kafka_producer_connect: producer connected
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MQTT topic list:[['ibswitch/0', 0], ['registration-result', 0]]
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | connecting with client id(6d46b5f9-e3dd-4dde-b6e0-b6534d88f18f) to mqtt broker (secured):mosquitto
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | ATTENTION: Missing # of MQTTbatches for agent UUID: bbb08a59-4a56-4cc3-82ed-5ded9544439c and topic: ibswitch/0 is: 47
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | waiting for kafka producer to connect
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | FanIn.kafka_producer_connect: producer connected
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | MQTT topic list:[['ibswitch/1', 0], ['registration-result', 0]]
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | connecting with client id(d8d3308f-be3a-41c8-9c50-842fadcf6373) to mqtt broker (secured):mosquitto
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | ATTENTION: Missing # of MQTTbatches for agent UUID: bbb08a59-4a56-4cc3-82ed-5ded9544439c and topic: ibswitch/1 is: 61
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 1 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 1000 messages published to Kafka, rate = 774.97 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 1 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 1000 messages published to Kafka, rate = 775.97 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 2 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 2000 messages published to Kafka, rate = 781.10 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 2 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 2000 messages published to Kafka, rate = 762.33 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 3 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 3000 messages published to Kafka, rate = 760.13 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 3 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 3000 messages published to Kafka, rate = 772.36 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 5 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 4000 messages published to Kafka, rate = 730.21 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 5 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 4000 messages published to Kafka, rate = 726.47 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 6 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 5000 messages published to Kafka, rate = 770.85 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 6 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 5000 messages published to Kafka, rate = 771.11 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 7 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 6000 messages published to Kafka, rate = 766.65 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 7 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 6000 messages published to Kafka, rate = 780.34 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 9 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 7000 messages published to Kafka, rate = 784.84 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 9 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 7000 messages published to Kafka, rate = 763.12 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 10 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 8000 messages published to Kafka, rate = 718.73 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 10 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 8000 messages published to Kafka, rate = 721.86 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 11 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 9000 messages published to Kafka, rate = 766.55 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 11 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 9000 messages published to Kafka, rate = 788.47 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 13 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 10000 messages published to Kafka, rate = 779.02 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 13 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 10000 messages published to Kafka, rate = 777.27 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 14 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 11000 messages published to Kafka, rate = 742.93 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 14 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 11000 messages published to Kafka, rate = 719.83 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 15 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 12000 messages published to Kafka, rate = 755.10 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 15 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 12000 messages published to Kafka, rate = 773.48 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 17 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 13000 messages published to Kafka, rate = 765.55 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 17 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 13000 messages published to Kafka, rate = 777.86 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 18 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 14000 messages published to Kafka, rate = 775.21 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 18 secs | Process-203 | Thread-140469438764800 | TopicMqtt-ibswitch/1 | 14000 messages published to Kafka, rate = 760.47 msg/sec
+krakenmare_fanin.1.jmh6d11e0u60@doudou    | 19 secs | Process-202 | Thread-140469438764800 | TopicMqtt-ibswitch/0 | 15000 messages published to Kafka, rate = 734.73 msg/sec
+
+
+
+
