@@ -41,7 +41,6 @@ run_me framework      curl -s framework:8080/agents               || exit 1
 run_me druid_coord    curl -s http://druid:8081/status/health     || exit 1
 run_me druid_broker   curl -s http://druid:8082/status/health     || exit 1
 run_me druid_histo    curl -s http://druid:8083/status/health     || exit 1
-run_me druid_overlord curl -s http://druid:8090/status/health     || exit 1
 run_me druid_middle   curl -s http://druid:8091/status/health     || exit 1
 #run_me druid_perfquery  'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_perfquery.json http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
 #run_me druid_collectd   'curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/druid_collectd.json   http://druid:8082/druid/v2?pretty | grep timestamp' || exit 1
