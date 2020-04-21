@@ -71,7 +71,7 @@ function check_swarm ()
 	docker secret ls | grep -qw $file
 	if [ ! "$?" -eq 0 ] ; then
 	    echo "" >&2
-	    echo "ERROR: missing at least $file" >&2
+	    echo "WARNING: missing at least $file" >&2
 	    return 1
 	fi
     done
@@ -82,7 +82,7 @@ function check_files()
 {
     if [ ! -d $secrets_path ] ; then
 	echo "" >&2
-	echo "ERROR: missing secrets directory $secrets_path" >&2
+	echo "WARNING: missing secrets directory $secrets_path" >&2
 	echo "run $TOOL_NAME -f or specify alternate path -s" >&2
         return 1
     fi
@@ -92,7 +92,7 @@ function check_files()
 	echo "checking secret: $file..."
 	if [ ! -f "$secrets_path/$file" ] ; then
 	    echo "" >&2
-	    echo "ERROR: missing at least $secrets_path/$file" >&2
+	    echo "WARNING: missing at least $secrets_path/$file" >&2
 
 	    return 1
 	fi
