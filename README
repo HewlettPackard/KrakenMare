@@ -25,9 +25,50 @@ SINGLE MACHINE setup... ( RAM qty=32GB, can run with 16GB but will be hard .... 
 
 - run setup.sh -r: this will start two registry, a mirror registry and a proxy registry
 
+- check that docker ps shows two registries
+
+xyz@xyz:~/wp1.3/playbooks$ docker ps 
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+df2b2c0bd90f        registry            "/entrypoint.sh /etc…"   5 seconds ago       Up 5 seconds        0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
+75a0537d3758        registry            "/entrypoint.sh /etc…"   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
+
+
 - run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
 
 - run setup.sh -d: this will deploy all containers to the single system.
+
+
+after a while (stack may take up to 10 minutes depending on the processing power of your system)
+
+run a sanity check:
+
+- run setup.sh -s: 
+
+running:timeout 10 mosquitto_sub -h mosquitto -p ok ... see logs </tmp/mosquitto>
+running:kafkacat -b broker-1 -L                  ok ... see logs </tmp/broker-1>
+running:kafkacat -b broker-2:9093 -L             ok ... see logs </tmp/broker-2>
+running:kafkacat -b broker-3:9094 -L             ok ... see logs </tmp/broker-3>
+running:redis-cli -h redis ping                  ok ... see logs </tmp/redis>
+running:curl -s framework:8080/agents            ok ... see logs </tmp/framework>
+running:curl -s http://druid:8081/status/health  ok ... see logs </tmp/druid_coord>
+running:curl -s http://druid:8082/status/health  ok ... see logs </tmp/druid_broker>
+running:curl -s http://druid:8083/status/health  ok ... see logs </tmp/druid_histo>
+running:curl -s http://druid:8090/status/health  ok ... see logs </tmp/druid_overlord>
+running:curl -s http://druid:8091/status/health  ok ... see logs </tmp/druid_middle>
+running:kafkacat -L -X ssl.ca.location=/run/secr ok ... see logs </tmp/ssl-broker-1>
+running:kafkacat -L -X ssl.ca.location=/run/secr ok ... see logs </tmp/ssl-broker-2>
+running:kafkacat -L -X ssl.ca.location=/run/secr ok ... see logs </tmp/ssl-broker-3>
+running:curl -s http://prometheus:9090/api/v1/ta ok ... see logs </tmp/prometheus>
+running:curl -s --cacert /run/secrets/km-ca-1.cr ok ... see logs </tmp/schemaregistry>
+running:kafkacat -b broker-1:29092 -L -X securit ok ... see logs </tmp/sasl-broker-1>
+running:kafkacat -b broker-2:29093 -L -X securit ok ... see logs </tmp/sasl-broker-2>
+running:kafkacat -b broker-3:29094 -L -X securit ok ... see logs </tmp/sasl-broker-3>
+running:curl -s --cacert /run/secrets/km-ca-1.cr ok ... see logs </tmp/schemaregistry>
+number of messages in KAFKA on the fabric topic... @time = 1587455812 : 320242
+
+all tests succeeded...
+
+
 
 
 
