@@ -83,7 +83,7 @@ do
          R     ) restartDocker=1;;
          F     ) no_cache='--no-cache';;
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
-         r     ) setupRegistry=1; ansible=1;;# To setup registry you have to setup the node first
+         r     ) setupRegistry=1; ;;
          s     ) stop=1                    ;;
          e     ) exportImages=1; setupRegistry=1; ansible=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
          I     ) importImages=1; setupRegistry=1; ansible=1; pull=1;;
@@ -190,30 +190,31 @@ if [  "$ansible" == "1"  ]; then
           echo "[warning] add -R flag to force this step if needed (requires privileges)"
           echo "***"
      fi
+
      docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100 
      docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100
 
-     if [ "$setupRegistry" == "1"  ]; then
+fi
 
-         #TO BE REMOVED
-         #stopping the mirror registries is necessary to stabilize our build systems
-         #see #384 for details.
-         #assuming we have the two registries like:
-         #[root@o184i108 ~]# docker ps 
-         #CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-         #f527a4303e4f        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
-         #d925eb8ce317        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
-
-         docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop &> /dev/null
-
-         if [ "$importImages" == "1" ]; then
-              # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
-              docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
-         else
-              docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml -f ../docker-registry/registry-proxy.yml up -d
-         fi
-     fi
-     
+if [ "$setupRegistry" == "1"  ]; then
+    
+    #TO BE REMOVED
+    #stopping the mirror registries is necessary to stabilize our build systems
+    #see #384 for details.
+    #assuming we have the two registries like:
+    #[root@o184i108 ~]# docker ps 
+    #CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+    #f527a4303e4f        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
+    #d925eb8ce317        registry            "/entrypoint.sh /etc…"   5 weeks ago         Up 5 weeks          0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
+    
+    docker ps | grep docker-registry_registry- | awk '{ print $1}' | xargs docker stop &> /dev/null
+    
+    if [ "$importImages" == "1" ]; then
+        # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
+        docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
+    else
+        docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml -f ../docker-registry/registry-proxy.yml up -d
+    fi
 fi
 
 if [ "$pull" == "1" ]; then
