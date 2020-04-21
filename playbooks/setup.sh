@@ -173,7 +173,7 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 if [  "$ansible" == "1"  ]; then
 
      if [ "$importImages" == "1" ]; then
-         cd $KM_HOME/docker-registry
+         cd /tmp/
          echo "Extracting registries content tarball..."
          tar -xf registries-content.tar
          echo "Loading ansible docker image..."
@@ -270,7 +270,7 @@ if [ "$exportImages" == "1" ]; then
     echo "Pull required images..."
     docker-compose pull
 
-    cd $KM_HOME/docker-registry
+    cd /tmp/
     echo "Saving ansible docker image..."
     docker save ansible:latest -o ansible-docker-image.tar
     echo "Saving registry docker image..."

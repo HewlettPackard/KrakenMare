@@ -5,7 +5,7 @@ services:
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
     volumes:
-      - ./registry-mirror/:/var/lib/registry/
+      - /tmp/registry-mirror:/var/lib/registry
     ports: 
       - "5000:5000"
   registry-private:
@@ -13,6 +13,6 @@ services:
     environment:
       - REGISTRY_HTTP_ADDR=0.0.0.0:5000
     volumes:
-      - ./registry-private/:/var/lib/registry/
+      - /tmp/registry-private:/var/lib/registry
     ports: 
       - "5001:5000"
