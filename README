@@ -8,7 +8,7 @@
 
 you may need to:
 
-1.1) create this dir: /etc/systemd/system/docker.service.d/
+1.1) mkdir -p /etc/systemd/system/docker.service.d/
 1.2) add this file :  /etc/systemd/system/docker.service.d/http-proxy.conf
 
 where the content is:
@@ -18,13 +18,14 @@ where the content is:
 [Service]
 Environment="HTTP_PROXY=http://web-proxy.bbn.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.bbn.hpecorp.net:8080" "NO_PROXY=<insert-your-hostname-here>"
 
-1.3) create /etc/docker/daemon.json and adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses
+1.3) mkdir /etc/docker
+1.4) create /etc/docker/daemon.json and adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses
 
 {"registry-mirrors": ["http://fsi-o184i059:5000"], "insecure-registries": ["http://fsi-o184i059:5000", "http://fsi-o184i059:5001"], "dns": ["8.8.8.8", "4.4.4.4"]}
 
 
-1.3) systemctl daemon-reload
-1.3) systemctl restart docker
+1.5) systemctl daemon-reload
+1.6) systemctl restart docker
 
 ###############################################
 # end ONLY for proxy-challenged IT departments#
