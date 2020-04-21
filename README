@@ -1,47 +1,73 @@
-SINGLE MACHINE setup... ( RAM qty=32GB, can run with 16GB but will be hard .... cpu-cores: 8 true cores, 4 is doable but hard on the system. )
+--- SINGLE MACHINE setup... ( MIN RAM=16, MIN cores=4, recommended = 32GB, 8 cores) ---
 
-- install docker (check it works with "docker run hello-world")
+1 - install docker (check it works with "docker run hello-world")
 
-# NO NO NOnote: need /etc/docker/daemon.json for PROXY-challenged setups
+###########################################
+# ONLY for proxy-challenged IT departments#
+###########################################
 
-- install docker-compose 1.25.5
+you may need to:
 
-- sudo curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+1.1) create this dir: /etc/systemd/system/docker.service.d/
+1.2) add this file :  /etc/systemd/system/docker.service.d/http-proxy.conf
 
-- make it executable
+where the content is:
 
-- chmod +x /usr/local/bin/docker-compose
+#cat /etc/systemd/system/docker.service.d/http-proxy.conf
 
-- cd playbooks
+[Service]
+Environment="HTTP_PROXY=http://web-proxy.bbn.hpecorp.net:8080" "HTTPS_PROXY=http://web-proxy.bbn.hpecorp.net:8080" "NO_PROXY=<insert-your-hostname-here>"
+
+1.3) create /etc/docker/daemon.json and adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses
+
+{"registry-mirrors": ["http://fsi-o184i059:5000"], "insecure-registries": ["http://fsi-o184i059:5000", "http://fsi-o184i059:5001"], "dns": ["8.8.8.8", "4.4.4.4"]}
+
+
+1.3) systemctl daemon-reload
+1.3) systemctl restart docker
+
+###############################################
+# end ONLY for proxy-challenged IT departments#
+###############################################
+
+2 - install docker-compose 1.25.5
+
+sudo curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+3 - make it executable
+
+chmod +x /usr/local/bin/docker-compose
+
+4 - create a km.conf file
 
 - cp playbooks/km.conf ~/km.conf, then edit it to match your setup
 
-###TBD SEB: add the unset proxy option in km.conf from my laptop..
+5 - create a swarm cluster
 
-- create a swarm cluster
--  docker swarm init --advertise-addr x.y.z.t (where x.y.z.t is a local IP address to attach to)
-- label your local machine with all KM labels (shell syntax)
-- for label in broker-1 broker-2 broker-3 fanin registry framework injectors test-tools supervisory_cloud; do docker node update --label-add $label=true `hostname`; done
+docker swarm init --advertise-addr x.y.z.t (where x.y.z.t is a local IP address to attach to)
 
-- run setup.sh -r: this will start two registry, a mirror registry and a proxy registry
+6 - label your local machine with all KM labels
 
-- check that docker ps shows two registries
+bash syntax
+
+#for label in broker-1 broker-2 broker-3 fanin registry framework injectors test-tools supervisory_cloud; do docker node update --label-add $label=true `hostname`; done
+
+7 - run setup.sh -r: this will start two registry, a mirror registry and a proxy registry
+
+8 - check that docker ps shows two registries
 
 xyz@xyz:~/wp1.3/playbooks$ docker ps 
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 df2b2c0bd90f        registry            "/entrypoint.sh /etc…"   5 seconds ago       Up 5 seconds        0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
 75a0537d3758        registry            "/entrypoint.sh /etc…"   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 
-- run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
+9 - run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
 
-- run setup.sh -d: this will deploy all containers to the single system.
+10 - run setup.sh -d: this will deploy all containers and start the stack
 
+11 - run a sanity check... after a while (stack may take up to 5 minutes to start)
 
-after a while (stack may take up to 10 minutes depending on the processing power of your system)
-
-run a sanity check:
-
-- run setup.sh -s: 
+run setup.sh -s: 
 
 running:timeout 10 mosquitto_sub -h mosquitto -p ok ... see logs </tmp/mosquitto>
 running:kafkacat -b broker-1 -L                  ok ... see logs </tmp/broker-1>
