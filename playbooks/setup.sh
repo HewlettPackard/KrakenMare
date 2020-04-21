@@ -15,7 +15,9 @@
 # under the License.
 
 cd $(dirname $0) || exit 1
-KM_HOME=$(pwd)
+SETUP_HOME=$(pwd)
+KM_HOME=`dirname $SETUP_HOME`
+cd -
 
 #TEMPLATE
 TOOL_NAME=`basename $0`
@@ -34,7 +36,7 @@ unset exportImages;
 unset kmconf
 dockerpull="--pull";
 #DEFAULT ARGS
-DEFAULT_INVENTORY_FILE=hosts;
+DEFAULT_INVENTORY_FILE=${SETUP_HOME}/hosts;
 MIRROR_REGISTRY_PORT=5001;
 
 project_name=krakenmare
@@ -125,7 +127,7 @@ if [ -f "$kmconf" ]; then
 else
     (	echo ""
 	echo "***"
-	echo "copy $KM_HOME/km.conf to ${kmconf}"
+	echo "copy ${SETUP_HOME}/km.conf to ${kmconf}"
 	echo "and edit to match your setup"
 	echo "then restart..."
 	echo "***"
@@ -142,7 +144,7 @@ if [ ! -f $DEFAULT_INVENTORY_FILE ]; then
     echo "***" >&2
     echo "$DEFAULT_INVENTORY_FILE does not exists, building one for $this_host" >&2;
     echo "***" >&2
-    sed "s/__HOST__/${this_host}/g" hosts-CI > hosts
+    sed "s/__HOST__/${this_host}/g" ${SETUP_HOME}/hosts-CI > ${SETUP_HOME}/hosts
 fi
 
 #Registry vars
@@ -165,11 +167,11 @@ registry_content;
 #BODY
 
 #Check proxy
-export COMPOSE_FILE=../all-compose.yml:../secrets.yml
+export COMPOSE_FILE=${KM_HOME}/all-compose.yml:${KM_HOME}/secrets.yml
 
 if [ ! -z "$http_proxy" ] ; then
     echo "appending proxy settings to all compose files"
-    export COMPOSE_FILE=${COMPOSE_FILE}:../docker-proxy.yml
+    export COMPOSE_FILE=${COMPOSE_FILE}:${KM_HOME}/docker-proxy.yml
 fi
 
 compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " -c $file "; done;)
@@ -178,23 +180,23 @@ compose_args=$( for file in $(echo $COMPOSE_FILE | tr ":" "\n"); do   echo -n " 
 if [  "$ansible" == "1"  ]; then
 
      if [ "$importImages" == "1" ]; then
-         cd /tmp/
+         cd /tmp/ || exit 1
          echo "Extracting registries content tarball..."
-         tar -xf registries-content.tar
+         tar -xf registries-content.tar || exit 1
          echo "Loading ansible docker image..."
-         docker load -i ansible-docker-image.tar
+         docker load -i ansible-docker-image.tar || exit 1
          echo "Loading registry docker image..."
-         docker load -i registry-docker-image.tar
-         cd $KM_HOME
+         docker load -i registry-docker-image.tar || exit 1
      else
          #Build ansible
+	 cd ${SETUP_HOME} || exit 1
          docker build $no_cache $dockerpull --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --tag ansible . || exit 1
      fi
 
-     mkdir -p $KM_HOME/download-cache || exit 1
+     mkdir -p ${SETUP_HOME}/download-cache || exit 1
 
      #The last task restarts docker and therefore exits brutally, FIXME
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} time_server=${time_server} dns_search="'"'"${dns_search}"'"'" dns_list="'"'"${dns_list}"'"'"" --forks 100
+     docker run --rm --volume ${SETUP_HOME}:/playbooks/ --volume $DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/kmu-client-playbook.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} time_server=${time_server} dns_search="'"'"${dns_search}"'"'" dns_list="'"'"${dns_list}"'"'"" --forks 100
      if [ "$restartDocker" == 1 ] ; then
           #need to be root to restart the docker service when proxy and/or registries have been reconfigured
           sudo systemctl daemon-reload || exit 1
@@ -207,8 +209,8 @@ if [  "$ansible" == "1"  ]; then
           echo "***"
      fi
 
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100 
-     docker run --rm --volume $KM_HOME:/playbooks/ --volume $KM_HOME/$DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100
+     docker run --rm --volume ${SETUP_HOME}:/playbooks/ --volume $DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_exit.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100 
+     docker run --rm --volume ${SETUP_HOME}:/playbooks/ --volume $DEFAULT_INVENTORY_FILE:/etc/ansible/hosts --network=host ansible ansible-playbook /playbooks/swarm_init.yml --extra-vars "http_proxy=${http_proxy} https_proxy=${https_proxy} " --forks 100
 
 fi
 
@@ -227,9 +229,9 @@ if [ "$setupRegistry" == "1"  ]; then
     
     if [ "$importImages" == "1" ]; then
         # don't do registry mirroring when importing, since the registry will die if it cannot acces the Internet
-        docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml up -d
+        docker-compose -f ${KM_HOME}/docker-registry/mirror-registry.yml -f ${KM_HOME}/docker-registry/docker-proxy.yml up -d
     else
-        docker-compose -f ../docker-registry/mirror-registry.yml -f ../docker-registry/docker-proxy.yml -f ../docker-registry/registry-proxy.yml up -d
+        docker-compose -f ${KM_HOME}/docker-registry/mirror-registry.yml -f ${KM_HOME}/docker-registry/docker-proxy.yml -f ${KM_HOME}/docker-registry/registry-proxy.yml up -d
     fi
 fi
 
@@ -256,14 +258,14 @@ if [ "$stop" == "1" ]; then
 fi
 
 if [ "$deploy" == "1" ]; then
-    cd ../km-security || exit 1
+    cd ${KM_HOME}/km-security || exit 1
     #if all necessary secrets already exist in swarm, use them,
     #if not and they exist as files, push them
     #if not generate them and push them
     #delete files after pushing to swarm in all cases
     ./km-secrets-tool.sh -wcgpd || exit 1
 
-    cd ../playbooks || exit 1
+    cd ${SETUP_HOME} || exit 1
     cmd="docker stack deploy $compose_args $project_name"
     echo "running..."
     echo "REGISTRY_FULL_PATH=$REGISTRY_FULL_PATH"
@@ -275,15 +277,13 @@ if [ "$exportImages" == "1" ]; then
     #make sure upstream image we don't build are available in the mirror registry
     echo "Pull required images..."
     docker-compose pull
-
-    cd /tmp/
+    cd /tmp/ || exit 1
     echo "Saving ansible docker image..."
     docker save ansible:latest -o ansible-docker-image.tar
     echo "Saving registry docker image..."
     docker save registry -o registry-docker-image.tar
     echo "Exporting registries content..."
     tar -cf registries-content.tar  ansible-docker-image.tar registry-docker-image.tar registry-mirror/ registry-private/
-    cd $KM_HOME
 fi
 
 if [ "$test" == "1" ]; then
