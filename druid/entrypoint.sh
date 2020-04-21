@@ -19,5 +19,5 @@ case $KM_DRUID_SIZE_PROFILE in
          medium   ) bin/start-single-server-medium ;;
          large    ) bin/start-single-server-large ;;
          xlarge   ) bin/start-single-server-xlarge ;;
-         *        ) echo "unrecognized SIZE option" ; exit 1  ;;
+         *        ) echo "unrecognized KM_DRUID_SIZE_PROFILE option" ; exit 1  ;;
 esac
