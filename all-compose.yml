@@ -359,7 +359,7 @@ services:
       - "8191:8091"
       - "8888:8888"
     environment:
-      SIZE: "micro"
+      KM_DRUID_SIZE_PROFILE: ${KM_DRUID_SIZE_PROFILE}
     deploy:
       restart_policy:
         condition: none
