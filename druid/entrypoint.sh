@@ -10,6 +10,8 @@ echo "hello from druid... starting waiting for services..."
 # Even though Java is in the path and is the right version druid still does not start. Hence we skip the java check.
 export DRUID_SKIP_JAVA_CHECK=1
 
+echo "Starting with KM_DRUID_SIZE_PROFILE $KM_DRUID_SIZE_PROFILE"
+
 case $KM_DRUID_SIZE_PROFILE in
          nano     ) bin/start-nano-quickstart  ;;
          micro    ) bin/start-micro-quickstart  ;;
