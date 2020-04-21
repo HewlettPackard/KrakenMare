@@ -38,6 +38,7 @@ usage () {
      echo "-a: to run Ansible playbooks"
      echo "-r: to create Registry"
      echo "-p: to Pull"
+     echo "-t: test stack is functional"
      echo "-b: to Build and Push"
      echo "-f: do not force pulling newer image from dockerhub"
      echo "-d: to Deploy"
@@ -59,18 +60,19 @@ usage () {
 
 
 registry_content () {
-     echo $registry will be used as registry node
-     
-     echo -n "[info] $registry catalog content on mirror registry (can be void if not running):"
-     curl --max-time 3 $registry:5000/v2/_catalog 2> /dev/null
-     echo ""
-     echo -n "[info] $registry catalog content on private registry (can be void if not running):"
-     curl --max-time 3 $registry:5001/v2/_catalog 2> /dev/null
-     echo ""
+    echo ""
+    echo docker registry at $registry 
+    echo ""
+    echo -n "[info] $registry catalog content on mirror registry (can be void if not running):"
+    curl --max-time 3 $registry:5000/v2/_catalog 2> /dev/null
+    echo ""
+    echo -n "[info] $registry catalog content on private registry (can be void if not running):"
+    curl --max-time 3 $registry:5001/v2/_catalog 2> /dev/null
+    echo ""
 }
 
 #Parse args
-while getopts "hfapbdc:rfi:FRseI" Option
+while getopts "hfaptbdc:rfi:FRseI" Option
 do
      case $Option in
          h     ) usage $0 ; exit 0        ;;
@@ -85,6 +87,7 @@ do
          i     ) DEFAULT_INVENTORY_FILE=${OPTARG}       ;;
          r     ) setupRegistry=1; ;;
          s     ) stop=1                    ;;
+	 t     ) test=1 ;;
          e     ) exportImages=1; setupRegistry=1; ansible=1; build=1; stop=1 ;;# Need to build, push and stop the stack before exporting registry content
          I     ) importImages=1; setupRegistry=1; ansible=1; pull=1;;
          *     ) echo "unrecognized option, try $0 -h" >&2 ; usage $0 ; exit 1  ;;
@@ -270,3 +273,7 @@ if [ "$exportImages" == "1" ]; then
     cd $KM_HOME
 fi
 
+if [ "$test" == "1" ]; then
+    ctn=`docker ps | grep test-tools | awk '{print $1}'` || exit 1
+    docker exec -ti $ctn /tmp/check-pipeline.sh
+fi
