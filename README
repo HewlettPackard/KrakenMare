@@ -32,7 +32,6 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 df2b2c0bd90f        registry            "/entrypoint.sh /etc…"   5 seconds ago       Up 5 seconds        0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
 75a0537d3758        registry            "/entrypoint.sh /etc…"   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 
-
 - run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
 
 - run setup.sh -d: this will deploy all containers to the single system.
@@ -67,9 +66,5 @@ running:curl -s --cacert /run/secrets/km-ca-1.cr ok ... see logs </tmp/schemareg
 number of messages in KAFKA on the fabric topic... @time = 1587455812 : 320242
 
 all tests succeeded...
-
-
-
-
 
 
