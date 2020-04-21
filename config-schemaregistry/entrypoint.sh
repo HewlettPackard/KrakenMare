@@ -26,6 +26,9 @@ do
   fi
 done
 
+# We push the schema we will use for connection to elastic to <topic>-value naming.  This is needed for TopicNameStrategy per
+# https://docs.confluent.io/current/schema-registry/serializer-formatter.html#limitations
+# https://github.com/confluentinc/kafka-connect-elasticsearch/issues/59
 http --ignore-stdin POST schemaregistry:8085/subjects/agent-registration-value/versions Accept:application/vnd.schemaregistry.v1+json schema=@/tmp/RegisterResponse.avsc
 http --ignore-stdin POST schemaregistry:8085/subjects/device-registration-value/versions Accept:application/vnd.schemaregistry.v1+json schema=@/tmp/Agent.avsc
 http --ignore-stdin POST schemaregistry:8085/subjects/agent-deregistration-value/versions Accept:application/vnd.schemaregistry.v1+json schema=@/tmp/DeregisterResponse.avsc
