@@ -1,6 +1,0 @@
-version: '3'
-services:
-  registry-mirror:
-    environment:
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
