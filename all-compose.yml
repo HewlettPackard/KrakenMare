@@ -561,7 +561,7 @@ services:
       - "9200:9200"
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "ES_JAVA_OPTS=-Xms${KM_ES_XMS:-256m} -Xmx${KM_ES_XMX:-256m}"
     <<: *deploy
     networks:
       - krakenmare
