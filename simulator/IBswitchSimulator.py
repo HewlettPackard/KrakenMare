@@ -510,6 +510,13 @@ class IBswitchSimulator(AgentCommon):
             self.myDeviceMap,
         )
 
+        # wait for a fix amount of time to let time to the fanin server to be ready
+        # removing this will likely make the client send MQTT data that will not
+        # be processed by the fanin
+        # tbd productization: make a true synchro/ready request with the fanin
+
+        time.sleep(10)
+        
         # start sending data
         self.send_data()
 
