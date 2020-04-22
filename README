@@ -59,8 +59,8 @@ bash syntax
 
 xyz@xyz:~/wp1.3/playbooks$ docker ps 
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-df2b2c0bd90f        registry            "/entrypoint.sh /etc…"   5 seconds ago       Up 5 seconds        0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
-75a0537d3758        registry            "/entrypoint.sh /etc…"   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
+df2b2c0bd90f        registry            "/entrypoint.sh /etc..."   5 seconds ago       Up 5 seconds        0.0.0.0:5000->5000/tcp   docker-registry_registry-mirror_1
+75a0537d3758        registry            "/entrypoint.sh /etc..."   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 
 9 - run setup.sh -b: this will build the stack from the internet, can be very long depending on internet connection
 
