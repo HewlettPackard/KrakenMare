@@ -85,7 +85,7 @@ services:
       KAFKA_ZOOKEEPER_SET_ACL: "true"
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
-      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS:-6g} -Xmx${KAFKA_XMX:-6g} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS} -Xmx${KAFKA_XMX} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9982:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - source: broker_jaas.conf
@@ -149,7 +149,7 @@ services:
       KAFKA_ZOOKEEPER_SET_ACL: "true"
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
-      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS:-6g} -Xmx${KAFKA_XMX:-6g} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS} -Xmx${KAFKA_XMX} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9983:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - source: broker_jaas.conf
@@ -213,7 +213,7 @@ services:
       KAFKA_ZOOKEEPER_SET_ACL: "true"
       KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
       KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=INFO,kafka=WARN,kafka.controller=WARN,kafka.request.logger=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN,kafka.log.LogCleaner=WARN"
-      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS:-6g} -Xmx${KAFKA_XMX:-6g} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_HEAP_OPTS: '-Xms${KAFKA_XMS} -Xmx${KAFKA_XMX} -XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/broker_jaas.conf -javaagent:/opt/prometheus/jmx_prometheus_javaagent-0.12.0.jar=9984:/opt/prometheus/kafka-2_0_0.yml"
     secrets:
       - source: broker_jaas.conf
@@ -561,7 +561,7 @@ services:
       - "9200:9200"
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms${KM_ES_XMS:-256m} -Xmx${KM_ES_XMX:-256m}"
+      - "ES_JAVA_OPTS=-Xms${KM_ES_XMS} -Xmx${KM_ES_XMX}"
     <<: *deploy
     networks:
       - krakenmare
