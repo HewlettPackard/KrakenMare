@@ -1,0 +1,47 @@
+{
+  "type": "kafka",
+  "dataSchema": {
+    "dataSource": "perfquery",
+    "parser": {
+      "type": "avro_stream",
+      "avroBytesDecoder": {
+        "type": "schema_registry",
+        "url": "http://schemaregistry:8085"
+      },
+      "parseSpec": {
+        "format": "avro",
+        "timestampSpec": {
+          "column": "timestamp",
+          "format": "millis"
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+          { "name": "timestamp", "type": "long" },
+          { "name": "sensorUuid", "type": "string" },
+          { "name": "sensorValue", "type": "float" }
+          ]
+        }
+      }
+    },
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "rollup": false,
+      "queryGranularity": "none"
+    },
+    "metricsSpec": []
+  },
+  "ioConfig": {
+    "type": "kafka",
+    "topic": "fabric",
+    "consumerProperties": {
+      "bootstrap.servers": "broker-1:9092,broker-2:9093,broker-3:9094"
+    }
+  },
+  "tuningConfig": {
+    "type": "kafka",
+    "forceExtendableShardSpecs": true,
+    "maxParseExceptions": 100,
+    "maxSavedParseExceptions": 10
+  }
+}

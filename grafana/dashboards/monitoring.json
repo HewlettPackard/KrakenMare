@@ -1,0 +1,321 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 2,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "cacheTimeout": null,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Druid",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 19,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "6.4.3",
+      "pointradius": 0.5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "aggregators": [
+            {
+              "fieldName": "sensorValue",
+              "name": "sensorValue",
+              "type": "longSum"
+            }
+          ],
+          "currentAggregator": {
+            "type": "count"
+          },
+          "currentFilter": {
+            "type": "selector"
+          },
+          "currentPostAggregator": {
+            "fn": "+",
+            "type": "arithmetic"
+          },
+          "currentSelect": {
+            "dimension": "",
+            "metric": ""
+          },
+          "customGranularity": "ten_second",
+          "dimension": "sensorUuid",
+          "druidDS": "perfquery",
+          "druidMetric": "sensorValue",
+          "errors": {
+            "aggregators": "You must supply at least one aggregator"
+          },
+          "filters": [],
+          "hide": false,
+          "limit": 9999,
+          "queryType": "topN",
+          "refId": "A",
+          "selectDimensions": [
+            "deviceId"
+          ],
+          "selectMetrics": [
+            "Counter"
+          ],
+          "shouldOverrideGranularity": true
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Symbol Error Counter",
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "decimals": null,
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Druid",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 19,
+        "x": 0,
+        "y": 12
+      },
+      "id": 8,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sideWidth": null,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 0.5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "aggregators": [
+            {
+              "fieldName": "sensorValue",
+              "fieldNames": "sensorValue",
+              "name": "sensorValue",
+              "type": "longSum"
+            }
+          ],
+          "currentAggregator": {
+            "type": "count"
+          },
+          "currentFilter": {
+            "type": "selector"
+          },
+          "currentPostAggregator": {
+            "fn": "+",
+            "type": "arithmetic"
+          },
+          "currentSelect": {
+            "dimension": "",
+            "metric": ""
+          },
+          "customGranularity": "ten_second",
+          "dimension": "sensorUuid",
+          "druidDS": "perfquery",
+          "druidMetric": "sensorValue",
+          "errors": {
+            "aggregators": "You must supply at least one aggregator"
+          },
+          "filters": [],
+          "hide": false,
+          "limit": 9999,
+          "queryType": "topN",
+          "refId": "A",
+          "selectDimensions": [
+            "deviceId"
+          ],
+          "selectMetrics": [
+            "Counter"
+          ],
+          "shouldOverrideGranularity": true
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Port Xmit Data",
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "decimals": null,
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 20,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "",
+  "title": "Monitoring",
+  "uid": "E_KTP6lmk",
+  "version": 38
+}

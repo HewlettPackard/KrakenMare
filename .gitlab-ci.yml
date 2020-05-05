@@ -1,0 +1,108 @@
+variables:
+  http_proxy: "http://web-proxy.bbn.hpecorp.net:8080"
+  https_proxy: "http://web-proxy.bbn.hpecorp.net:8080"
+
+stages:
+  - test
+  - deploy
+
+test-framework:
+  stage: test
+  image: maven:3.6.0-jdk-8
+  services:
+  - redis:5.0.3
+  - eclipse-mosquitto:latest
+  before_script: &before_mvn
+    # proxy settings
+    - "host=`echo $https_proxy | cut -d: -f2 | cut -d/ -f3`"
+    - "port=`echo $https_proxy | cut -d: -f3`"
+    # set the path inside of source tree so CI can cache it
+    # see https://gitlab.com/gitlab-org/gitlab-ce/issues/4431
+    - export MAVEN_OPTS="-Dmaven.repo.local=.mvnrepo -Dhttps.proxyHost=$host -Dhttps.proxyPort=$port"
+    - echo $MAVEN_OPTS
+  cache: &cache_mvn
+    key: "$CI_JOB_NAME"
+    paths:
+      - .mvnrepo
+  script:
+    - mvn -f framework/pom.xml
+        -Dredis.server=redis:6379
+        -Dmqtt.server=tcp://eclipse-mosquitto:1883
+        -Dbootstrap.servers=
+        -Dschema.registry=mock://test
+        -P coverage
+        test jacoco:report
+    - "cp -a framework/target/site/jacoco/ coverage && echo Coverage: `grep -o '[0-9]*%' coverage/index.html | head -1` || echo Coverage: 0%"
+  only:
+    changes:
+     - "framework/**/*"
+     - "config-schemaregistry/*.avdl"
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      junit:
+        - framework/target/surefire-reports/TEST-*.xml
+    expire_in: 2 weeks
+
+# if this fails, run "mvn license:format" to apply the license header and commit the result!
+check-framework-license:
+  stage: test
+  image: maven:3.6.0-jdk-8
+  before_script: *before_mvn
+  cache: *cache_mvn
+  script:
+    - mvn -f framework/pom.xml license:check
+  only:
+    changes:
+     - "framework/**/*"
+
+deploy-dev: &deploy-dev
+  stage: deploy
+  tags:
+    - u176i108
+  environment: &u176i108
+    name: u176i108
+    url: http://16.19.176.108:3000/d/E_KTP6lmk/monitoring
+    on_stop: stop-dev
+  dependencies: []
+  script:
+    - bash -x playbooks/setup.sh -sarbd -c ./km-gre.conf
+  except:
+    - master
+
+stop-dev:
+  <<: *deploy-dev
+  variables:
+    GIT_STRATEGY: none
+  environment:
+    <<: *u176i108
+    action: stop
+  dependencies: []
+  script:
+    - bash -x playbooks/setup.sh -s -c ./km-gre.conf
+  when: manual
+
+deploy-master: &deploy-master
+  stage: deploy
+  tags:
+    - u176i109
+  environment: &u176i109
+    name: u176i109
+    url: http://16.19.176.109:3000/d/E_KTP6lmk/monitoring
+  dependencies: []
+  script:
+    - bash -x playbooks/setup.sh -sarbd -c ./km-gre.conf
+  only:
+    - master
+  except:
+    - schedules
+
+full-rebuild-deploy:
+  <<: *deploy-master
+  script:
+    - docker image prune --force
+    - bash -x playbooks/setup.sh -sarbdF -c ./km-gre.conf
+  only:
+    - schedules
+  except: []

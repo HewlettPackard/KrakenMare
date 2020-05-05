@@ -1,0 +1,15 @@
+- name: Remove all workers from Swarm
+  hosts: swarm_nodes,swarm_manager
+
+  vars_files:
+    - vars.yml
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ http_proxy }}"
+
+  tasks:
+
+    - name: Remove nodes
+      docker_swarm:
+        state: absent
+        force: true

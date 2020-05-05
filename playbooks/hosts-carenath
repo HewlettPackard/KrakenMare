@@ -1,0 +1,22 @@
+[all:vars]
+ansible_user=root
+ansible_ssh_pass=R0n8n143
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[registry]
+carenath
+[supervisory_cloud]
+carenath.local
+[broker-1]
+carenath.local
+[broker-2]
+carenath.local
+[broker-3]
+carenath.local
+[injectors]
+carenath.local
+[swarm_manager]
+carenath ip_addr=192.168.1.11
+[swarm_nodes]
+carenath.local
+[fanin]
+carenath.local

@@ -1,0 +1,110 @@
+@namespace("com.hpe.krakenmare.message.agent")
+protocol Protocol {
+
+	import idl "core.avdl";
+
+	record DeviceList {
+		/** Agent UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** List of devices */
+		array<com.hpe.krakenmare.core.Device> devices;
+	}
+
+	record RegisterRequest {
+		/** Unique identifier agent (MAC for system internal agents, Certificate for external) */
+		string uid;
+
+		/** Free format names such as Agent (System X), Consumer, JobAgent, UserAgent, KME (Kraken Mare Embedded )Agent, KMN (Kraken Mare Node) Agent */
+		string type;
+
+		/** Human readable agent name */
+		string name;
+
+		/** Human readable agent description */
+		string description;
+
+		/** If true, framework will provide device/sensor list */
+		boolean useSensorTemplate;
+	}
+
+	record DeregisterRequest {
+		/** Agent UUID */
+		@logicalType("uuid")
+		string uuid;
+	}
+
+	record EventMeasurement {
+		/** Sensor UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Event */
+		string sensorEvent;
+	}
+
+	record SendEvents {
+		/** Agent UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Timestamp of sensor value, milliseconds since the epoch */
+		@logicalType("timestamp-millis")
+		long timestamp;
+
+		array<EventMeasurement> measurementList;
+	}
+
+	record TimeSeriesMeasurement {
+		/** Sensor UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Sensor value */
+		float sensorValue;
+	}
+
+	record SendTimeSeries {
+		/** Agent UUID */
+		@logicalType("uuid")
+		string uuid;
+
+		/** Timestamp of sensor value, milliseconds since the epoch */
+		@logicalType("timestamp-millis")
+		long timestamp;
+
+		array<TimeSeriesMeasurement> measurementList;
+	}
+
+	record SendTimeSeriesDruid {
+		/** Timestamp of sensor value, milliseconds since the epoch */
+		long timestamp;
+
+		/** Sensor UUID */
+		@logicalType("uuid")
+		string sensorUuid;
+
+		/** Sensor value */
+		float sensorValue;
+	}
+
+	record SendEventsDruid {
+		/** Timestamp of sensor value, milliseconds since the epoch */
+		@logicalType("timestamp-millis")
+		long timestamp;
+
+		/** Sensor UUID */
+		@logicalType("uuid")
+		string sensorUuid;
+
+		/** Event text */
+		string sensorEvent;
+	}
+
+	record SendTimeSeriesDruidArray {
+		/** Array of SendTimeSeriesDruid records  */
+    array<SendTimeSeriesDruid> tripletBatch;
+	}
+
+}

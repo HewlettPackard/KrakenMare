@@ -1,0 +1,21 @@
+{ 
+"PortSelect": 255 ,
+"SymbolErrorCounter": 600 ,
+"LinkErrorRecoveryCounter": 0 ,
+"LinkDownedCounter": 0 ,
+"PortRcvErrors": 0 ,
+"PortRcvRemotePhysicalErrors": 0 ,
+"PortRcvSwitchRelayErrors": 13 ,
+"PortXmitDiscards": 0 ,
+"PortXmitConstraintErrors": 0 ,
+"PortRcvConstraintErrors": 0 ,
+"LocalLinkIntegrityErrors": 0 ,
+"ExcessiveBufferOverrunErrors": 0 ,
+"VL15Dropped": 0 ,
+"PortXmitData": 18235298 ,
+"PortRcvData": 18092794 ,
+"PortXmitPkts": 116452 ,
+"PortRcvPkts": 112651 ,
+"PortXmitWait": 822105 ,
+"Timestamp": 1546466012, "GUID": "0x080069000000731E", "Name": "r1ib"
+}

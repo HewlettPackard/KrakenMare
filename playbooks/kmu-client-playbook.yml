@@ -1,0 +1,118 @@
+---
+- name: Preparation phase
+  hosts: localhost
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+# End of variables
+
+  tasks:
+- name: Ansible setup for the scalability analysis
+  hosts: swarm_manager,swarm_nodes
+  gather_facts: no
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+# End of variables
+
+  tasks:
+  - name: Install yum-utils,wget and tmux
+    yum:
+      name:
+        - yum-utils
+        - wget
+        - python3-pip
+        
+      state: latest
+  
+  - name: Add pip to use swarm_init from Ansible
+    pip:
+      name: 
+        - docker
+      executable: pip-3
+      
+  - name : Setup HPE proxy for Docker Registry  in  /etc/systemd/system/docker.service.d/http-proxy.conf
+    blockinfile:
+      path: /etc/systemd/system/docker.service.d/http-proxy.conf
+      create: yes
+      block: |
+        [Service]
+        Environment="HTTP_PROXY={{ http_proxy }}" "HTTPS_PROXY={{ https_proxy }}" "NO_PROXY={{ docker_mirror_registry_address }}"
+
+  - name: Create /etc/docker/ if it doesn't exist
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0775
+    with_items:
+      - /etc/docker
+
+  - name : Setup docker and use a local mirror registry and classic docker registry
+    copy:
+      dest: /etc/docker/daemon.json
+      backup: yes
+      content: |
+        {
+          "insecure-registries" : ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}","http://{{ docker_mirror_registry_address }}:{{ docker_registry_port }}"],
+          "registry-mirrors": ["http://{{ docker_mirror_registry_address }}:{{ docker_mirror_registry_port }}"],
+          "dns" : [{{ dns_list }}],
+          "dns-search" : [{{ dns_search }}]
+        }
+##KMU user
+  - name: Add the user 'kmu'
+    user:
+      name: kmu
+      password: "{{password}}"
+      groups: docker,wheel
+      append: yes
+
+## Docker-compose
+  - name: modifying chrony.conf (Synchronize time)
+    lineinfile:
+      path: /etc/chrony.conf
+      regexp: '^pool\ '
+      line: "server {{ time_server }} iburst"
+  - name: restart chrony
+    systemd:
+      state: restarted
+      name: chronyd
+
+
+# Send instructions on nodes before killing docker services on host machine
+- name: Restart docker on swarm_nodes
+  hosts: swarm_nodes
+  gather_facts: no  
+
+
+# Edit variables.
+  vars_files:
+    - vars.yml
+
+  environment:
+    http_proxy: "{{ http_proxy }}"
+    https_proxy: "{{ https_proxy }}"
+
+
+# End of variables
+
+  tasks:
+  - name: Run daemon-reload then restart Docker service
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      enabled : yes
+      name: docker
