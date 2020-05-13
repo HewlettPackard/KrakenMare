@@ -8,11 +8,14 @@ Configuration:
 - Minimum RAM = 16 GB, Minimum Cores = 4
 - Recommended RAM = 32GB, Recommended Cores = 8
 
-Next steps have to be performed as superuser (root)
+# **Next steps are performed as root when the prompt is** `#`.
 
 ## Install Docker
 
-Install docker (you may use instructions at https://github.com/bcornec/Labs/tree/master/Docker#docker-installation
+Install docker (you may use instructions at https://github.com/bcornec/Labs/tree/master/Docker#docker-installation)
+
+Follow the instructions at https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user to 
+enable your userid to run docker commands without sudo.
 
 Check it works:
 
@@ -33,6 +36,12 @@ EOF
 
 Note: change web-proxy.domain.net to the name of your proxy machine and adapt as well the port used.
 
+You may want to read https://docs.docker.com/engine/admin/systemd/#http-proxy
+
+**For all IT departments**
+
+Create daemon.json to tell Docker about the registry and mirror that will be created and to enable their use.
+
 `#` **`mkdir -p /etc/docker`**
 
 `#` **`echo '{"registry-mirrors": ["http://myregistry:5000"], "insecure-registries": ["http://myregistry:5000", "http://myregistry:5001"], "dns": ["8.8.8.8", "4.4.4.4"]}' > /etc/docker/daemon.json`**
@@ -43,37 +52,36 @@ Note: adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses
 
 `#` **`systemctl restart docker`**
 
-You may want to read https://docs.docker.com/engine/admin/systemd/#http-proxy
-
-**For all IT departments**
 
 ## Install docker-compose 1.25.5
 
-`#` **`sudo curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose`**
+`#` **`curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose`**
 
 `#` **`chmod +x /usr/local/bin/docker-compose`**
 
-Next steps have to be performed as a docker capable user (able to laucnh docker commands, user belonging to the docker group e.g.)
+Next steps have to be performed as a docker capable user (able to launch docker commands, user belonging to the docker group e.g.)
 
 ## Create a km.conf file
 
 `$` **`cp playbooks/km.conf ~/km.conf`**
 
-Note: edit it to match your setup
+Note: edit it to match your setup. The default configuration is for the minimum size system.
 
 ## Create a swarm cluster
 
 `$` **`docker swarm init --advertise-addr x.y.z.t `**
 
-Note: x.y.z.t is a local IP address to attach to
+Note: x.y.z.t is a local IP address to attach to. This must be an IP used by the system you are using.
+
+Instructions from this point require no modification and are to be run as shown.
 
 ## Label your local machine with all KM labels
 
-`$` **`for label in broker-1 broker-2 broker-3 fanin registry framework injectors test-tools supervisory_cloud; do docker node update --label-add $label=true `hostname`; done`**
+`$` **`for label in broker-1 broker-2 broker-3 fanin registry framework injectors test-tools supervisory_cloud; do docker node update --label-add $label=true $(hostname); done`**
 
 ## Setup registries
 
-`$` **`./setup.sh -r`**
+`$` **`playbooks/setup.sh -r`**
 
 Note:  this will start two registry, a mirror registry and a proxy registry
 
@@ -84,20 +92,21 @@ df2b2c0bd90f        registry            "/entrypoint.sh /etc..."   5 seconds ago
 75a0537d3758        registry            "/entrypoint.sh /etc..."   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 ```
 
-Check that docker ps shows two registries
+Check that docker ps shows two registries. If you restart docker you will need to run setup.sh -r to start the registires.
 
 ## Build the stack
 
-`$` **`./setup.sh -b`**
+`$` **`playbooks/setup.sh -b`**
  
 This will build the stack from the Internet, can be very long depending on Internet connection
 
-`$` **`./setup.sh -d`**
+`$` **`playbooks/setup.sh -d`**
 
 This will deploy all containers and start the stack
+
 Then run a sanity check... after a while (stack may take up to 5 minutes to start)
 
-`$` **`./setup.sh -s`**
+`$` **`playbooks/setup.sh -t`**
 ```none
 running:timeout 10 mosquitto_sub -h mosquitto -p ok ... see logs </tmp/mosquitto>
 running:kafkacat -b broker-1 -L                  ok ... see logs </tmp/broker-1>
@@ -140,7 +149,7 @@ Grafana 6.6.2 (needed for support of Druid plugin) configured to read from Druid
 ## schemaregistry
 Confluent schemaregistry as central repository of Avro schema
 ## framework
-Agent, device and sensor regisitration server. Uses redis for backend
+Agent, device and sensor registration server. Uses redis for backend
 ## redis
 Backend for framework
 ## prometheus
@@ -168,7 +177,7 @@ Further documentation on iLO REST API can be found at https://www.hpe.com/us/en/
 
 As this network path may not function we do not start the agent at stack start up.  Please use
 
-`#` **`docker service logs -f krakenmare_redfish`**
+`$` **`docker service logs -f krakenmare_redfish`**
 
 until it reports
 
@@ -178,13 +187,11 @@ use: /redfish/start.sh to actually start the container payload.
 
 Please enter the container with 
 
-```none
-docker exec -ti `docker ps | grep redfish | awk '{print $1}'` bash
-```
+`$` **`docker exec -ti $(docker ps | grep redfish | awk '{print $1}') bash`**
+
 and run as above or use
-```none
-docker exec `docker ps | grep redfish | awk '{print $1}'` /redfish/start.sh
-```
+
+`$` **`docker exec $(docker ps | grep redfish | awk '{print $1}') /redfish/start.sh`**
 
 The agent requests the chassis and from each chassis the temperatures and fans building up a map of sensors.
 This process takes several seconds.
