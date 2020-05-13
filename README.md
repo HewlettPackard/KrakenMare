@@ -8,13 +8,14 @@ Configuration:
 - Minimum RAM = 16 GB, Minimum Cores = 4
 - Recommended RAM = 32GB, Recommended Cores = 8
 
-Next steps are performed as using sudo 
+# **Next steps are performed as root when the prompt is** `#`.
 
 ## Install Docker
 
-Install docker (you may use instructions at https://github.com/bcornec/Labs/tree/master/Docker#docker-installation
+Install docker (you may use instructions at https://github.com/bcornec/Labs/tree/master/Docker#docker-installation)
+
 Follow the instructions at https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user to 
-add enable your userid to run docker commands without sudo.
+enable your userid to run docker commands without sudo.
 
 Check it works:
 
@@ -24,9 +25,9 @@ Check it works:
 
 you may need to perform the following tasks:
 
-`#` **`sudo mkdir -p /etc/systemd/system/docker.service.d/`**
+`#` **`mkdir -p /etc/systemd/system/docker.service.d/`**
 
-`#` **`sudo cat > /etc/systemd/system/docker.service.d/http-proxy.conf << EOF`**
+`#` **`cat > /etc/systemd/system/docker.service.d/http-proxy.conf << EOF`**
 ```none
 [Service]
 Environment="HTTP_PROXY=http://web-proxy.domain.net:8080" "HTTPS_PROXY=http://web-proxy.domain.net:8080" "NO_PROXY=<insert-your-hostname-here>"
@@ -35,25 +36,28 @@ EOF
 
 Note: change web-proxy.domain.net to the name of your proxy machine and adapt as well the port used.
 
-`#` **`sudo mkdir -p /etc/docker`**
-
-`#` **`sudo echo '{"registry-mirrors": ["http://myregistry:5000"], "insecure-registries": ["http://myregistry:5000", "http://myregistry:5001"], "dns": ["8.8.8.8", "4.4.4.4"]}' > /etc/docker/daemon.json`**
-
-Note: adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses and myregistry to the name of your registry machine. For single machine setup the registry is the current hostname.
-
-`#` **`sudo systemctl daemon-reload`**
-
-`#` **`sudo systemctl restart docker`**
-
 You may want to read https://docs.docker.com/engine/admin/systemd/#http-proxy
 
 **For all IT departments**
 
+Create daemon.json to tell Docker about the registry and mirror that will be created and to enable their use.
+
+`#` **`mkdir -p /etc/docker`**
+
+`#` **`echo '{"registry-mirrors": ["http://myregistry:5000"], "insecure-registries": ["http://myregistry:5000", "http://myregistry:5001"], "dns": ["8.8.8.8", "4.4.4.4"]}' > /etc/docker/daemon.json`**
+
+Note: adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses and myregistry to the name of your registry machine. For single machine setup the registry is the current hostname.
+
+`#` **`systemctl daemon-reload`**
+
+`#` **`systemctl restart docker`**
+
+
 ## Install docker-compose 1.25.5
 
-`#` **`sudo curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose`**
+`#` **`curl -L https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose`**
 
-`#` **`sudo chmod +x /usr/local/bin/docker-compose`**
+`#` **`chmod +x /usr/local/bin/docker-compose`**
 
 Next steps have to be performed as a docker capable user (able to launch docker commands, user belonging to the docker group e.g.)
 
@@ -88,7 +92,7 @@ df2b2c0bd90f        registry            "/entrypoint.sh /etc..."   5 seconds ago
 75a0537d3758        registry            "/entrypoint.sh /etc..."   57 minutes ago      Up 5 seconds        0.0.0.0:5001->5000/tcp   docker-registry_registry-private_1
 ```
 
-Check that docker ps shows two registries
+Check that docker ps shows two registries. If you restart docker you will need to run setup.sh -r to start the registires.
 
 ## Build the stack
 
@@ -99,9 +103,10 @@ This will build the stack from the Internet, can be very long depending on Inter
 `$` **`playbooks/setup.sh -d`**
 
 This will deploy all containers and start the stack
+
 Then run a sanity check... after a while (stack may take up to 5 minutes to start)
 
-`$` **`playbooks/setup.sh -s`**
+`$` **`playbooks/setup.sh -t`**
 ```none
 running:timeout 10 mosquitto_sub -h mosquitto -p ok ... see logs </tmp/mosquitto>
 running:kafkacat -b broker-1 -L                  ok ... see logs </tmp/broker-1>
@@ -172,7 +177,7 @@ Further documentation on iLO REST API can be found at https://www.hpe.com/us/en/
 
 As this network path may not function we do not start the agent at stack start up.  Please use
 
-`#` **`docker service logs -f krakenmare_redfish`**
+`$` **`docker service logs -f krakenmare_redfish`**
 
 until it reports
 
@@ -182,13 +187,11 @@ use: /redfish/start.sh to actually start the container payload.
 
 Please enter the container with 
 
-```none
-docker exec -ti $(docker ps | grep redfish | awk '{print $1}') bash
-```
+`$` **`docker exec -ti $(docker ps | grep redfish | awk '{print $1}') bash`**
+
 and run as above or use
-```none
-docker exec $(docker ps | grep redfish | awk '{print $1}') /redfish/start.sh
-```
+
+`$` **`docker exec $(docker ps | grep redfish | awk '{print $1}') /redfish/start.sh`**
 
 The agent requests the chassis and from each chassis the temperatures and fans building up a map of sensors.
 This process takes several seconds.
