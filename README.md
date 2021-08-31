@@ -2,6 +2,8 @@ KrakenMare is a containerized software stack providing a versatile data pipeline
 The source code is provided under the Apache License version 2.0 (See [LICENSE](LICENSE) file at the root of the tree)
 The data is provided under the Creative Common 0 License version 1.0 (See [LICENSE.data](LICENSE.data) file at the root of the tree)
 
+This work has been supported in part by the U.S. Department of Energy under LLNS Subcontract B621301.
+
 # SINGLE MACHINE setup
 
 Configuration: 
