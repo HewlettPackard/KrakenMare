@@ -1,8 +1,15 @@
 FROM confluentinc/cp-kafka-connect:5.4.0
 
+RUN echo "kafka-connect"
+
+RUN apt-get --allow-unauthenticated install -y sed
+RUN sed -i 's/\/debian\./\/archive\.debian\./g' /etc/apt/sources.list
+RUN sed -i 's/deb http:\/\/security/#deb http:\/\/security/g' /etc/apt/sources.list
+
 # requirement for wait-for
-RUN  apt-get update && apt-get install -y netcat wget sed zulu-11 unzip && apt-get remove -y zulu-8 
-RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -
+RUN apt-get --allow-unauthenticated update \
+    && apt-get --allow-unauthenticated install -y netcat wget sed zulu-11 zip unzip && apt-get remove -y zulu-8
+RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -                  
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
 
 # get 6.0 beta with fix for https://github.com/confluentinc/kafka-connect-elasticsearch/issues/381 and https://github.com/confluentinc/kafka-connect-elasticsearch/issues/390

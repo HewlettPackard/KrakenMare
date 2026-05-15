@@ -12,12 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-FROM openjdk:8-jdk
+FROM openjdk:8-jdk AS druid
 
-# requirement for wait-for
-RUN apt update && apt install -y netcat
+# requirement for wait-for and druid (which needs python2)
+RUN apt update && apt install -y netcat python3-pip python2
 
-RUN wget https://downloads.apache.org/druid/0.17.1/apache-druid-0.17.1-bin.tar.gz \
+RUN wget https://archive.apache.org/dist/druid/0.17.1/apache-druid-0.17.1-bin.tar.gz \
     && tar -xzf apache-druid-0.17.1-bin.tar.gz \
     && mv apache-druid-0.17.1 /opt/druid/
 
@@ -32,6 +32,12 @@ RUN sed -i 's/druid-hdfs-storage/druid-avro-extensions/' /opt/druid/conf/druid/s
 RUN cd /tmp/ && wget --no-check-certificate https://api.github.com/repos/eficode/wait-for/tarball/828386460d138e418c31a1ebf87d9a40f5cedc32 -O - | tar xzf -
 
 RUN mv /tmp/eficode-wait-for-*/wait-for /tmp/
+
+# The applications bundled with druid assume that you have a python in your PATH, but no such file exists out of the box
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+# Install druid dependencies
+#COPY ./requirements.txt .
+#RUN python -m pip install -r requirements.txt
 
 COPY entrypoint.sh /tmp/
 

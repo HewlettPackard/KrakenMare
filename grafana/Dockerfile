@@ -14,6 +14,8 @@
 
 FROM grafana/grafana:6.6.2
 
+RUN echo "grafana"
+
 USER root
 RUN apk update && apk add wget
 

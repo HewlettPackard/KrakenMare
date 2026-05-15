@@ -15,7 +15,7 @@
 # under the License.
 #
 # -- license --
-container=`docker ps | grep test-tools | awk '{print $1}'` || exit 1
-docker exec -ti $container /tmp/check-pipeline.sh
-docker exec -ti $container /tmp/km-scaling-test-rate.sh
-docker exec -ti $container /tmp/query_druid.sh
+# 
+# These need to run within the container
+curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/query.json http://druid:8082/druid/v2/sql?full | jq
+curl -s -X 'POST' -H 'Content-Type:application/json' -d @/tmp/query.json http://druid:8082/druid/v2/sql?full | jq

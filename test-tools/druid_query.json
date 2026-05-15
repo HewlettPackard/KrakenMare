@@ -1,0 +1,6 @@
+{
+	"query": "SELECT datasource, SUM(\"size\") AS total_size, CASE WHEN SUM(\"size\") = 0 THEN 0 ELSE SUM(\"size\") / (COUNT(*) FILTER(WHERE \"size\" > 0)) END AS avg_size, CASE WHEN SUM(num_rows) = 0 THEN 0 ELSE SUM(\"num_rows\") / (COUNT(*) FILTER(WHERE num_rows > 0)) END AS avg_num_rows, COUNT(*) AS num_segments FROM sys.segments WHERE is_active = 1 GROUP BY 1 ORDER BY 2 DESC",
+	"context":{
+		"executionMode":"ASYNC"
+	}
+}

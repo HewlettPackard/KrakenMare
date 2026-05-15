@@ -131,6 +131,13 @@
 			<version>${avro.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- This one seems to be missing and is required to supply the Datasource class -->
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

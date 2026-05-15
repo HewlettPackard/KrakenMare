@@ -61,7 +61,12 @@ Note: adjust the 8.8.8.8 and 4.4.4.4 IP addresses to match your DNS IP addresses
 
 `#` **`chmod +x /usr/local/bin/docker-compose`**
 
-Next steps have to be performed as a docker capable user (able to launch docker commands, user belonging to the docker group e.g.)
+Next steps have to be performed as a docker capable user (able to launch docker commands, user belonging to the docker group e.g.)  You will also need to add two lines to the docker.service file in systemd (usually /usr/lib/systemd/system/docker.service).
+
+`SupplementaryGroups=docker    
+ExecStartPost=/bin/chmod 666 /var/run/docker.sock`
+
+Then reload daemon-files and restart the docker service.
 
 ## Create a km.conf file
 

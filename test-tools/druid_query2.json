@@ -1,0 +1,6 @@
+{
+        "query": "SELECT * FROM INFORMATION_SCHEMA.TABLES",
+        "context":{
+                "executionMode":"ASYNC"
+        }
+}
